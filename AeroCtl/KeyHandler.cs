@@ -118,16 +118,6 @@ namespace AeroCtl
 
 			// Create a dummy form to capture the input events.
 			this.form = new DummyForm();
-			this.form.HandleCreated += (s, e) =>
-			{
-				RAWINPUTDEVICE[] pRawInputDevice = new RAWINPUTDEVICE[1];
-				pRawInputDevice[0].usUsagePage = 65282;
-				pRawInputDevice[0].usUsage = 1;
-				pRawInputDevice[0].dwFlags = RAWINPUTDEVICE.RIDEV_INPUTSINK | RAWINPUTDEVICE.RIDEV_DEVNOTIFY;
-				pRawInputDevice[0].hwndTarget = this.form.Handle;
-				if (!User32.RegisterRawInputDevices(pRawInputDevice, (uint)pRawInputDevice.Length, (uint)Marshal.SizeOf<RAWINPUTDEVICE>()))
-					throw new ApplicationException("Failed to register raw input device(s).");
-			};
 			this.form.RawInputReceived += this.onRawInput;
 		}
 
@@ -155,6 +145,24 @@ namespace AeroCtl
 		private sealed class DummyForm : Form
 		{
 			public event EventHandler<RAWINPUT> RawInputReceived;
+
+			public DummyForm()
+			{
+				this.CreateHandle();
+			}
+
+			protected override void OnHandleCreated(EventArgs e)
+			{
+				base.OnHandleCreated(e);
+
+				RAWINPUTDEVICE[] pRawInputDevice = new RAWINPUTDEVICE[1];
+				pRawInputDevice[0].usUsagePage = 65282;
+				pRawInputDevice[0].usUsage = 1;
+				pRawInputDevice[0].dwFlags = RAWINPUTDEVICE.RIDEV_INPUTSINK | RAWINPUTDEVICE.RIDEV_DEVNOTIFY;
+				pRawInputDevice[0].hwndTarget = this.Handle;
+				if (!User32.RegisterRawInputDevices(pRawInputDevice, (uint)pRawInputDevice.Length, (uint)Marshal.SizeOf<RAWINPUTDEVICE>()))
+					throw new ApplicationException("Failed to register raw input device(s).");
+			}
 
 			protected override void WndProc(ref Message m)
 			{
