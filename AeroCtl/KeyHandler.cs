@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -14,6 +15,9 @@ namespace AeroCtl
 	{
 		#region Fields
 
+		/// <summary>
+		/// Probably the keyboard device GUID.
+		/// </summary>
 		private static readonly Guid deviceGuid = new Guid("4D1E55B2-F16F-11CF-88CB-001111000030");
 
 		/// <summary>
@@ -124,6 +128,12 @@ namespace AeroCtl
 				if (!User32.RegisterRawInputDevices(pRawInputDevice, (uint)pRawInputDevice.Length, (uint)Marshal.SizeOf<RAWINPUTDEVICE>()))
 					throw new ApplicationException("Failed to register raw input device(s).");
 			};
+			this.form.RawInputReceived += this.onRawInput;
+		}
+
+		private void onRawInput(object sender, RAWINPUT e)
+		{
+			Console.WriteLine($"type={e.header.dwType} MakeCode={e.data.keyboard.MakeCode} Flags={e.data.keyboard.Flags} VKey={e.data.keyboard.VKey} Message={e.data.keyboard.Message:X8} Extra={e.data.keyboard.ExtraInformation}");
 		}
 
 		#endregion
@@ -144,11 +154,23 @@ namespace AeroCtl
 		/// </summary>
 		private sealed class DummyForm : Form
 		{
+			public event EventHandler<RAWINPUT> RawInputReceived;
+
 			protected override void WndProc(ref Message m)
 			{
 				if (m.Msg == 0xFF) // WM_INPUT
 				{
-					Console.WriteLine(m);
+					int sizeOfRawInput = Marshal.SizeOf<RAWINPUTHEADER>();
+					int size = 0;
+
+					if (User32.GetRawInputData(m.LParam, User32.RID_INPUT, IntPtr.Zero, ref size, sizeOfRawInput) == -1)
+						throw new Win32Exception(Marshal.GetLastWin32Error());
+
+					if (User32.GetRawInputData(m.LParam, User32.RID_INPUT, out RAWINPUT rawInput, ref size, sizeOfRawInput) == -1)
+						throw new Win32Exception(Marshal.GetLastWin32Error());
+
+					this.RawInputReceived?.Invoke(this, rawInput);
+
 					return;
 				}
 

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading.Tasks;
 using System.Windows.Forms;
@@ -7,17 +8,22 @@ using AeroCtl.UI;
 
 namespace AeroCtl
 {
-	static class Program
+	public static class Program
 	{
 		/// <summary>
 		/// The main entry point for the application.
 		/// </summary>
 		[STAThread]
-		static void Main()
+		public static void Main()
 		{
 			Application.EnableVisualStyles();
 			Application.SetCompatibleTextRenderingDefault(false);
-			Application.Run(new MainWindow());
+
+			using (AeroWmi wmi = new AeroWmi())
+			using (Aero aero = new Aero(wmi))
+			{
+				Application.Run(new MainWindow(aero));
+			}
 		}
 	}
 }

@@ -6,7 +6,10 @@ using System.Threading.Tasks;
 
 namespace AeroCtl
 {
-	public class Aero
+	/// <summary>
+	/// Implements the AERO interfaces.
+	/// </summary>
+	public class Aero : IDisposable
 	{
 		#region Fields
 
@@ -16,6 +19,14 @@ namespace AeroCtl
 
 		#region Properties
 
+		/// <summary>
+		/// Gets Keyboard Fn key handler.
+		/// </summary>
+		public KeyHandler Keys { get; }
+
+		/// <summary>
+		/// Gets the fan controller.
+		/// </summary>
 		public FanController Fans { get; }
 
 		#endregion
@@ -25,11 +36,20 @@ namespace AeroCtl
 		public Aero(AeroWmi wmi)
 		{
 			this.wmi = wmi;
+
+			this.Keys = new KeyHandler();
+			this.Fans = new FanController(wmi);
 		}
 
 		#endregion
 
 		#region Methods
+
+		public void Dispose()
+		{
+			this.wmi?.Dispose();
+			this.Keys?.Dispose();
+		}
 
 		#endregion
 	}

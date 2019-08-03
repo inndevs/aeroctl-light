@@ -4,9 +4,12 @@ namespace AeroCtl.UI
 {
 	public partial class MainWindow : Form
 	{
-		public MainWindow()
+		private readonly Aero aero;
+
+		public MainWindow(Aero aero)
 		{
 			this.InitializeComponent();
+			this.aero = aero;
 		}
 	}
 }
