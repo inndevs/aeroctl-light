@@ -76,7 +76,7 @@
                     <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.FixedFan}">Fixed Fan</CheckBox>
                     <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.StepFan}">Step Fan</CheckBox>
                     <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.MaxFan}">Max Fan</CheckBox>
-                    <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.NvThermalTarget}">NvTermalTarget (?)</CheckBox>
+                    <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.NvThermalTarget}">NvThermalTarget (?)</CheckBox>
 
                     <Label Target="{Binding ElementName=fanAdjust}">Fan Adjust</Label>
                     <Slider Name="fanAdjust" Minimum="0" Maximum="229" IsSnapToTickEnabled="True" Value="{Binding ElementName=this, Path=Aero.FanAdjust}" />
@@ -85,7 +85,7 @@
                     <Slider Name="fixedFanSpeed" Minimum="0" Maximum="229" IsSnapToTickEnabled="True" Value="{Binding ElementName=this, Path=Aero.FixedFanSpeed}" />
 
                     <Button Click="ButtonBase_OnClick">Reload</Button>
-                    <DataGrid Name="curveGrid" ItemsSource="{Binding ElementName=this, Path=Aero.FanCurve}" Height="320">
+                    <DataGrid Name="curveGrid" Height="320">
 
                     </DataGrid>
                 </StackPanel>
