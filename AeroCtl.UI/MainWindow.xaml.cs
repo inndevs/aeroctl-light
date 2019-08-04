@@ -76,30 +76,9 @@ namespace AeroCtl.UI
 			}
 		}
 
-		private async Task kbdTest(CancellationToken token)
-		{
-			//LightColor color = 0;
-			await this.aero.Keyboard.Rgb.SetEffectAsync(LightEffect.Static, 1, 50, LightColor.Orange, 0);
-
-			byte[] temp = new byte[512];
-
-			for (int i = 0; i < temp.Length; i += 4)
-			{
-				temp[i + 0] = 0;
-				temp[i + 1] = 0;
-				temp[i + 2] = 200;
-				temp[i + 3] = 255;
-			}
-
-			await this.aero.Keyboard.Rgb.SetEffectAsync(LightEffect.Custom1, 5, 50, LightColor.Green, 0);
-			await this.aero.Keyboard.Rgb.SetImageAsync(0, temp);
-		}
-
 		private async Task updateLoop(CancellationToken token)
 		{
 			bool first = true;
-
-			Task test = Task.Run(() => this.kbdTest(token));
 
 			await Task.Yield();
 			try
@@ -117,7 +96,6 @@ namespace AeroCtl.UI
 			}
 			finally
 			{
-				await test;
 				this.aero.Dispose();
 				this.wmi.Dispose();
 
