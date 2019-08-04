@@ -4,7 +4,7 @@ using Microsoft.Win32.SafeHandles;
 
 namespace AeroCtl.Native
 {
-	internal static class Kernel32
+	public static class Kernel32
 	{
 		private const string lib = "kernel32.dll";
 
@@ -54,5 +54,9 @@ namespace AeroCtl.Native
 
 		[DllImport(lib)]
 		public static extern int CloseHandle(int hObject);
+
+		[DllImport(lib)]
+		public static extern void GetSystemPowerStatus(out SYSTEM_POWER_STATUS lpSystemPowerStatus);
+
 	}
 }

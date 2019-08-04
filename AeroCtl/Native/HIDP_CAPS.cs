@@ -2,7 +2,7 @@
 
 namespace AeroCtl.Native
 {
-	internal struct HIDP_CAPS
+	public struct HIDP_CAPS
 	{
 		public ushort Usage;
 		public ushort UsagePage;

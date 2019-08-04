@@ -1,0 +1,38 @@
+﻿<Window x:Class="AeroCtl.UI.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        xmlns:local="clr-namespace:AeroCtl.UI"
+        mc:Ignorable="d"
+        DataContext="{Binding RelativeSource={RelativeSource Self}}"
+        Title="AERO Controls" Height="450" Width="800" Name="this">
+    <StackPanel>
+        <GroupBox Header="Info">
+            <StackPanel>
+                <Label Target="{Binding ElementName=baseBoard}">Model / Base Board</Label>
+                <TextBox Name="baseBoard" IsReadOnly="True" Text="{Binding ElementName=this, Path=AeroState.BaseBoard}"></TextBox>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="Switches">
+            <StackPanel>
+                <CheckBox>Wifi</CheckBox>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="Fans">
+            <StackPanel>
+                <Label Target="{Binding ElementName=rpm1}">Fan RPM 1:</Label>
+                <TextBlock Name="rpm1" Text="{Binding ElementName=this, Path=AeroState.FanRpm1}"></TextBlock>
+
+                <Label Target="{Binding ElementName=rpm2}">Fan RPM 2:</Label>
+                <TextBlock Name="rpm2" Text="{Binding ElementName=this, Path=AeroState.FanRpm2}"></TextBlock>
+            </StackPanel>
+        </GroupBox>
+        <GroupBox Header="Screen">
+            <StackPanel>
+                <Label Target="{Binding ElementName=screenBrightness}">Screen brightness:</Label>
+                <Slider Minimum="0" Maximum="100" Value="{Binding ElementName=this, Path=AeroState.ScreenBrightness}" />
+            </StackPanel>
+        </GroupBox>
+    </StackPanel>
+</Window>

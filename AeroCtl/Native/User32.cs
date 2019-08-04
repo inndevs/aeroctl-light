@@ -4,7 +4,7 @@ using System.Threading;
 
 namespace AeroCtl.Native
 {
-	internal class User32
+	public class User32
 	{
 		private const string lib = "user32.dll";
 		
@@ -32,5 +32,11 @@ namespace AeroCtl.Native
 			IntPtr pData,
 			[In, Out] ref int pcbSize,
 			int cbSizeHeader);
+
+		[DllImport(lib, SetLastError = true)]
+		public static extern IntPtr RegisterPowerSettingNotification(
+		  IntPtr hRecipient,
+		  ref Guid PowerSettingGuid,
+		  uint Flags);
 	}
 }

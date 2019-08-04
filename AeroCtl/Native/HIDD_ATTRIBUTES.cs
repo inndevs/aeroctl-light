@@ -1,6 +1,6 @@
 ﻿namespace AeroCtl.Native
 {
-	internal struct HIDD_ATTRIBUTES
+	public struct HIDD_ATTRIBUTES
 	{
 		public int Size;
 		public ushort VendorID;

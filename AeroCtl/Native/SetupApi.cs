@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AeroCtl.Native
 {
-	internal class SetupApi
+	public class SetupApi
 	{
 		[DllImport("setupapi.dll", SetLastError = true)]
 		private static extern bool SetupDiEnumDeviceInfo(

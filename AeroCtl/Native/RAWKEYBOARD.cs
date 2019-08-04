@@ -3,7 +3,7 @@
 namespace AeroCtl.Native
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct RAWKEYBOARD
+	public struct RAWKEYBOARD
 	{
 		public ushort MakeCode;
 		public ushort Flags;

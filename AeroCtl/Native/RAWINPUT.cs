@@ -3,7 +3,7 @@
 namespace AeroCtl.Native
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct RAWINPUT
+	public struct RAWINPUT
 	{
 		[StructLayout(LayoutKind.Explicit)]
 		public struct Union

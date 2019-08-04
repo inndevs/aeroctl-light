@@ -2,7 +2,7 @@
 
 namespace AeroCtl.Native
 {
-	internal struct SP_DEVICE_INTERFACE_DATA
+	public struct SP_DEVICE_INTERFACE_DATA
 	{
 		public uint cbSize;
 		public Guid InterfaceClassGuid;

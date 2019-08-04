@@ -13,11 +13,16 @@ namespace AeroCtl
 	{
 		#region Fields
 
-		private readonly AeroWmi wmi;
-
 		#endregion
 
 		#region Properties
+
+		/// <summary>
+		/// Gets the WMI interface.
+		/// </summary>
+		private AeroWmi Wmi { get; }
+
+		public string BaseBoard => this.Wmi.BaseBoard;
 
 		/// <summary>
 		/// Gets Keyboard Fn key handler.
@@ -29,16 +34,21 @@ namespace AeroCtl
 		/// </summary>
 		public FanController Fans { get; }
 
+		/// <summary>
+		/// Gets the screen controller.
+		/// </summary>
+		public ScreenController Screen { get; }
+
 		#endregion
 
 		#region Constructors
 
 		public Aero(AeroWmi wmi)
 		{
-			this.wmi = wmi;
-
+			this.Wmi = wmi;
 			this.Keys = new KeyHandler();
 			this.Fans = new FanController(wmi);
+			this.Screen = new ScreenController(wmi);
 		}
 
 		#endregion
@@ -47,7 +57,7 @@ namespace AeroCtl
 
 		public void Dispose()
 		{
-			this.wmi?.Dispose();
+			this.Wmi?.Dispose();
 			this.Keys?.Dispose();
 		}
 

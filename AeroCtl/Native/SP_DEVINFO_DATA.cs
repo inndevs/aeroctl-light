@@ -2,7 +2,7 @@
 
 namespace AeroCtl.Native
 {
-	internal struct SP_DEVINFO_DATA
+	public struct SP_DEVINFO_DATA
 	{
 		public uint cbSize;
 		public Guid ClassGuid;

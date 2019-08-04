@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace AeroCtl.Native
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct RAWINPUTHEADER
+	public struct RAWINPUTHEADER
 	{
 		public const int RIM_TYPEMOUSE = 0;
 		public const int RIM_TYPEKEYBOARD = 1;

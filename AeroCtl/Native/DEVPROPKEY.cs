@@ -2,7 +2,7 @@
 
 namespace AeroCtl.Native
 {
-	internal struct DEVPROPKEY
+	public struct DEVPROPKEY
 	{
 		public static readonly DEVPROPKEY DEVPKEY_Device_BusReportedDeviceDesc = new DEVPROPKEY
 		{

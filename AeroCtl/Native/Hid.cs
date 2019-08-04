@@ -32,7 +32,7 @@ namespace AeroCtl.Native
 		Tablet = 128, // 0x0080
 	}
 
-	internal class Hid
+	public class Hid
 	{
 		private const string lib = "hid.dll";
 

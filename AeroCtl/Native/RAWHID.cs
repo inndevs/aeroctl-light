@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace AeroCtl.Native
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct RAWHID
+	public struct RAWHID
 	{
 		public int dwSizeHid;
 		public int dwCount;

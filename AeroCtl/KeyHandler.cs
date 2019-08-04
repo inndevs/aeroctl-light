@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -123,7 +124,7 @@ namespace AeroCtl
 
 		private void onRawInput(object sender, RAWINPUT e)
 		{
-			Console.WriteLine($"type={e.header.dwType} MakeCode={e.data.keyboard.MakeCode} Flags={e.data.keyboard.Flags} VKey={e.data.keyboard.VKey} Message={e.data.keyboard.Message:X8} Extra={e.data.keyboard.ExtraInformation}");
+			Debug.WriteLine($"type={e.header.dwType} MakeCode={e.data.keyboard.MakeCode} Flags={e.data.keyboard.Flags} VKey={e.data.keyboard.VKey} Message={e.data.keyboard.Message:X8} Extra={e.data.keyboard.ExtraInformation}");
 		}
 
 		#endregion

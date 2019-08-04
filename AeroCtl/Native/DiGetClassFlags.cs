@@ -3,7 +3,7 @@
 namespace AeroCtl.Native
 {
 	[Flags]
-	internal enum DiGetClassFlags
+	public enum DiGetClassFlags
 	{
 		Default = 1,
 		Present = 2,

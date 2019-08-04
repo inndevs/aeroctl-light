@@ -11,8 +11,16 @@ namespace AeroCtl
 		public ManagementClass SetClass { get; }
 		public ManagementObject Set { get; }
 
+		public string BaseBoard { get; }
+
 		public AeroWmi()
 		{
+			ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BaseBoard");
+			foreach (ManagementObject managementObject in managementObjectSearcher.Get())
+			{
+				this.BaseBoard = managementObject["Product"].ToString();
+			}
+
 			ManagementScope scope = new ManagementScope("root\\WMI", new ConnectionOptions
 			{
 				EnablePrivileges = true,

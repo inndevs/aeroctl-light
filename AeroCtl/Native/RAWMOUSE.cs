@@ -3,7 +3,7 @@
 namespace AeroCtl.Native
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct RAWMOUSE
+	public struct RAWMOUSE
 	{
 		public const ushort MOUSE_MOVE_RELATIVE = 0;
 		public const ushort MOUSE_MOVE_ABSOLUTE = 1;

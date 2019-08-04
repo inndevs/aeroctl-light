@@ -4,7 +4,7 @@ using System.Runtime.InteropServices;
 namespace AeroCtl.Native
 {
 	[StructLayout(LayoutKind.Sequential)]
-	internal struct RAWINPUTDEVICE
+	public struct RAWINPUTDEVICE
 	{
 		public const uint RIDEV_NONE = 0x0000;
 		public const uint RIDEV_REMOVE = 0x0001;
