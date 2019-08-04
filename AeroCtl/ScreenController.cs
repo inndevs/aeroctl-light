@@ -30,9 +30,39 @@ namespace AeroCtl
 			}
 		}
 
+		// not functional.
+		//public bool Backlight
+		//{
+		//	get
+		//	{
+		//		ManagementBaseObject inParams = this.wmi.GetClass.GetMethodParameters("GetBirightnessOff"); // sic
+		//		ManagementBaseObject outParams = this.wmi.Get.InvokeMethod("GetBirightnessOff", inParams, null);
+		//		return Convert.ToByte(outParams["Data"]) == 0;
+		//	}
+		//}
+
 		public ScreenController(AeroWmi wmi)
 		{
 			this.wmi = wmi;
+		}
+
+		public bool ToggleScreen()
+		{
+			ManagementBaseObject inParams = this.wmi.SetClass.GetMethodParameters("SetBrightnessOff");
+			inParams["Data"] = (byte)1;
+
+			try
+			{
+				ManagementBaseObject outParams = this.wmi.Set.InvokeMethod("SetBrightnessOff", inParams, null);
+				byte dataOut = Convert.ToByte(outParams["DataOut"]);
+				return true;
+			}
+			catch (ManagementException)
+			{
+				// Apparently this is expected to throw an exception for whatever reason, even though it does toggle the screen.
+			}
+
+			return false;
 		}
 
 		public int IncreaseBrightness()

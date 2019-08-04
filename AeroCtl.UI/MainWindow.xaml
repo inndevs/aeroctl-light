@@ -7,32 +7,72 @@
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="AERO Controls" Height="450" Width="800" Name="this">
-    <StackPanel>
-        <GroupBox Header="Info">
-            <StackPanel>
-                <Label Target="{Binding ElementName=baseBoard}">Model / Base Board</Label>
-                <TextBox Name="baseBoard" IsReadOnly="True" Text="{Binding ElementName=this, Path=AeroState.BaseBoard}"></TextBox>
-            </StackPanel>
-        </GroupBox>
-        <GroupBox Header="Switches">
-            <StackPanel>
-                <CheckBox>Wifi</CheckBox>
-            </StackPanel>
-        </GroupBox>
-        <GroupBox Header="Fans">
-            <StackPanel>
-                <Label Target="{Binding ElementName=rpm1}">Fan RPM 1:</Label>
-                <TextBlock Name="rpm1" Text="{Binding ElementName=this, Path=AeroState.FanRpm1}"></TextBlock>
+    <ScrollViewer>
+        <StackPanel>
+            <GroupBox Header="Info" Margin="5 5 5 0">
+                <StackPanel>
+                    <Label Target="{Binding ElementName=baseBoard}">Model / Base Board</Label>
+                    <TextBox Name="baseBoard" IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.BaseBoard, Mode=OneWay}"></TextBox>
 
-                <Label Target="{Binding ElementName=rpm2}">Fan RPM 2:</Label>
-                <TextBlock Name="rpm2" Text="{Binding ElementName=this, Path=AeroState.FanRpm2}"></TextBlock>
-            </StackPanel>
-        </GroupBox>
-        <GroupBox Header="Screen">
-            <StackPanel>
-                <Label Target="{Binding ElementName=screenBrightness}">Screen brightness:</Label>
-                <Slider Minimum="0" Maximum="100" Value="{Binding ElementName=this, Path=AeroState.ScreenBrightness}" />
-            </StackPanel>
-        </GroupBox>
-    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0 0 5 0">CPU Temperature:</TextBlock>
+                        <TextBlock Text="{Binding ElementName=this, Path=Aero.CpuTemperature, Mode=OneWay}" />
+                        <TextBlock Margin="5 0 0 0">°C</TextBlock>
+                    </StackPanel>
+
+                    <CheckBox Name="wifiCheck" IsChecked="{Binding ElementName=this, Path=Aero.WifiEnabled}">Wifi</CheckBox>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Fans" Margin="5 5 5 0">
+                <StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0 0 5 0">Fan 1 RPM:</TextBlock>
+                        <TextBlock Text="{Binding ElementName=this, Path=Aero.FanRpm1, Mode=OneWay}"></TextBlock>
+                    </StackPanel>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0 0 5 0">Fan 2 RPM:</TextBlock>
+                        <TextBlock Text="{Binding ElementName=this, Path=Aero.FanRpm2, Mode=OneWay}"></TextBlock>
+                    </StackPanel>
+
+                    <StackPanel Orientation="Horizontal">
+                        <Button Name="fanProfileQuiet" Click="FanProfileQuiet_OnClick">Quiet</Button>
+                        <Button Name="fanProfileNormal" Click="FanProfileNormal_OnClick">Normal</Button>
+                        <Button Name="fanProfileGaming" Click="FanProfileGaming_OnClick">Gaming</Button>
+                        <Button Name="fanProfileAuto" Click="FanProfileAuto_OnClick">Custom (Auto)</Button>
+                        <Button Name="fanProfileFixed" Click="FanProfileFixed_OnClick">Custom (Fixed)</Button>
+                    </StackPanel>
+
+                    <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.AutoFan}">Auto Fan</CheckBox>
+                    <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.FixedFan}">Fixed Fan</CheckBox>
+                    <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.StepFan}">Step Fan</CheckBox>
+                    <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.MaxFan}">Max Fan</CheckBox>
+                    <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.NvThermalTarget}">NvTermalTarget (?)</CheckBox>
+
+                    <Label Target="{Binding ElementName=fanAdjust}">Fan Adjust</Label>
+                    <Slider Name="fanAdjust" Minimum="0" Maximum="229" IsSnapToTickEnabled="True" Value="{Binding ElementName=this, Path=Aero.FanAdjust}" />
+
+                    <Label Target="{Binding ElementName=fixedFanSpeed}">Fixed Fan Speed</Label>
+                    <Slider Name="fixedFanSpeed" Minimum="0" Maximum="229" IsSnapToTickEnabled="True" Value="{Binding ElementName=this, Path=Aero.FixedFanSpeed}" />
+
+                    <Button Click="ButtonBase_OnClick">Reload</Button>
+                    <DataGrid Name="curveGrid" ItemsSource="{Binding ElementName=this, Path=Aero.FanCurve}" Height="320">
+
+                    </DataGrid>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Display" Margin="5 5 5 0">
+                <StackPanel>
+                    <Label Target="{Binding ElementName=screenBrightness}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="0 0 5 0">Screen brightness:</TextBlock>
+                            <TextBlock Text="{Binding ElementName=this, Path=Aero.ScreenBrightness, Mode=OneWay}" />
+                        </StackPanel>
+                    </Label>
+                    <Slider Minimum="0" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding ElementName=this, Path=Aero.ScreenBrightness}" />
+                </StackPanel>
+            </GroupBox>
+        </StackPanel>
+    </ScrollViewer>
 </Window>

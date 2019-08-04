@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Management;
 
 namespace AeroCtl
@@ -44,6 +46,25 @@ namespace AeroCtl
 
 				this.Set = (ManagementObject)enumerator.Current;
 			}
+		}
+
+		public T InvokeSet<T>(string methodName, T value)
+		{
+			ManagementBaseObject inParams = this.SetClass.GetMethodParameters(methodName);
+			inParams["Data"] = value;
+			ManagementBaseObject outParams = this.Set.InvokeMethod(methodName, inParams, null);
+
+			if (outParams == null)
+				return default;
+
+			return (T)outParams["DataOut"];
+		}
+
+		public T InvokeGet<T>(string methodName)
+		{
+			ManagementBaseObject inParams = this.GetClass.GetMethodParameters(methodName);
+			ManagementBaseObject outParams = this.Get.InvokeMethod(methodName, inParams, null);
+			return (T)outParams["Data"];
 		}
 
 		public void Dispose()

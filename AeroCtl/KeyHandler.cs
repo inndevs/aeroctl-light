@@ -12,6 +12,26 @@ using Microsoft.Win32.SafeHandles;
 
 namespace AeroCtl
 {
+	public enum FnKey
+	{
+		ToggleFan,
+		ToggleWifi,
+		ToggleTouchpad,
+		ToggleScreen,
+		DecreaseBrightness,
+		IncreaseBrightness,
+	}
+
+	public class FnKeyEventArgs : EventArgs
+	{
+		public FnKey Key { get; }
+
+		public FnKeyEventArgs(FnKey key)
+		{
+			this.Key = key;
+		}
+	}
+
 	public class KeyHandler : IDisposable
 	{
 		#region Fields
@@ -51,7 +71,7 @@ namespace AeroCtl
 				}
 			}
 		};
-		
+
 		private readonly DummyForm form;
 
 		#endregion
@@ -122,8 +142,39 @@ namespace AeroCtl
 			this.form.RawInputReceived += this.onRawInput;
 		}
 
+		public event EventHandler<FnKeyEventArgs> FnKeyPressed;
+
 		private void onRawInput(object sender, RAWINPUT e)
 		{
+			if(e.header.dwType == 2 && e.data.keyboard.MakeCode == 4)
+			{
+				switch(e.data.keyboard.Message)
+				{
+					case 0x7C000004: // Wifi.
+						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleWifi));
+						return;
+
+					case 0x7D000004: // Decrease brightness.
+						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.DecreaseBrightness));
+						return;
+
+					case 0x7E000004: // Increase brightness.
+						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.IncreaseBrightness));
+						return;
+
+					case 0x80000004: // Screen toggle.
+						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleScreen));
+						return;
+
+					case 0x81000004: // Toggle touchpad on/off.
+						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleTouchpad));
+						return;
+
+					case 0x84000004: // Max fan.
+						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleFan));
+						return;
+				}
+			}
 			Debug.WriteLine($"type={e.header.dwType} MakeCode={e.data.keyboard.MakeCode} Flags={e.data.keyboard.Flags} VKey={e.data.keyboard.VKey} Message={e.data.keyboard.Message:X8} Extra={e.data.keyboard.ExtraInformation}");
 		}
 
