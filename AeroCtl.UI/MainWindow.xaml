@@ -11,8 +11,10 @@
         <StackPanel>
             <GroupBox Header="Info" Margin="5 5 5 0">
                 <StackPanel>
-                    <Label Target="{Binding ElementName=baseBoard}">Model / Base Board</Label>
-                    <TextBox Name="baseBoard" IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.BaseBoard, Mode=OneWay}"></TextBox>
+                    <StackPanel Orientation="Horizontal">
+                        <TextBlock Margin="0 0 5 0">Model / Base board:</TextBlock>
+                        <TextBox Name="baseBoard" IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.BaseBoard, Mode=OneWay}"></TextBox>
+                    </StackPanel>
 
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="0 0 5 0">CPU Temperature:</TextBlock>
@@ -21,6 +23,33 @@
                     </StackPanel>
 
                     <CheckBox Name="wifiCheck" IsChecked="{Binding ElementName=this, Path=Aero.WifiEnabled}">Wifi</CheckBox>
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Display" Margin="5 5 5 0">
+                <StackPanel>
+                    <Label Target="{Binding ElementName=screenBrightness}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="0 0 5 0">Screen brightness:</TextBlock>
+                            <TextBlock Text="{Binding ElementName=this, Path=Aero.ScreenBrightness, Mode=OneWay}" />
+                        </StackPanel>
+                    </Label>
+                    <Slider Name="screenBrightness" Minimum="0" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding ElementName=this, Path=Aero.ScreenBrightness}" />
+                </StackPanel>
+            </GroupBox>
+
+            <GroupBox Header="Battery" Margin="5 5 5 0">
+                <StackPanel>
+                    <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.ChargeStopEnabled}">Enable charge stop</CheckBox>
+
+                    <Label Target="{Binding ElementName=chargeStop}">
+                        <StackPanel Orientation="Horizontal">
+                            <TextBlock Margin="0 0 5 0">Charge stop:</TextBlock>
+                            <TextBlock Text="{Binding ElementName=this, Path=Aero.ChargeStop, Mode=OneWay}" />
+                            <TextBlock Margin="5 0 0 0">%</TextBlock>
+                        </StackPanel>
+                    </Label>
+                    <Slider Name="chargeStop" Minimum="1" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding ElementName=this, Path=Aero.ChargeStop}" />
                 </StackPanel>
             </GroupBox>
 
@@ -59,33 +88,6 @@
                     <DataGrid Name="curveGrid" ItemsSource="{Binding ElementName=this, Path=Aero.FanCurve}" Height="320">
 
                     </DataGrid>
-                </StackPanel>
-            </GroupBox>
-
-            <GroupBox Header="Display" Margin="5 5 5 0">
-                <StackPanel>
-                    <Label Target="{Binding ElementName=screenBrightness}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Margin="0 0 5 0">Screen brightness:</TextBlock>
-                            <TextBlock Text="{Binding ElementName=this, Path=Aero.ScreenBrightness, Mode=OneWay}" />
-                        </StackPanel>
-                    </Label>
-                    <Slider Name="screenBrightness" Minimum="0" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding ElementName=this, Path=Aero.ScreenBrightness}" />
-                </StackPanel>
-            </GroupBox>
-
-            <GroupBox Header="Battery" Margin="5 5 5 0">
-                <StackPanel>
-                    <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.ChargeStopEnabled}">Enable charge stop</CheckBox>
-
-                    <Label Target="{Binding ElementName=chargeStop}">
-                        <StackPanel Orientation="Horizontal">
-                            <TextBlock Margin="0 0 5 0">Charge stop:</TextBlock>
-                            <TextBlock Text="{Binding ElementName=this, Path=Aero.ChargeStop, Mode=OneWay}" />
-                            <TextBlock Margin="5 0 0 0">%</TextBlock>
-                        </StackPanel>
-                    </Label>
-                    <Slider Name="chargeStop" Minimum="1" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding ElementName=this, Path=Aero.ChargeStop}" />
                 </StackPanel>
             </GroupBox>
         </StackPanel>

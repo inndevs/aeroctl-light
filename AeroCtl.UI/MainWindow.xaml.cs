@@ -25,8 +25,6 @@ namespace AeroCtl.UI
 		private readonly Aero aero;
 		private readonly AeroWmi wmi;
 
-		private Task updateTask;	
-		
 		public AeroController Aero { get; }
 
 		public MainWindow()
@@ -40,20 +38,20 @@ namespace AeroCtl.UI
 			this.InitializeComponent();
 
 			CancellationTokenSource cts = new CancellationTokenSource();
+			Task updateTask = this.updateLoop(cts.Token);
 			this.Closing += async (s, e) =>
 			{
 				cts.Cancel();
 				
 				try
 				{
-					await this.updateTask;
+					await updateTask;
 				}
 				catch (TaskCanceledException)
 				{
 
 				}
 			};
-			this.updateTask = this.updateLoop(cts.Token);
 		}
 
 		private void onFnKeyPressed(object sender, FnKeyEventArgs e)
@@ -61,11 +59,11 @@ namespace AeroCtl.UI
 			switch(e.Key)
 			{
 				case FnKey.IncreaseBrightness:
-					this.aero.Screen.Brightness = Math.Min(100, this.Aero.ScreenBrightness + 5);
+					this.aero.Screen.Brightness = Math.Min(100, this.aero.Screen.Brightness + 5);
 					break;
 
 				case FnKey.DecreaseBrightness:
-					this.aero.Screen.Brightness = Math.Max(0, this.Aero.ScreenBrightness - 5);
+					this.aero.Screen.Brightness = Math.Max(0, this.aero.Screen.Brightness - 5);
 					break;
 
 				case FnKey.ToggleWifi:
