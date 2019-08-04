@@ -36,6 +36,8 @@ namespace AeroCtl.Native
 	{
 		private const string lib = "hid.dll";
 
+		public const int HIDP_STATUS_SUCCESS = 0x11 << 16;
+
 		[DllImport(lib, SetLastError = true)]
 		public static extern void HidD_GetHidGuid(ref Guid hidGuid);
 
@@ -53,23 +55,40 @@ namespace AeroCtl.Native
 		[DllImport(lib, SetLastError = true)]
 		public static extern bool HidD_GetPreparsedData(
 			SafeFileHandle HidDeviceObject,
-			ref IntPtr PreparsedData);
+			out IntPtr PreparsedData);
 
 		[DllImport(lib, SetLastError = true)]
-		public static extern bool HidD_FreePreparsedData(ref IntPtr PreparsedData);
+		public static extern bool HidD_FreePreparsedData(IntPtr PreparsedData);
 
 		[DllImport(lib, SetLastError = true)]
-		public static extern int HidP_GetCaps(IntPtr preparsedData, ref HIDP_CAPS capabilities);
+		public static extern int HidP_GetCaps(IntPtr preparsedData, out HIDP_CAPS capabilities);
 
 		[DllImport(lib, SetLastError = true)]
 		public static extern bool HidD_FlushQueue(SafeFileHandle HidDeviceObject);
 
+		[DllImport(lib, SetLastError = true)]
+		public static extern bool HidD_GetFeature(
+			SafeFileHandle hidDeviceObject,
+			[MarshalAs(UnmanagedType.LPArray)] byte[] lpReportBuffer,
+			int reportBufferLength);
 
-		[DllImport(lib, CallingConvention = CallingConvention.StdCall, SetLastError = true)]
+		[DllImport(lib, SetLastError = true)]
+		public static extern bool HidD_GetFeature(
+			SafeFileHandle hidDeviceObject,
+			ref byte lpReportBuffer,
+			int reportBufferLength);
+
+		[DllImport(lib, SetLastError = true)]
 		public static extern bool HidD_SetFeature(
 			SafeFileHandle hDevice,
-			byte[] ReportBuffer,
+			[MarshalAs(UnmanagedType.LPArray)] byte[] ReportBuffer,
 			uint ReportBufferLength);
+
+		[DllImport(lib, SetLastError = true)]
+		public static extern bool HidD_SetFeature(
+			SafeFileHandle hidDeviceObject,
+			ref byte lpReportBuffer,
+			int reportBufferLength);
 
 		[StructLayout(LayoutKind.Sequential)]
 		public class SP_DEVINFO_DATA

@@ -53,6 +53,13 @@
                 </StackPanel>
             </GroupBox>
 
+            <GroupBox Header="Keyboard" Margin="5 5 5 0">
+                <StackPanel Orientation="Horizontal">
+                    <TextBlock Margin="0 0 5 0">Firmware version:</TextBlock>
+                    <TextBox IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.KeyboardFWVersion, Mode=OneWay}" />
+                </StackPanel>
+            </GroupBox>
+
             <GroupBox Header="Fans" Margin="5 5 5 0">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">

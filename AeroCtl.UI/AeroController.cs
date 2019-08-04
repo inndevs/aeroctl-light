@@ -27,6 +27,17 @@ namespace AeroCtl.UI
 			}
 		}
 
+		private Version keyboardFWVersion;
+		public Version KeyboardFWVersion
+		{
+			get => this.keyboardFWVersion;
+			set
+			{
+				this.keyboardFWVersion = value;
+				this.OnPropertyChanged();
+			}
+		}
+
 		private int cpuTemperature;
 		public int CpuTemperature
 		{
@@ -247,11 +258,19 @@ namespace AeroCtl.UI
 			this.aero = aero;
 		}
 
-		public void Update()
+		public async Task UpdateAsync(bool full = false)
 		{
 			this.updating = true;
 			try
 			{
+				if (full)
+				{
+					if (this.aero.Keyboard.Rgb != null)
+					{
+						this.KeyboardFWVersion = await this.aero.Keyboard.Rgb.GetFirmwareVersionAsync();
+					}
+				}
+
 				this.BaseBoard = this.aero.BaseBoard;
 				this.CpuTemperature = this.aero.CpuTemperature;
 				this.FanRpm1 = this.aero.Fans.Rpm1;

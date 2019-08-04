@@ -8,6 +8,17 @@ namespace AeroCtl.Native
 	{
 		private const string lib = "kernel32.dll";
 
+		public const uint GENERIC_READ = 1u << 31;
+		public const uint GENERIC_WRITE = 1u << 30;
+
+		public const uint FILE_SHARE_READ = 1;
+		public const uint FILE_SHARE_WRITE = 2;
+
+		public const uint CREATE_NEW = 1;
+		public const uint CREATE_ALWAYS = 2;
+
+		public const uint FILE_FLAG_OVERLAPPED = 0x40000000u;
+
 		[DllImport(lib, CharSet = CharSet.Unicode, SetLastError = true)]
 		public static extern SafeFileHandle CreateFile(
 			string lpFileName,
