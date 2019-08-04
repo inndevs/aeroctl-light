@@ -3,19 +3,22 @@ using System.Management;
 
 namespace AeroCtl
 {
+	/// <summary>
+	/// Implements the fan controller and thermal management of the notebook.
+	/// </summary>
 	public class FanController
 	{
 		#region Fields
-
-		public const int FanPointCount = 15;
-		public const int MinFanSpeed = 0;
-		public const int MaxFanSpeed = 229;
 
 		private readonly AeroWmi wmi;
 
 		#endregion
 
 		#region Properties
+
+		public int MinFanSpeed => 0;
+		public int MaxFanSpeed => 229;
+		public int FanCurvePointCount => 15;
 
 		/// <summary>
 		/// Gets the current RPM of fan 1.
@@ -157,9 +160,14 @@ namespace AeroCtl
 			this.FixedFanSpeed = (byte)fixedSpeed;
 		}
 
+		/// <summary>
+		/// Returns the fan point at the specified index.
+		/// </summary>
+		/// <param name="index"></param>
+		/// <returns></returns>
 		public FanPoint GetFanPoint(int index)
 		{
-			if (index < 0 || index >= FanPointCount)
+			if (index < 0 || index >= this.FanCurvePointCount)
 				throw new ArgumentOutOfRangeException(nameof(index));
 
 			ManagementBaseObject inParams = this.wmi.GetClass.GetMethodParameters("GetFanIndexValue");
@@ -173,9 +181,14 @@ namespace AeroCtl
 			};
 		}
 
+		/// <summary>
+		/// Sets the fan point at the specified index.
+		/// </summary>
+		/// <param name="index"></param>
+		/// <param name="point"></param>
 		public void SetFanPoint(int index, FanPoint point)
 		{
-			if (index < 0 || index >= FanPointCount)
+			if (index < 0 || index >= this.FanCurvePointCount)
 				throw new ArgumentOutOfRangeException(nameof(index));
 
 			ManagementBaseObject inParams = this.wmi.SetClass.GetMethodParameters("SetFanIndexValue");
@@ -185,6 +198,11 @@ namespace AeroCtl
 			this.wmi.Set.InvokeMethod("SetFanIndexValue", inParams, null);
 		}
 
+		/// <summary>
+		/// Reverse a 16-bit integer byte order.
+		/// </summary>
+		/// <param name="val"></param>
+		/// <returns></returns>
 		private static ushort reverse(ushort val)
 		{
 			return (ushort)((val << 8) | (val >> 8));

@@ -18,7 +18,7 @@ namespace AeroCtl
 			set => this.controller.SetFanPoint(index, value);
 		}
 
-		public int Count => FanController.FanPointCount;
+		public int Count => this.controller.FanCurvePointCount;
 
 		public bool IsReadOnly => true;
 

@@ -53,10 +53,13 @@
     <Compile Include="Aero.cs" />
     <Compile Include="AeroWmi.cs" />
     <Compile Include="BatteryController.cs" />
+    <Compile Include="ChargePolicy.cs" />
     <Compile Include="FanController.cs" />
     <Compile Include="FanCurve.cs" />
     <Compile Include="FanPoint.cs" />
     <Compile Include="FnKey.cs" />
+    <Compile Include="FnKeyEventArgs.cs" />
+    <Compile Include="HidDevice.cs" />
     <Compile Include="KeyboardController.cs" />
     <Compile Include="KeyboardRgbController.cs" />
     <Compile Include="LightColor.cs" />

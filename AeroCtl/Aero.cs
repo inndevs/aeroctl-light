@@ -15,7 +15,7 @@ namespace AeroCtl
 	{
 		#region Fields
 
-		private WlanClient wlanClient;
+		private readonly WlanClient wlanClient;
 
 		#endregion
 

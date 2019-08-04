@@ -6,12 +6,6 @@ using System.Threading.Tasks;
 
 namespace AeroCtl
 {
-	public enum ChargePolicy
-	{
-		Full = 0,
-		CustomStop = 4,
-	}
-
 	public class BatteryController
 	{
 		private readonly AeroWmi wmi;

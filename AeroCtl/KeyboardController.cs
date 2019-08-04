@@ -2,7 +2,6 @@
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.IO;
 using System.Linq;
 using System.Runtime.InteropServices;
 using System.Text;
@@ -14,34 +13,6 @@ using Microsoft.Win32.SafeHandles;
 
 namespace AeroCtl
 {
-	public class FnKeyEventArgs : EventArgs
-	{
-		public FnKey Key { get; }
-
-		public FnKeyEventArgs(FnKey key)
-		{
-			this.Key = key;
-		}
-	}
-
-	public class HidDevice
-	{
-		public string Path { get; }
-		public HIDD_ATTRIBUTES Attributes { get; }
-		public HIDP_CAPS Caps { get; }
-		public SafeFileHandle Handle { get; }
-		public FileStream Stream { get; }
-
-		public HidDevice(string path, HIDD_ATTRIBUTES attributes, HIDP_CAPS caps, SafeFileHandle handle)
-		{
-			this.Path = path;
-			this.Attributes = attributes;
-			this.Caps = caps;
-			this.Handle = handle;
-			this.Stream = new FileStream(this.Handle, FileAccess.ReadWrite, 4096, true);
-		}
-	}
-
 	public class KeyboardController : IDisposable
 	{
 		#region Fields
@@ -104,70 +75,60 @@ namespace AeroCtl
 			IntPtr classDevs = SetupApi.SetupDiGetClassDevs(ref guid, IntPtr.Zero, IntPtr.Zero, DiGetClassFlags.Present | DiGetClassFlags.DeviceInterface);
 			try
 			{
-				uint memberIndex = 0;
-
-				// No idea why this has to be done in a loop, but Gigabyte does this as well.
-				for (;;)
+				// Enumerable all devices for that GUID.
+				for (uint index = 0;; ++index)
 				{
-					SP_DEVICE_INTERFACE_DETAIL_DATA deviceInterfaceDetailData;
-					bool found = false;
-					for (;;)
+					SP_DEVICE_INTERFACE_DATA deviceInterfaceData = new SP_DEVICE_INTERFACE_DATA { cbSize = (uint)Marshal.SizeOf<SP_DEVICE_INTERFACE_DATA>() };
+					if (!SetupApi.SetupDiEnumDeviceInterfaces(classDevs, IntPtr.Zero, ref guid, index, ref deviceInterfaceData))
+						break; // End of list.
+
+					SP_DEVICE_INTERFACE_DETAIL_DATA deviceInterfaceDetailData = new SP_DEVICE_INTERFACE_DETAIL_DATA { cbSize = IntPtr.Size == 8 ? 8U : (uint)(4 + Marshal.SystemDefaultCharSize) };
+					SP_DEVINFO_DATA deviceInfoData = new SP_DEVINFO_DATA { cbSize = (uint)Marshal.SizeOf<SP_DEVINFO_DATA>() };
+					if (SetupApi.SetupDiGetDeviceInterfaceDetail(classDevs, ref deviceInterfaceData, ref deviceInterfaceDetailData, 256U, out uint requiredSize, ref deviceInfoData))
 					{
-						SP_DEVICE_INTERFACE_DATA deviceInterfaceData = new SP_DEVICE_INTERFACE_DATA {cbSize = (uint) Marshal.SizeOf<SP_DEVICE_INTERFACE_DATA>()};
-						SP_DEVINFO_DATA deviceInfoData = new SP_DEVINFO_DATA {cbSize = (uint) Marshal.SizeOf<SP_DEVINFO_DATA>()};
-						deviceInterfaceDetailData = new SP_DEVICE_INTERFACE_DETAIL_DATA {cbSize = IntPtr.Size == 8 ? 8U : (uint) (4 + Marshal.SystemDefaultCharSize)};
+						// Found one.
+						// Try to open device.
+						string devPath = deviceInterfaceDetailData.DevicePath;
+						SafeFileHandle devHandle = Kernel32.CreateFile(devPath, Kernel32.GENERIC_READ | Kernel32.GENERIC_WRITE,
+							Kernel32.FILE_SHARE_READ | Kernel32.FILE_SHARE_WRITE, IntPtr.Zero, Kernel32.CREATE_NEW | Kernel32.CREATE_ALWAYS, Kernel32.FILE_FLAG_OVERLAPPED, IntPtr.Zero);
 
-						if (!SetupApi.SetupDiEnumDeviceInterfaces(classDevs, IntPtr.Zero, ref guid, memberIndex++, ref deviceInterfaceData))
-							break;
+						// Get HID attributes.
+						HIDD_ATTRIBUTES attributes = default;
+						HIDP_CAPS caps;
+						Hid.HidD_GetAttributes(devHandle, ref attributes);
 
-						if (SetupApi.SetupDiGetDeviceInterfaceDetail(classDevs, ref deviceInterfaceData, ref deviceInterfaceDetailData, 256U, out uint requiredSize, ref deviceInfoData))
+						// Match against Gigabyte keyboard product IDs.
+						if (!supportedKeyboards.TryGetValue(attributes.VendorID, out ushort[] pids))
+							continue;
+
+						if (!pids.Contains(attributes.ProductID))
+							continue;
+
+						// Get HID capabilities.
+						IntPtr preparsedData = IntPtr.Zero;
+						try
 						{
-							found = true;
-							break;
+							if (!Hid.HidD_GetPreparsedData(devHandle, out preparsedData))
+								throw new Win32Exception(Marshal.GetLastWin32Error());
+
+							if (Hid.HidP_GetCaps(preparsedData, out caps) != Hid.HIDP_STATUS_SUCCESS)
+								throw new Win32Exception(Marshal.GetLastWin32Error());
 						}
-					}
+						finally
+						{
+							if (preparsedData != IntPtr.Zero)
+								Hid.HidD_FreePreparsedData(preparsedData);
+						}
 
-					if (!found)
-						break;
+						// Store device.
+						HidDevice dev = new HidDevice(devPath, attributes, caps, devHandle);
+						devs.Add(dev);
 
-					// Try to open device.
-					string devPath = deviceInterfaceDetailData.DevicePath;
-					SafeFileHandle devHandle = Kernel32.CreateFile(devPath, Kernel32.GENERIC_READ | Kernel32.GENERIC_WRITE,
-						Kernel32.FILE_SHARE_READ | Kernel32.FILE_SHARE_WRITE, IntPtr.Zero, Kernel32.CREATE_NEW | Kernel32.CREATE_ALWAYS, Kernel32.FILE_FLAG_OVERLAPPED, IntPtr.Zero);
-
-					// Gather HID info.
-					HIDD_ATTRIBUTES attributes = default;
-					HIDP_CAPS caps;
-					Hid.HidD_GetAttributes(devHandle, ref attributes);
-
-					if (!supportedKeyboards.TryGetValue(attributes.VendorID, out ushort[] pids))
-						continue;
-
-					if (!pids.Contains(attributes.ProductID))
-						continue;
-
-					IntPtr preparsedData = IntPtr.Zero;
-
-					try
-					{
-						if (!Hid.HidD_GetPreparsedData(devHandle, out preparsedData))
-							throw new Win32Exception(Marshal.GetLastWin32Error());
-
-						if (Hid.HidP_GetCaps(preparsedData, out caps) != Hid.HIDP_STATUS_SUCCESS)
-							throw new Win32Exception(Marshal.GetLastWin32Error());
-					}
-					finally
-					{
-						if (preparsedData != IntPtr.Zero)
-							Hid.HidD_FreePreparsedData(preparsedData);
-					}
-
-					HidDevice dev = new HidDevice(devPath, attributes, caps, devHandle);
-					devs.Add(dev);
-
-					if (caps.UsagePage == 0xFF01 && caps.Usage == 1 && caps.FeatureReportByteLength == 9)
-					{
-						this.Rgb = new Aero2019RgbController(dev);
+						// Find RGB controller.
+						if (caps.UsagePage == 0xFF01 && caps.Usage == 1 && caps.FeatureReportByteLength == 9)
+						{
+							this.Rgb = new Aero2019RgbController(dev);
+						}
 					}
 				}
 
