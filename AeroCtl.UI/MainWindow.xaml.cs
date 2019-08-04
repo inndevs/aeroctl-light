@@ -33,14 +33,26 @@ namespace AeroCtl.UI
 		{
 			this.wmi = new AeroWmi();
 			this.aero = new Aero(this.wmi);
+			this.aero.Keyboard.FnKeyPressed += onFnKeyPressed;
+
 			this.Aero = new AeroController(this.aero);
 
-			this.aero.Keys.FnKeyPressed += onFnKeyPressed;
-
 			this.InitializeComponent();
-			
+
 			CancellationTokenSource cts = new CancellationTokenSource();
-			this.Closed += (s, e) => cts.Cancel();
+			this.Closing += async (s, e) =>
+			{
+				cts.Cancel();
+				
+				try
+				{
+					await this.updateTask;
+				}
+				catch (TaskCanceledException)
+				{
+
+				}
+			};
 			this.updateTask = this.updateLoop(cts.Token);
 		}
 
@@ -49,11 +61,11 @@ namespace AeroCtl.UI
 			switch(e.Key)
 			{
 				case FnKey.IncreaseBrightness:
-					this.Aero.ScreenBrightness = Math.Min(100, this.Aero.ScreenBrightness + 5);
+					this.aero.Screen.Brightness = Math.Min(100, this.Aero.ScreenBrightness + 5);
 					break;
 
 				case FnKey.DecreaseBrightness:
-					this.Aero.ScreenBrightness = Math.Max(0, this.Aero.ScreenBrightness - 5);
+					this.aero.Screen.Brightness = Math.Max(0, this.Aero.ScreenBrightness - 5);
 					break;
 
 				case FnKey.ToggleWifi:
@@ -86,12 +98,6 @@ namespace AeroCtl.UI
 
 				this.Close();
 			}
-		}
-
-		protected override void OnClosed(EventArgs e)
-		{
-			this.updateTask.Wait();
-			base.OnClosed(e);
 		}
 
 		private void ButtonBase_OnClick(object sender, RoutedEventArgs e)

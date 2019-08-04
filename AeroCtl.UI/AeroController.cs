@@ -71,8 +71,7 @@ namespace AeroCtl.UI
 
 				if (!this.updating)
 				{
-					System.Diagnostics.Debug.WriteLine($"Setting brighness to {value}.");
-					this.aero.Screen.Brightness = (uint)value;
+					this.aero.Screen.Brightness = value;
 				}
 			}
 		}
@@ -108,8 +107,8 @@ namespace AeroCtl.UI
 			}
 		}
 
-		private byte fanAdjust;
-		public byte FanAdjust
+		private int fanAdjust;
+		public int FanAdjust
 		{
 			get => this.fanAdjust;
 			set
@@ -153,8 +152,8 @@ namespace AeroCtl.UI
 			}
 		}
 
-		private byte fixedFanSpeed;
-		public byte FixedFanSpeed
+		private int fixedFanSpeed;
+		public int FixedFanSpeed
 		{
 			get => this.fixedFanSpeed;
 			set
@@ -198,6 +197,51 @@ namespace AeroCtl.UI
 			}
 		}
 
+		private bool nvPowerConfig;
+		public bool NvPowerConfig
+		{
+			get => this.nvPowerConfig;
+			set
+			{
+				this.nvPowerConfig = value;
+				this.OnPropertyChanged();
+				if (!this.updating)
+				{
+					this.aero.Fans.NvPowerConfig = value;
+				}
+			}
+		}
+
+		private int chargeStop;
+		public int ChargeStop
+		{
+			get => this.chargeStop;
+			set
+			{
+				this.chargeStop = value;
+				this.OnPropertyChanged();
+				if (!this.updating)
+				{
+					this.aero.Battery.ChargeStop = value;
+				}
+			}
+		}
+
+		private bool chargeStopEnabled;
+		public bool ChargeStopEnabled
+		{
+			get => this.chargeStopEnabled;
+			set
+			{
+				this.chargeStopEnabled = value;
+				this.OnPropertyChanged();
+				if (!this.updating)
+				{
+					this.aero.Battery.ChargePolicy = value ? ChargePolicy.CustomStop : ChargePolicy.Full;
+				}
+			}
+		}
+
 		public AeroController(Aero aero)
 		{
 			this.aero = aero;
@@ -219,7 +263,10 @@ namespace AeroCtl.UI
 				this.FixedFanSpeed = this.aero.Fans.FixedFanSpeed;
 				this.StepFan = this.aero.Fans.StepFan;
 				this.NvThermalTarget = this.aero.Fans.NvThermalTarget;
+				this.NvPowerConfig = this.aero.Fans.NvPowerConfig;
 				this.ScreenBrightness = (int)this.aero.Screen.Brightness;
+				this.ChargeStopEnabled = this.aero.Battery.ChargePolicy == ChargePolicy.CustomStop;
+				this.ChargeStop = this.aero.Battery.ChargeStop;
 				this.WifiEnabled = this.aero.WifiEnabled;
 			}
 			finally

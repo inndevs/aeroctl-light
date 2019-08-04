@@ -15,17 +15,20 @@ namespace AeroCtl
 		public static Guid VIDEO_SUBGROUP = new Guid("7516b95f-f776-4464-8c53-06167f40cc99");
 		public static Guid VIDEO_NORMALLEVEL = new Guid("aded5e82-b909-4619-9949-f5d71dac0bcb");
 
-		public uint Brightness
+		public int Brightness
 		{
 			get
 			{
 				Guid activePlan = PowerManager.GetActivePlan();
-				return PowerManager.GetPlanSetting(activePlan, VIDEO_SUBGROUP, VIDEO_NORMALLEVEL, PowerManager.GetCurrentMode());
+				return (int)PowerManager.GetPlanSetting(activePlan, VIDEO_SUBGROUP, VIDEO_NORMALLEVEL, PowerManager.GetCurrentMode());
 			}
 			set
 			{
+				if (value < 0 || value > 100)
+					throw new ArgumentOutOfRangeException(nameof(value));
+
 				Guid activePlan = PowerManager.GetActivePlan();
-				PowerManager.SetPlanSetting(activePlan, VIDEO_SUBGROUP, VIDEO_NORMALLEVEL, PowerManager.GetCurrentMode(), value);
+				PowerManager.SetPlanSetting(activePlan, VIDEO_SUBGROUP, VIDEO_NORMALLEVEL, PowerManager.GetCurrentMode(), (uint)value);
 				PowerManager.SetActivePlan(activePlan);
 			}
 		}

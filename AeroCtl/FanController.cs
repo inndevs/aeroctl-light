@@ -1,131 +1,15 @@
 ﻿using System;
-using System.Collections;
-using System.Collections.Generic;
-using System.Linq;
 using System.Management;
 
 namespace AeroCtl
 {
-	public struct FanPoint : IEquatable<FanPoint>
-	{
-		public int Temperature { get; set; }
-		public int Speed { get; set; }
-
-		public bool Equals(FanPoint other)
-		{
-			return Temperature == other.Temperature && Speed == other.Speed;
-		}
-
-		public override bool Equals(object obj)
-		{
-			return obj is FanPoint other && Equals(other);
-		}
-
-		public override int GetHashCode()
-		{
-			unchecked
-			{
-				return (this.Temperature * 397) ^ this.Speed;
-			}
-		}
-
-		public static bool operator ==(FanPoint left, FanPoint right)
-		{
-			return left.Equals(right);
-		}
-
-		public static bool operator !=(FanPoint left, FanPoint right)
-		{
-			return !left.Equals(right);
-		}
-	}
-
-	public class FanCurve : IList<FanPoint>
-	{
-		private readonly FanController controller;
-
-		public FanPoint this[int index]
-		{
-			get => this.controller.GetFanPoint(index);
-			set => this.controller.SetFanPoint(index, value);
-		}
-
-		public int Count => FanController.FanPointCount;
-
-		public bool IsReadOnly => true;
-
-		public FanCurve(FanController controller)
-		{
-			this.controller = controller;
-		}
-
-		public void Add(FanPoint item)
-		{
-			throw new NotSupportedException();
-		}
-
-		public void Clear()
-		{
-			throw new NotSupportedException();
-		}
-
-		public bool Contains(FanPoint item)
-		{
-			return ((IEnumerable<FanPoint>)this).Contains(item);
-		}
-
-		public void CopyTo(FanPoint[] array, int arrayIndex)
-		{
-			for (int i = 0; i < this.Count; ++i)
-			{
-				array[arrayIndex + i] = this[i];
-			}
-		}
-
-		public IEnumerator<FanPoint> GetEnumerator()
-		{
-			for (int i = 0; i < this.Count; ++i)
-			{
-				yield return this[i];
-			}
-		}
-
-		IEnumerator IEnumerable.GetEnumerator()
-		{
-			return this.GetEnumerator();
-		}
-
-		public int IndexOf(FanPoint item)
-		{
-			for (int i = 0; i < this.Count; ++i)
-			{
-				if (Equals(this[i], item))
-					return i;
-			}
-			return -1;
-		}
-
-		public void Insert(int index, FanPoint item)
-		{
-			throw new NotSupportedException();
-		}
-
-		public bool Remove(FanPoint item)
-		{
-			throw new NotSupportedException();
-		}
-
-		public void RemoveAt(int index)
-		{
-			throw new NotSupportedException();
-		}
-	}
-
 	public class FanController
 	{
 		#region Fields
 
 		public const int FanPointCount = 15;
+		public const int MinFanSpeed = 0;
+		public const int MaxFanSpeed = 229;
 
 		private readonly AeroWmi wmi;
 
@@ -133,8 +17,14 @@ namespace AeroCtl
 
 		#region Properties
 
+		/// <summary>
+		/// Gets the current RPM of fan 1.
+		/// </summary>
 		public int Rpm1 => reverse(this.wmi.InvokeGet<ushort>("getRpm1"));
 
+		/// <summary>
+		/// Gets the current RPM of fan 2.
+		/// </summary>
 		public int Rpm2 => reverse(this.wmi.InvokeGet<ushort>("getRpm2"));
 
 		public bool AutoFan
@@ -143,10 +33,16 @@ namespace AeroCtl
 			set => this.wmi.InvokeSet<byte>("SetAutoFanStatus", value ? (byte)1 : (byte)0);
 		}
 
-		public byte FanAdjust
+		public int FanAdjust
 		{
 			get => this.wmi.InvokeGet<byte>("GetFanAdjustStatus");
-			set => this.wmi.InvokeSet<byte>("SetFanAdjustStatus", value);
+			set
+			{
+				if (value < MinFanSpeed || value > MaxFanSpeed)
+					throw new ArgumentOutOfRangeException(nameof(value));
+
+				this.wmi.InvokeSet<byte>("SetFanAdjustStatus", (byte)value);
+			}
 		}
 
 		public bool MaxFan
@@ -171,10 +67,16 @@ namespace AeroCtl
 			set => this.wmi.InvokeSet<byte>("SetFixedFanStatus", value ? (byte)1 : (byte)0);
 		}
 
-		public byte FixedFanSpeed
+		public int FixedFanSpeed
 		{
 			get => (byte)this.wmi.InvokeGet<ushort>("GetFixedFanSpeed");
-			set => this.wmi.InvokeSet<byte>("SetFixedFanSpeed", value);
+			set
+			{
+				if (value < MinFanSpeed || value > MaxFanSpeed)
+					throw new ArgumentOutOfRangeException(nameof(value));
+
+				this.wmi.InvokeSet<byte>("SetFixedFanSpeed", (byte)value);
+			}
 		}
 
 		public bool StepFan
@@ -235,24 +137,24 @@ namespace AeroCtl
 			this.NvThermalTarget = false;
 		}
 
-		public void SetCustomAuto()
+		public void SetCustomAuto(int fanAdjust = 50)
 		{
 			this.FixedFan = false;
 			this.MaxFan = false;
 			this.StepFan = true;
 			this.AutoFan = false;
 			this.NvThermalTarget = false;
-			this.FanAdjust = 50;
+			this.FanAdjust = (byte)fanAdjust;
 		}
 
-		public void SetCustomFixed()
+		public void SetCustomFixed(int fixedSpeed = 50)
 		{
 			this.MaxFan = false;
 			this.StepFan = true;
 			this.AutoFan = false;
 			this.NvThermalTarget = false;
 			this.FixedFan = true;
-			this.FixedFanSpeed = 50;
+			this.FixedFanSpeed = (byte)fixedSpeed;
 		}
 
 		public FanPoint GetFanPoint(int index)

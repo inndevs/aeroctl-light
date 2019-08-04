@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading.Tasks;
 
@@ -25,12 +26,15 @@ namespace AeroCtl
 		/// </summary>
 		private AeroWmi Wmi { get; }
 
+		/// <summary>
+		/// Gets the base board / notebook model name.
+		/// </summary>
 		public string BaseBoard => this.Wmi.BaseBoard;
 
 		/// <summary>
 		/// Gets Keyboard Fn key handler.
 		/// </summary>
-		public KeyHandler Keys { get; }
+		public KeyboardController Keyboard { get; }
 
 		/// <summary>
 		/// Gets the fan controller.
@@ -41,6 +45,11 @@ namespace AeroCtl
 		/// Gets the screen controller.
 		/// </summary>
 		public ScreenController Screen { get; }
+
+		/// <summary>
+		/// Gets the battery stats / controller.
+		/// </summary>
+		public BatteryController Battery { get; }
 
 		/// <summary>
 		/// Gets the CPU temperature as reported by the Gigabyte ACPI interface.
@@ -91,9 +100,10 @@ namespace AeroCtl
 		public Aero(AeroWmi wmi)
 		{
 			this.Wmi = wmi;
-			this.Keys = new KeyHandler();
+			this.Keyboard = new KeyboardController();
 			this.Fans = new FanController(wmi);
 			this.Screen = new ScreenController(wmi);
+			this.Battery = new BatteryController(wmi);
 			this.wlanClient = new WlanClient();
 		}
 
@@ -104,7 +114,7 @@ namespace AeroCtl
 		public void Dispose()
 		{
 			this.Wmi?.Dispose();
-			this.Keys?.Dispose();
+			this.Keyboard?.Dispose();
 		}
 
 		#endregion

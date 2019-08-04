@@ -62,8 +62,8 @@ namespace AeroCtl
 
 		public T InvokeGet<T>(string methodName)
 		{
-			ManagementBaseObject inParams = this.GetClass.GetMethodParameters(methodName);
-			ManagementBaseObject outParams = this.Get.InvokeMethod(methodName, inParams, null);
+			//ManagementBaseObject inParams = this.GetClass.GetMethodParameters(methodName);
+			ManagementBaseObject outParams = this.Get.InvokeMethod(methodName, null, null);
 			return (T)outParams["Data"];
 		}
 

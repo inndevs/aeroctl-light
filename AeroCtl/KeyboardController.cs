@@ -12,16 +12,6 @@ using Microsoft.Win32.SafeHandles;
 
 namespace AeroCtl
 {
-	public enum FnKey
-	{
-		ToggleFan,
-		ToggleWifi,
-		ToggleTouchpad,
-		ToggleScreen,
-		DecreaseBrightness,
-		IncreaseBrightness,
-	}
-
 	public class FnKeyEventArgs : EventArgs
 	{
 		public FnKey Key { get; }
@@ -32,7 +22,7 @@ namespace AeroCtl
 		}
 	}
 
-	public class KeyHandler : IDisposable
+	public class KeyboardController : IDisposable
 	{
 		#region Fields
 
@@ -82,7 +72,7 @@ namespace AeroCtl
 
 		#region Constructors
 
-		public KeyHandler()
+		public KeyboardController()
 		{
 			Guid guid = deviceGuid;
 			Hid.HidD_GetHidGuid(ref guid);

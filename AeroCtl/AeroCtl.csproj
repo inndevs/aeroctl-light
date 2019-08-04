@@ -52,8 +52,12 @@
   <ItemGroup>
     <Compile Include="Aero.cs" />
     <Compile Include="AeroWmi.cs" />
+    <Compile Include="BatteryController.cs" />
     <Compile Include="FanController.cs" />
-    <Compile Include="KeyHandler.cs" />
+    <Compile Include="FanCurve.cs" />
+    <Compile Include="FanPoint.cs" />
+    <Compile Include="FnKey.cs" />
+    <Compile Include="KeyboardController.cs" />
     <Compile Include="Native\DEVPROPKEY.cs" />
     <Compile Include="Native\DiGetClassFlags.cs" />
     <Compile Include="Native\HIDD_ATTRIBUTES.cs" />
