@@ -122,126 +122,6 @@ namespace AeroCtl.UI
 			}
 		}
 
-		private bool autoFan;
-		public bool AutoFan
-		{
-			get => this.autoFan;
-			set
-			{
-				this.autoFan = value;
-				this.OnPropertyChanged();
-				if(!this.updating)
-				{
-					this.aero.Fans.AutoFan = value;
-				}
-			}
-		}
-
-		private int fanAdjust;
-		public int FanAdjust
-		{
-			get => this.fanAdjust;
-			set
-			{
-				this.fanAdjust = value;
-				this.OnPropertyChanged();
-				if (!this.updating)
-				{
-					this.aero.Fans.FanAdjust = value;
-				}
-			}
-		}
-
-		private bool maxFan;
-		public bool MaxFan
-		{
-			get => this.maxFan;
-			set
-			{
-				this.maxFan = value;
-				this.OnPropertyChanged();
-				if (!this.updating)
-				{
-					this.aero.Fans.MaxFan = value;
-				}
-			}
-		}
-
-		private bool fixedFan;
-		public bool FixedFan
-		{
-			get => this.fixedFan;
-			set
-			{
-				this.fixedFan = value;
-				this.OnPropertyChanged();
-				if (!this.updating)
-				{
-					this.aero.Fans.FixedFan = value;
-				}
-			}
-		}
-
-		private int fixedFanSpeed;
-		public int FixedFanSpeed
-		{
-			get => this.fixedFanSpeed;
-			set
-			{
-				this.fixedFanSpeed = value;
-				this.OnPropertyChanged();
-				if (!this.updating)
-				{
-					this.aero.Fans.FixedFanSpeed = value;
-				}
-			}
-		}
-
-		private bool stepFan;
-		public bool StepFan
-		{
-			get => this.stepFan;
-			set
-			{
-				this.stepFan = value;
-				this.OnPropertyChanged();
-				if (!this.updating)
-				{
-					this.aero.Fans.StepFan = value;
-				}
-			}
-		}
-
-		private bool nvThermalTarget;
-		public bool NvThermalTarget
-		{
-			get => this.nvThermalTarget;
-			set
-			{
-				this.nvThermalTarget = value;
-				this.OnPropertyChanged();
-				if (!this.updating)
-				{
-					this.aero.Fans.NvThermalTarget = value;
-				}
-			}
-		}
-
-		private bool nvPowerConfig;
-		public bool NvPowerConfig
-		{
-			get => this.nvPowerConfig;
-			set
-			{
-				this.nvPowerConfig = value;
-				this.OnPropertyChanged();
-				if (!this.updating)
-				{
-					this.aero.Fans.NvPowerConfig = value;
-				}
-			}
-		}
-
 		private int chargeStop;
 		public int ChargeStop
 		{
@@ -272,9 +152,74 @@ namespace AeroCtl.UI
 			}
 		}
 
+		private bool fanProfileInvalid;
+
+		private FanProfile fanProfile;
+		public FanProfile FanProfile
+		{
+			get => this.fanProfile;
+			set
+			{
+				this.fanProfile = value;
+				this.OnPropertyChanged();
+				this.fanProfileInvalid = true;
+			}
+		}
+
+		private double fixedFanSpeed = 0.25;
+		public double FixedFanSpeed
+		{
+			get => this.fixedFanSpeed;
+			set
+			{
+				this.fixedFanSpeed = value;
+				this.OnPropertyChanged();
+				this.fanProfileInvalid = true;
+			}
+		}
+
+		private double autoFanAdjust = 0.25;
+		public double AutoFanAdjust
+		{
+			get => this.autoFanAdjust;
+			set
+			{
+				this.autoFanAdjust = value;
+				this.OnPropertyChanged();
+				this.fanProfileInvalid = true;
+			}
+		}
+
 		public AeroController(Aero aero)
 		{
 			this.aero = aero;
+		}
+
+		private void applyFanProfile()
+		{
+			switch (this.FanProfile)
+			{
+				case FanProfile.Quiet:
+					this.aero.Fans.SetQuiet();
+					break;
+				case FanProfile.Normal:
+					this.aero.Fans.SetNormal();
+					break;
+				case FanProfile.Gaming:
+					this.aero.Fans.SetGaming();
+					break;
+				case FanProfile.Fixed:
+					this.aero.Fans.SetFixed(this.fixedFanSpeed);
+					break;
+				case FanProfile.Auto:
+					this.aero.Fans.SetAuto(this.autoFanAdjust);
+					break;
+				case FanProfile.Custom:
+					// TODO
+					break;
+				default:
+					throw new InvalidEnumArgumentException(nameof(this.FanProfile), (int) this.FanProfile, typeof(FanProfile));
+			}
 		}
 
 		public async Task UpdateAsync(bool full = false)
@@ -294,17 +239,15 @@ namespace AeroCtl.UI
 					}
 				}
 
+				if (this.fanProfileInvalid)
+				{
+					this.applyFanProfile();
+					this.fanProfileInvalid = false;
+				}
+
 				this.CpuTemperature = this.aero.CpuTemperature;
 				this.FanRpm1 = this.aero.Fans.Rpm1;
 				this.FanRpm2 = this.aero.Fans.Rpm2;
-				this.AutoFan = this.aero.Fans.AutoFan;
-				this.FanAdjust = this.aero.Fans.FanAdjust;
-				this.MaxFan = this.aero.Fans.MaxFan;
-				this.FixedFan = this.aero.Fans.FixedFan;
-				this.FixedFanSpeed = this.aero.Fans.FixedFanSpeed;
-				this.StepFan = this.aero.Fans.StepFan;
-				this.NvThermalTarget = this.aero.Fans.NvThermalTarget;
-				this.NvPowerConfig = this.aero.Fans.NvPowerConfig;
 				this.ScreenBrightness = (int)this.aero.Screen.Brightness;
 				this.ChargeStopEnabled = this.aero.Battery.ChargePolicy == ChargePolicy.CustomStop;
 				this.ChargeStop = this.aero.Battery.ChargeStop;

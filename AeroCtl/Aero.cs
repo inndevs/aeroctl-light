@@ -46,7 +46,7 @@ namespace AeroCtl
 		/// <summary>
 		/// Gets the fan controller.
 		/// </summary>
-		public FanController Fans { get; }
+		public IFanController Fans { get; }
 
 		/// <summary>
 		/// Gets the screen controller.
@@ -108,7 +108,7 @@ namespace AeroCtl
 		{
 			this.Wmi = wmi;
 			this.Keyboard = new KeyboardController();
-			this.Fans = new FanController(wmi);
+			this.Fans = new Aero2019FanController(wmi);
 			this.Screen = new ScreenController(wmi);
 			this.Battery = new BatteryController(wmi);
 			this.wlanClient = new WlanClient();

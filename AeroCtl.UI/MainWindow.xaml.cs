@@ -62,11 +62,11 @@ namespace AeroCtl.UI
 			switch(e.Key)
 			{
 				case FnKey.IncreaseBrightness:
-					this.aero.Screen.Brightness = Math.Min(100, this.aero.Screen.Brightness + 5);
+					this.aero.Screen.Brightness = Math.Min(100, this.aero.Screen.Brightness + 10);
 					break;
 
 				case FnKey.DecreaseBrightness:
-					this.aero.Screen.Brightness = Math.Max(0, this.aero.Screen.Brightness - 5);
+					this.aero.Screen.Brightness = Math.Max(0, this.aero.Screen.Brightness - 10);
 					break;
 
 				case FnKey.ToggleWifi:
@@ -88,7 +88,7 @@ namespace AeroCtl.UI
 			{
 				for (;;)
 				{
-					if (Mouse.Captured == null && this.WindowState != WindowState.Minimized)
+					if (this.WindowState != WindowState.Minimized)
 					{
 						await this.Aero.UpdateAsync(first);
 						first = false;
@@ -112,36 +112,6 @@ namespace AeroCtl.UI
 
 			if (this.WindowState == WindowState.Minimized)
 				this.Hide();
-		}
-
-		private void ButtonBase_OnClick(object sender, RoutedEventArgs e)
-		{
-			this.curveGrid.ItemsSource = new FanCurve(this.aero.Fans);
-		}
-
-		private void FanProfileQuiet_OnClick(object sender, RoutedEventArgs e)
-		{
-			this.aero.Fans.SetQuiet();
-		}
-
-		private void FanProfileNormal_OnClick(object sender, RoutedEventArgs e)
-		{
-			this.aero.Fans.SetNormal();
-		}
-
-		private void FanProfileGaming_OnClick(object sender, RoutedEventArgs e)
-		{
-			this.aero.Fans.SetGaming();
-		}
-
-		private void FanProfileAuto_OnClick(object sender, RoutedEventArgs e)
-		{
-			this.aero.Fans.SetCustomAuto();
-		}
-
-		private void FanProfileFixed_OnClick(object sender, RoutedEventArgs e)
-		{
-			this.aero.Fans.SetCustomFixed();
 		}
 	}
 }

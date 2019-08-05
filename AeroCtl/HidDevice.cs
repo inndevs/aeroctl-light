@@ -4,6 +4,9 @@ using Microsoft.Win32.SafeHandles;
 
 namespace AeroCtl
 {
+	/// <summary>
+	/// Represents an opened HID instance.
+	/// </summary>
 	public class HidDevice
 	{
 		public string Path { get; }
@@ -18,6 +21,7 @@ namespace AeroCtl
 			this.Attributes = attributes;
 			this.Caps = caps;
 			this.Handle = handle;
+
 			this.Stream = new FileStream(this.Handle, FileAccess.ReadWrite, 4096, true);
 		}
 	}

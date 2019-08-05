@@ -1,23 +1,25 @@
 ﻿using System;
 using System.Management;
+using System.Runtime.InteropServices;
 
 namespace AeroCtl
 {
 	/// <summary>
 	/// Implements the fan controller and thermal management of the notebook.
 	/// </summary>
-	public class FanController
+	public class Aero2019FanController : IFanController, IFanCurveController
 	{
 		#region Fields
 
 		private readonly AeroWmi wmi;
 
+		private const int minFanSpeed = 0;
+		private const int maxFanSpeed = 229;
+
 		#endregion
 
 		#region Properties
 
-		public int MinFanSpeed => 0;
-		public int MaxFanSpeed => 229;
 		public int FanCurvePointCount => 15;
 
 		/// <summary>
@@ -41,7 +43,7 @@ namespace AeroCtl
 			get => this.wmi.InvokeGet<byte>("GetFanAdjustStatus");
 			set
 			{
-				if (value < MinFanSpeed || value > MaxFanSpeed)
+				if (value < minFanSpeed || value > maxFanSpeed)
 					throw new ArgumentOutOfRangeException(nameof(value));
 
 				this.wmi.InvokeSet<byte>("SetFanAdjustStatus", (byte)value);
@@ -75,7 +77,7 @@ namespace AeroCtl
 			get => (byte)this.wmi.InvokeGet<ushort>("GetFixedFanSpeed");
 			set
 			{
-				if (value < MinFanSpeed || value > MaxFanSpeed)
+				if (value < minFanSpeed || value > maxFanSpeed)
 					throw new ArgumentOutOfRangeException(nameof(value));
 
 				this.wmi.InvokeSet<byte>("SetFixedFanSpeed", (byte)value);
@@ -104,7 +106,7 @@ namespace AeroCtl
 
 		#region Constructors
 
-		public FanController(AeroWmi wmi)
+		public Aero2019FanController(AeroWmi wmi)
 		{
 			this.wmi = wmi;
 		}
@@ -112,6 +114,18 @@ namespace AeroCtl
 		#endregion
 
 		#region Methods
+
+		private static int relToAbs(double fanSpeed)
+		{
+			if (fanSpeed <= 0.0) return minFanSpeed;
+			if (fanSpeed >= 1.0) return maxFanSpeed;
+			return (int) (minFanSpeed + fanSpeed * (maxFanSpeed - minFanSpeed));
+		}
+
+		private static double absToRel(int fanSpeed)
+		{
+			return (double) (fanSpeed - minFanSpeed) / (maxFanSpeed - minFanSpeed);
+		}
 
 		public void SetQuiet()
 		{
@@ -140,24 +154,24 @@ namespace AeroCtl
 			this.NvThermalTarget = false;
 		}
 
-		public void SetCustomAuto(int fanAdjust = 50)
+		public void SetAuto(double fanAdjust = 0.25)
 		{
-			this.FixedFan = false;
 			this.MaxFan = false;
-			this.StepFan = true;
 			this.AutoFan = false;
+			this.FixedFan = false;
+			this.StepFan = true;
 			this.NvThermalTarget = false;
-			this.FanAdjust = (byte)fanAdjust;
+			this.FanAdjust = (byte)relToAbs(fanAdjust);
 		}
 
-		public void SetCustomFixed(int fixedSpeed = 50)
+		public void SetFixed(double fanSpeed = 0.25)
 		{
 			this.MaxFan = false;
-			this.StepFan = true;
 			this.AutoFan = false;
+			this.StepFan = true;
 			this.NvThermalTarget = false;
 			this.FixedFan = true;
-			this.FixedFanSpeed = (byte)fixedSpeed;
+			this.FixedFanSpeed = (byte)relToAbs(fanSpeed);
 		}
 
 		/// <summary>
@@ -165,7 +179,7 @@ namespace AeroCtl
 		/// </summary>
 		/// <param name="index"></param>
 		/// <returns></returns>
-		public FanPoint GetFanPoint(int index)
+		public FanPoint GetFanCurvePoint(int index)
 		{
 			if (index < 0 || index >= this.FanCurvePointCount)
 				throw new ArgumentOutOfRangeException(nameof(index));
@@ -177,7 +191,7 @@ namespace AeroCtl
 			return new FanPoint
 			{
 				Temperature = (byte)outParams["Temperture"], // sic
-				Speed = (byte)outParams["Value"],
+				FanSpeed = absToRel((byte)outParams["Value"]),
 			};
 		}
 
@@ -186,7 +200,7 @@ namespace AeroCtl
 		/// </summary>
 		/// <param name="index"></param>
 		/// <param name="point"></param>
-		public void SetFanPoint(int index, FanPoint point)
+		public void SetFanCurvePoint(int index, FanPoint point)
 		{
 			if (index < 0 || index >= this.FanCurvePointCount)
 				throw new ArgumentOutOfRangeException(nameof(index));
@@ -194,7 +208,7 @@ namespace AeroCtl
 			ManagementBaseObject inParams = this.wmi.SetClass.GetMethodParameters("SetFanIndexValue");
 			inParams["Index"] = (byte)index;
 			inParams["Temperture"] = (byte)point.Temperature;
-			inParams["Value"] = (byte)point.Speed;
+			inParams["Value"] = (byte)relToAbs(point.FanSpeed);
 			this.wmi.Set.InvokeMethod("SetFanIndexValue", inParams, null);
 		}
 

@@ -10,33 +10,23 @@ namespace AeroCtl
 	/// </summary>
 	public class FanCurve : IList<FanPoint>, IReadOnlyList<FanPoint>
 	{
-		private readonly FanController controller;
+		private readonly IFanCurveController controller;
 
 		public FanPoint this[int index]
 		{
-			get => this.controller.GetFanPoint(index);
-			set => this.controller.SetFanPoint(index, value);
+			get => this.controller.GetFanCurvePoint(index);
+			set => this.controller.SetFanCurvePoint(index, value);
 		}
 
 		public int Count => this.controller.FanCurvePointCount;
 
 		public bool IsReadOnly => true;
 
-		public FanCurve(FanController controller)
+		public FanCurve(IFanCurveController controller)
 		{
 			this.controller = controller;
 		}
-
-		void ICollection<FanPoint>.Add(FanPoint item)
-		{
-			throw new NotSupportedException();
-		}
-
-		void ICollection<FanPoint>.Clear()
-		{
-			throw new NotSupportedException();
-		}
-
+		
 		public bool Contains(FanPoint item)
 		{
 			return ((IEnumerable<FanPoint>)this).Contains(item);
@@ -73,19 +63,10 @@ namespace AeroCtl
 			return -1;
 		}
 
-		void IList<FanPoint>.Insert(int index, FanPoint item)
-		{
-			throw new NotSupportedException();
-		}
-
-		bool ICollection<FanPoint>.Remove(FanPoint item)
-		{
-			throw new NotSupportedException();
-		}
-
-		void IList<FanPoint>.RemoveAt(int index)
-		{
-			throw new NotSupportedException();
-		}
+		void ICollection<FanPoint>.Add(FanPoint item) => throw new NotSupportedException();
+		void ICollection<FanPoint>.Clear() => throw new NotSupportedException();
+		void IList<FanPoint>.Insert(int index, FanPoint item) => throw new NotSupportedException();
+		bool ICollection<FanPoint>.Remove(FanPoint item)=> throw new NotSupportedException();
+		void IList<FanPoint>.RemoveAt(int index) => throw new NotSupportedException();
 	}
 }

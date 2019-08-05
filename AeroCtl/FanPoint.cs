@@ -15,11 +15,11 @@ namespace AeroCtl
 		/// <summary>
 		/// Gets or sets the fan speed (Y coordinate).
 		/// </summary>
-		public int Speed { get; set; }
+		public double FanSpeed { get; set; }
 
 		public bool Equals(FanPoint other)
 		{
-			return Temperature == other.Temperature && Speed == other.Speed;
+			return Temperature == other.Temperature && this.FanSpeed == other.FanSpeed;
 		}
 
 		public override bool Equals(object obj)
@@ -29,10 +29,7 @@ namespace AeroCtl
 
 		public override int GetHashCode()
 		{
-			unchecked
-			{
-				return (this.Temperature * 397) ^ this.Speed;
-			}
+			return this.Temperature ^ this.FanSpeed.GetHashCode();
 		}
 
 		public static bool operator ==(FanPoint left, FanPoint right)
