@@ -4,13 +4,6 @@ using AeroCtl.Native;
 
 namespace AeroCtl
 {
-	public interface IKeyboardRgbController
-	{
-		Task<Version> GetFirmwareVersionAsync();
-		Task SetEffectAsync(LightEffect effect, int speed, int brightness, LightColor color, int direction);
-		Task SetImageAsync(int index, ReadOnlyMemory<byte> image);
-	}
-
 	public class Aero2019RgbController : IKeyboardRgbController
 	{
 		private readonly HidDevice device;
@@ -47,7 +40,7 @@ namespace AeroCtl
 		public async Task SetImageAsync(int index, ReadOnlyMemory<byte> image)
 		{
 			this.Set(new Packet {B1 = 18, B3 = (byte)index, B4 = 8});
-			//await Task.Delay(defaultWait);
+			await Task.Delay(defaultWait);
 
 			byte[] temp = new byte[65];
 

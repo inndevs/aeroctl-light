@@ -60,6 +60,7 @@
     <Compile Include="FnKey.cs" />
     <Compile Include="FnKeyEventArgs.cs" />
     <Compile Include="HidDevice.cs" />
+    <Compile Include="IKeyboardRgbController.cs" />
     <Compile Include="KeyboardController.cs" />
     <Compile Include="KeyboardRgbController.cs" />
     <Compile Include="LightColor.cs" />

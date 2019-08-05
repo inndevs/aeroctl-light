@@ -74,7 +74,7 @@ namespace AeroCtl
 
 		public int DecreaseBrightness()
 		{
-			ManagementBaseObject inParams = this.wmi.SetClass.GetMethodParameters("DecreaseBrigtness");
+			ManagementBaseObject inParams = this.wmi.SetClass.GetMethodParameters("DecreaseBrigtness"); // sic
 			inParams["Data"] = (byte)0;
 			ManagementBaseObject outParams = this.wmi.Set.InvokeMethod("DecreaseBrigtness", inParams, null);
 			return Convert.ToByte(outParams["DataOut"]);

@@ -7,19 +7,6 @@
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="AERO Controls" Height="540" Width="480" Name="this">
-    <Window.Resources>
-        <Style x:Key="BlurEffect" TargetType="{x:Type Control}">
-            <Style.Triggers>
-                <Trigger Property="IsFocused" Value="False">
-                    <Setter Property="Effect">
-                        <Setter.Value>
-                            <BlurEffect Radius="10"></BlurEffect>
-                        </Setter.Value>
-                    </Setter>
-                </Trigger>
-            </Style.Triggers>
-        </Style>
-    </Window.Resources>
     <ScrollViewer>
         <StackPanel>
             <StackPanel.Resources >
@@ -46,7 +33,20 @@
                     <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.BaseBoard, Mode=OneWay}" />
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="2">Serial Number</TextBlock>
-                    <TextBox Grid.Row="1" Grid.Column="1" IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.SerialNumber, Mode=OneWay}"  Style="{StaticResource BlurEffect}">
+                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="snTextBox" IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.SerialNumber, Mode=OneWay}">
+                        <TextBox.Resources>
+                            <Style TargetType="{x:Type ScrollViewer}">
+                                <Style.Triggers>
+                                    <DataTrigger Binding="{Binding ElementName=snTextBox, Path=IsFocused}" Value="False">
+                                        <Setter Property="Effect">
+                                            <Setter.Value>
+                                                <BlurEffect Radius="10"></BlurEffect>
+                                            </Setter.Value>
+                                        </Setter>
+                                    </DataTrigger>
+                                </Style.Triggers>
+                            </Style>
+                        </TextBox.Resources>
                     </TextBox>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="2">BIOS Version(s)</TextBlock>
