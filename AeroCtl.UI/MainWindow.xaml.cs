@@ -32,8 +32,20 @@ namespace AeroCtl.UI
 			this.wmi = new AeroWmi();
 			this.aero = new Aero(this.wmi);
 			this.aero.Keyboard.FnKeyPressed += onFnKeyPressed;
-
 			this.Aero = new AeroController(this.aero);
+
+			System.Windows.Forms.NotifyIcon trayIcon = new System.Windows.Forms.NotifyIcon
+			{
+				Icon = Properties.Resources.Main,
+				Visible = true,
+				Text = "AERO Controls"
+			};
+
+			trayIcon.DoubleClick += (s, e) =>
+			{
+				this.Show();
+				this.WindowState = WindowState.Normal;
+			};
 
 			this.InitializeComponent();
 
@@ -51,6 +63,8 @@ namespace AeroCtl.UI
 				{
 
 				}
+
+				trayIcon.Dispose();
 			};
 		}
 
@@ -101,6 +115,14 @@ namespace AeroCtl.UI
 
 				this.Close();
 			}
+		}
+
+		protected override void OnStateChanged(EventArgs e)
+		{
+			base.OnStateChanged(e);
+
+			if (this.WindowState == WindowState.Minimized)
+				this.Hide();
 		}
 
 		private void ButtonBase_OnClick(object sender, RoutedEventArgs e)

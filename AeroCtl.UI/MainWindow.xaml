@@ -9,24 +9,50 @@
         Title="AERO Controls" Height="450" Width="800" Name="this">
     <ScrollViewer>
         <StackPanel>
-            <GroupBox Header="Info" Margin="5 5 5 0">
-                <StackPanel>
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="0 0 5 0">Model / Base board:</TextBlock>
-                        <TextBox Name="baseBoard" IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.BaseBoard, Mode=OneWay}"></TextBox>
-                    </StackPanel>
+            <StackPanel.Resources >
+                <Style TargetType="GroupBox" >
+                    <Setter Property="Margin" Value="5,5,5,0" />
+                </Style>
+            </StackPanel.Resources>
+            <GroupBox Header="Info">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                        <RowDefinition Height="Auto" />
+                    </Grid.RowDefinitions>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="Auto" />
+                        <ColumnDefinition Width="*" />
+                    </Grid.ColumnDefinitions>
 
-                    <StackPanel Orientation="Horizontal">
-                        <TextBlock Margin="0 0 5 0">CPU Temperature:</TextBlock>
+                    <TextBlock Grid.Row="0" Grid.Column="0" Margin="2">Model / Base board</TextBlock>
+                    <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.BaseBoard, Mode=OneWay}" />
+
+                    <TextBlock Grid.Row="1" Grid.Column="0" Margin="2">Serial Number</TextBlock>
+                    <TextBox Grid.Row="1" Grid.Column="1" IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.SerialNumber, Mode=OneWay}" />
+
+                    <TextBlock Grid.Row="2" Grid.Column="0" Margin="2">BIOS Version(s)</TextBlock>
+                    <TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.BiosVersion, Mode=OneWay}" />
+
+                    <TextBlock Grid.Row="3" Grid.Column="0" Margin="2">Keyboard firmware version</TextBlock>
+                    <TextBox Grid.Row="3" Grid.Column="1" IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.KeyboardFWVersion, Mode=OneWay}" />
+
+                    <TextBlock Grid.Row="4" Grid.Column="0" Margin="2">CPU Temperature</TextBlock>
+                    <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
                         <TextBlock Text="{Binding ElementName=this, Path=Aero.CpuTemperature, Mode=OneWay}" />
                         <TextBlock Margin="5 0 0 0">°C</TextBlock>
                     </StackPanel>
 
-                    <CheckBox Name="wifiCheck" IsChecked="{Binding ElementName=this, Path=Aero.WifiEnabled}">Wifi</CheckBox>
-                </StackPanel>
+                    <TextBlock Grid.Row="5" Grid.Column="0" Margin="2">Wifi Enabled</TextBlock>
+                    <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding ElementName=this, Path=Aero.WifiEnabled}" />
+                </Grid>
             </GroupBox>
 
-            <GroupBox Header="Display" Margin="5 5 5 0">
+            <GroupBox Header="Display">
                 <StackPanel>
                     <Label Target="{Binding ElementName=screenBrightness}">
                         <StackPanel Orientation="Horizontal">
@@ -38,7 +64,7 @@
                 </StackPanel>
             </GroupBox>
 
-            <GroupBox Header="Battery" Margin="5 5 5 0">
+            <GroupBox Header="Battery">
                 <StackPanel>
                     <CheckBox IsChecked="{Binding ElementName=this, Path=Aero.ChargeStopEnabled}">Enable charge stop</CheckBox>
 
@@ -52,15 +78,8 @@
                     <Slider Name="chargeStop" Minimum="1" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding ElementName=this, Path=Aero.ChargeStop}" />
                 </StackPanel>
             </GroupBox>
-
-            <GroupBox Header="Keyboard" Margin="5 5 5 0">
-                <StackPanel Orientation="Horizontal">
-                    <TextBlock Margin="0 0 5 0">Firmware version:</TextBlock>
-                    <TextBox IsReadOnly="True" Text="{Binding ElementName=this, Path=Aero.KeyboardFWVersion, Mode=OneWay}" />
-                </StackPanel>
-            </GroupBox>
-
-            <GroupBox Header="Fans" Margin="5 5 5 0">
+            
+            <GroupBox Header="Fans">
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="0 0 5 0">Fan 1 RPM:</TextBlock>

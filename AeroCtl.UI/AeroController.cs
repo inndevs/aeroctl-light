@@ -27,6 +27,28 @@ namespace AeroCtl.UI
 			}
 		}
 
+		private string biosVersion;
+		public string BiosVersion
+		{
+			get => this.biosVersion;
+			private set
+			{
+				this.biosVersion = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		private string serialNumber;
+		public string SerialNumber
+		{
+			get => this.serialNumber;
+			private set
+			{
+				this.serialNumber = value;
+				this.OnPropertyChanged();
+			}
+		}
+
 		private Version keyboardFWVersion;
 		public Version KeyboardFWVersion
 		{
@@ -265,13 +287,16 @@ namespace AeroCtl.UI
 			{
 				if (full)
 				{
+					this.BaseBoard = this.aero.BaseBoard;
+					this.SerialNumber = this.aero.SerialNumber;
+					this.BiosVersion = string.Join("; ", this.aero.BiosVersions);
+
 					if (this.aero.Keyboard.Rgb != null)
 					{
 						this.KeyboardFWVersion = await this.aero.Keyboard.Rgb.GetFirmwareVersionAsync();
 					}
 				}
 
-				this.BaseBoard = this.aero.BaseBoard;
 				this.CpuTemperature = this.aero.CpuTemperature;
 				this.FanRpm1 = this.aero.Fans.Rpm1;
 				this.FanRpm2 = this.aero.Fans.Rpm2;

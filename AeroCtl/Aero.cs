@@ -32,6 +32,16 @@ namespace AeroCtl
 		public string BaseBoard => this.Wmi.BaseBoard;
 
 		/// <summary>
+		/// Gets the serial number. Should match the one found on the underside of the notebook.
+		/// </summary>
+		public string SerialNumber => this.Wmi.SerialNumber;
+
+		/// <summary>
+		/// Gets the BIOS version strings.
+		/// </summary>
+		public IReadOnlyList<string> BiosVersions => this.Wmi.BiosVersions;
+
+		/// <summary>
 		/// Gets Keyboard Fn key handler.
 		/// </summary>
 		public KeyboardController Keyboard { get; }

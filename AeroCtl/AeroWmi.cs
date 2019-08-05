@@ -14,15 +14,22 @@ namespace AeroCtl
 		public ManagementObject Set { get; }
 
 		public string BaseBoard { get; }
+		public string SerialNumber { get; }
+		public IReadOnlyList<string> BiosVersions { get; }
 
 		public AeroWmi()
 		{
-			ManagementObjectSearcher managementObjectSearcher = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BaseBoard");
-			foreach (ManagementObject managementObject in managementObjectSearcher.Get())
+			foreach (ManagementObject obj in new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BaseBoard").Get().OfType<ManagementObject>())
 			{
-				this.BaseBoard = managementObject["Product"].ToString();
+				this.BaseBoard = (string)obj["Product"];
 			}
 
+			foreach (ManagementObject obj in new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BIOS").Get().OfType<ManagementObject>())
+			{
+				this.SerialNumber = (string)obj["SerialNumber"];
+				this.BiosVersions = (string[])obj["BIOSVersion"];
+			}
+			
 			ManagementScope scope = new ManagementScope("root\\WMI", new ConnectionOptions
 			{
 				EnablePrivileges = true,
