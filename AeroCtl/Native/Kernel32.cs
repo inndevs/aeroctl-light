@@ -19,6 +19,15 @@ namespace AeroCtl.Native
 
 		public const uint FILE_FLAG_OVERLAPPED = 0x40000000u;
 
+		[DllImport(lib)]
+		public static extern IntPtr LoadLibrary(string path);
+
+		[DllImport(lib)]
+		public static extern IntPtr GetProcAddress(IntPtr hModule, string procedureName);
+
+		[DllImport(lib)]
+		public static extern bool FreeLibrary(IntPtr hModule);
+
 		[DllImport(lib, CharSet = CharSet.Unicode, SetLastError = true)]
 		public static extern SafeFileHandle CreateFile(
 			string lpFileName,

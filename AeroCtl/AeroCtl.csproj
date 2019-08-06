@@ -85,6 +85,7 @@
     <Compile Include="Native\RAWMOUSE.cs" />
     <Compile Include="Native\SYSTEM_POWER_STATUS.cs" />
     <Compile Include="Native\User32.cs" />
+    <Compile Include="Native\Util.cs" />
     <Compile Include="Native\WlanApi.Native.cs" />
     <Compile Include="Native\WlanApi.cs" />
     <Compile Include="Properties\AssemblyInfo.cs" />
@@ -113,6 +114,9 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="NvAPIWrapper.Net">
+      <Version>0.7.0.57</Version>
+    </PackageReference>
     <PackageReference Include="System.Management">
       <Version>4.5.0</Version>
     </PackageReference>

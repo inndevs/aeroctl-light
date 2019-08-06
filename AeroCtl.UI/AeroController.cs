@@ -3,6 +3,7 @@ using System.ComponentModel;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
 using AeroCtl.UI.Properties;
@@ -69,6 +70,17 @@ namespace AeroCtl.UI
 			private set
 			{
 				this.cpuTemperature = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		private double gpuTemperature;
+		public double GpuTemperature
+		{
+			get => this.gpuTemperature;
+			private set
+			{
+				this.gpuTemperature = value;
 				this.OnPropertyChanged();
 			}
 		}
@@ -348,6 +360,7 @@ namespace AeroCtl.UI
 				}
 
 				this.CpuTemperature = await this.aero.GetCpuTemperatureAsync();
+				this.GpuTemperature = await this.aero.GetGpuTemperatureAsync();
 				(this.FanRpm1, this.FanRpm2) = await this.aero.Fans.GetRpmAsync();
 				this.ScreenBrightness = (int)this.aero.Screen.Brightness;
 				this.ChargeStopEnabled = this.aero.Battery.ChargePolicy == ChargePolicy.CustomStop;
@@ -375,9 +388,12 @@ namespace AeroCtl.UI
 				this.aero = aero;
 			}
 
-			public Task<double> GetTemperatureAsync(CancellationToken cancellationToken)
+			public async Task<double> GetTemperatureAsync(CancellationToken cancellationToken)
 			{
-				return this.aero.GetCpuTemperatureAsync();
+				double cpu = await this.aero.GetCpuTemperatureAsync();
+				double gpu = await this.aero.GetGpuTemperatureAsync();
+
+				return Math.Max(cpu, gpu);
 			}
 
 			public async Task SetSpeedAsync(double speed, CancellationToken cancellationToken)

@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AeroCtl.UI"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="AERO Controls" Height="600" Width="500" Name="wnd">
+        Title="AERO Controls" Height="600" Width="500">
     <Window.Resources>
         <local:EnumBooleanConverter x:Key="EnumConv" />
     </Window.Resources>
@@ -20,6 +20,7 @@
             <GroupBox Header="Info">
                 <Grid>
                     <Grid.RowDefinitions>
+                        <RowDefinition />
                         <RowDefinition />
                         <RowDefinition />
                         <RowDefinition />
@@ -65,11 +66,17 @@
                         <TextBlock Margin="5 0 0 0">°C</TextBlock>
                     </StackPanel>
 
-                    <TextBlock Grid.Row="5" Grid.Column="0" Margin="2">Wifi Enabled</TextBlock>
-                    <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding Aero.WifiEnabled}" />
+                    <TextBlock Grid.Row="5" Grid.Column="0" Margin="2">GPU Temperature</TextBlock>
+                    <StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+                        <TextBlock Text="{Binding Path=Aero.GpuTemperature, Mode=OneWay}" />
+                        <TextBlock Margin="5 0 0 0">°C</TextBlock>
+                    </StackPanel>
 
-                    <TextBlock Grid.Row="6" Grid.Column="0" Margin="2">Start minimized</TextBlock>
-                    <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding Aero.StartMinimized}" />
+                    <TextBlock Grid.Row="6" Grid.Column="0" Margin="2">Wifi Enabled</TextBlock>
+                    <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding Aero.WifiEnabled}" />
+
+                    <TextBlock Grid.Row="7" Grid.Column="0" Margin="2">Start minimized</TextBlock>
+                    <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding Aero.StartMinimized}" />
                 </Grid>
             </GroupBox>
 

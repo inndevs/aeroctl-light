@@ -3,6 +3,10 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading.Tasks;
+using NvAPIWrapper;
+using NvAPIWrapper.GPU;
+using NvAPIWrapper.Native.Exceptions;
+using NvAPIWrapper.Native.General;
 
 namespace AeroCtl
 {
@@ -14,6 +18,7 @@ namespace AeroCtl
 		#region Fields
 
 		private readonly WlanClient wlanClient;
+		private readonly PhysicalGPU gpu;
 
 		#endregion
 
@@ -108,6 +113,9 @@ namespace AeroCtl
 			this.Screen = new ScreenController(wmi);
 			this.Battery = new BatteryController(wmi);
 			this.wlanClient = new WlanClient();
+
+			NVIDIA.Initialize();
+			this.gpu = PhysicalGPU.GetPhysicalGPUs().FirstOrDefault();
 		}
 
 		#endregion
@@ -117,6 +125,28 @@ namespace AeroCtl
 		public async Task<double> GetCpuTemperatureAsync()
 		{
 			return await this.Wmi.InvokeGetAsync<ushort>("getCpuTemp");
+		}
+
+		public Task<double> GetGpuTemperatureAsync()
+		{
+			double max = 0.0;
+
+			if (this.gpu != null)
+			{
+				try
+				{
+					foreach (var sensor in this.gpu.ThermalInformation.ThermalSensors)
+					{
+						max = Math.Max(sensor.CurrentTemperature, max);
+					}
+				}
+				catch (NVIDIAApiException ex) when (ex.Status == (Status)(-220)) /* gpu not powered */
+				{
+
+				}
+			}
+
+			return Task.FromResult(max);
 		}
 
 		public void Dispose()
