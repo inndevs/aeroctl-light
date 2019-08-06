@@ -16,12 +16,7 @@ namespace AeroCtl
 		void SetGaming();
 		void SetFixed(double fanSpeed = 0.25);
 		void SetAuto(double fanAdjust = 0.25);
-	}
-
-	public interface IFanCurveController
-	{
-		int FanCurvePointCount { get; }
-		FanPoint GetFanCurvePoint(int index);
-		void SetFanCurvePoint(int index, FanPoint point);
+		void SetCustom();
+		FanCurve GetFanCurve();
 	}
 }

@@ -137,7 +137,7 @@
                         <Slider Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="False" Value="{Binding ElementName=this, Path=Aero.AutoFanAdjust}" IsEnabled="{Binding ElementName=fanProfileAuto, Path=IsChecked}" />
 
                         <RadioButton Grid.Row="5" Grid.Column="0" IsChecked="{Binding ElementName=this, Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Custom}}" DockPanel.Dock="Left" Name="fanProfileCustom">Custom</RadioButton>
-                        <Button Grid.Row="5" Grid.Column="1" Width="100" Height="23" HorizontalAlignment="Left" IsEnabled="{Binding ElementName=fanProfileCustom, Path=IsChecked}">Edit Curve</Button>
+                        <Button Grid.Row="5" Grid.Column="1" Width="100" Height="23" HorizontalAlignment="Left" IsEnabled="{Binding ElementName=fanProfileCustom, Path=IsChecked}" Click="onEditFanCurveClicked">Edit Curve</Button>
                     </Grid>
 
                 </StackPanel>

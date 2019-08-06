@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Collections.Generic;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -112,6 +114,25 @@ namespace AeroCtl.UI
 
 			if (this.WindowState == WindowState.Minimized)
 				this.Hide();
+		}
+
+		private void onEditFanCurveClicked(object sender, RoutedEventArgs e)
+		{
+			FanCurve curve = this.aero.Fans.GetFanCurve();
+			if (curve == null)
+				return;
+
+			FanPoint[] clone = curve.ToArray();
+			FanCurveEditor editor = new FanCurveEditor(clone);
+			editor.Show();
+
+			editor.CurveApplied += (s, e2) =>
+			{
+				for (int i = 0; i < curve.Count; ++i)
+				{
+					curve[i] = clone[i];
+				}
+			};
 		}
 	}
 }

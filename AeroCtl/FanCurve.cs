@@ -8,25 +8,14 @@ namespace AeroCtl
 	/// <summary>
 	/// Represents a hardware fan curve (or steps, rather).
 	/// </summary>
-	public class FanCurve : IList<FanPoint>, IReadOnlyList<FanPoint>
+	public abstract class FanCurve : IList<FanPoint>, IReadOnlyList<FanPoint>
 	{
-		private readonly IFanCurveController controller;
+		public abstract FanPoint this[int index] { get; set; }
 
-		public FanPoint this[int index]
-		{
-			get => this.controller.GetFanCurvePoint(index);
-			set => this.controller.SetFanCurvePoint(index, value);
-		}
+		public abstract int Count { get; }
 
-		public int Count => this.controller.FanCurvePointCount;
+		bool ICollection<FanPoint>.IsReadOnly => true;
 
-		public bool IsReadOnly => true;
-
-		public FanCurve(IFanCurveController controller)
-		{
-			this.controller = controller;
-		}
-		
 		public bool Contains(FanPoint item)
 		{
 			return ((IEnumerable<FanPoint>)this).Contains(item);

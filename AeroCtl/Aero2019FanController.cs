@@ -7,7 +7,7 @@ namespace AeroCtl
 	/// <summary>
 	/// Implements the fan controller and thermal management of the notebook.
 	/// </summary>
-	public class Aero2019FanController : IFanController, IFanCurveController
+	public class Aero2019FanController : IFanController
 	{
 		#region Fields
 
@@ -15,12 +15,11 @@ namespace AeroCtl
 
 		private const int minFanSpeed = 0;
 		private const int maxFanSpeed = 229;
+		private const int fanCurvePointCount = 15;
 
 		#endregion
 
 		#region Properties
-
-		public int FanCurvePointCount => 15;
 
 		/// <summary>
 		/// Gets the current RPM of fan 1.
@@ -174,6 +173,20 @@ namespace AeroCtl
 			this.FixedFanSpeed = (byte)relToAbs(fanSpeed);
 		}
 
+		public void SetCustom()
+		{
+			this.AutoFan = false;
+			this.FixedFan = false;
+			this.MaxFan = false;
+			this.StepFan = true;
+			this.NvThermalTarget = false;
+		}
+
+		public FanCurve GetFanCurve()
+		{
+			return new Curve(this);
+		}
+
 		/// <summary>
 		/// Returns the fan point at the specified index.
 		/// </summary>
@@ -181,7 +194,7 @@ namespace AeroCtl
 		/// <returns></returns>
 		public FanPoint GetFanCurvePoint(int index)
 		{
-			if (index < 0 || index >= this.FanCurvePointCount)
+			if (index < 0 || index >= fanCurvePointCount)
 				throw new ArgumentOutOfRangeException(nameof(index));
 
 			ManagementBaseObject inParams = this.wmi.GetClass.GetMethodParameters("GetFanIndexValue");
@@ -202,7 +215,7 @@ namespace AeroCtl
 		/// <param name="point"></param>
 		public void SetFanCurvePoint(int index, FanPoint point)
 		{
-			if (index < 0 || index >= this.FanCurvePointCount)
+			if (index < 0 || index >= fanCurvePointCount)
 				throw new ArgumentOutOfRangeException(nameof(index));
 
 			ManagementBaseObject inParams = this.wmi.SetClass.GetMethodParameters("SetFanIndexValue");
@@ -220,6 +233,28 @@ namespace AeroCtl
 		private static ushort reverse(ushort val)
 		{
 			return (ushort)((val << 8) | (val >> 8));
+		}
+
+		#endregion
+
+		#region Nested Types
+
+		private sealed class Curve : FanCurve
+		{
+			private readonly Aero2019FanController controller;
+			public Curve(Aero2019FanController controller)
+			{
+				this.controller = controller;
+			}
+
+
+			public override FanPoint this[int index]
+			{
+				get => this.controller.GetFanCurvePoint(index);
+				set => this.controller.SetFanCurvePoint(index, value);
+			}
+
+			public override int Count => fanCurvePointCount;
 		}
 
 		#endregion
