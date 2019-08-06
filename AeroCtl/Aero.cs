@@ -64,6 +64,8 @@ namespace AeroCtl
 		/// </summary>
 		public BatteryController Battery { get; }
 
+		public TouchpadController Touchpad { get; }
+
 		/// <summary>
 		/// Gets or sets the software wifi enable state.
 		/// </summary>
@@ -113,6 +115,7 @@ namespace AeroCtl
 			this.Screen = new ScreenController(wmi);
 			this.Battery = new BatteryController(wmi);
 			this.wlanClient = new WlanClient();
+			this.Touchpad = new TouchpadController(wmi);
 
 			NVIDIA.Initialize();
 			this.gpu = PhysicalGPU.GetPhysicalGPUs().FirstOrDefault();

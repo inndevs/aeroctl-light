@@ -86,6 +86,10 @@ namespace AeroCtl.UI
 				case FnKey.ToggleScreen:
 					this.aero.Screen.ToggleScreen();
 					break;
+
+				case FnKey.ToggleTouchpad:
+					this.aero.Touchpad.ToggleTouchpad();
+					break;
 			}
 		}
 

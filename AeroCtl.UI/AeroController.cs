@@ -139,6 +139,18 @@ namespace AeroCtl.UI
 			}
 		}
 
+		public bool TouchpadEnabled
+		{
+			get => this.aero.Touchpad.Enabled;
+			set
+			{
+				if (!this.updating)
+					this.aero.Touchpad.Enabled = value;
+
+				this.OnPropertyChanged();
+			}
+		}
+
 
 		private bool startMinimized;
 		public bool StartMinimized

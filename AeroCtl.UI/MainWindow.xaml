@@ -28,6 +28,7 @@
                         <RowDefinition />
                         <RowDefinition />
                         <RowDefinition />
+						<RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -75,8 +76,11 @@
                     <TextBlock Grid.Row="6" Grid.Column="0" Margin="2">Wifi Enabled</TextBlock>
                     <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding Aero.WifiEnabled}" />
 
-                    <TextBlock Grid.Row="7" Grid.Column="0" Margin="2">Start minimized</TextBlock>
-                    <CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding Aero.StartMinimized}" />
+					<TextBlock Grid.Row="7" Grid.Column="0" Margin="2">Touchpad Enabled</TextBlock>
+					<CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding Aero.TouchpadEnabled}" />
+
+					<TextBlock Grid.Row="8" Grid.Column="0" Margin="2">Start minimized</TextBlock>
+                    <CheckBox Grid.Row="8" Grid.Column="1" IsChecked="{Binding Aero.StartMinimized}" />
                 </Grid>
             </GroupBox>
 
