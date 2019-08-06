@@ -58,7 +58,7 @@ namespace AeroCtl.UI
 				{
 					await updateTask;
 				}
-				catch (TaskCanceledException)
+				catch (OperationCanceledException)
 				{
 
 				}

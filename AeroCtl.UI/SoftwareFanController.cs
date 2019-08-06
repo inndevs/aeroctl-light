@@ -59,7 +59,7 @@ namespace AeroCtl.UI
 			{
 				await this.task;
 			}
-			catch (TaskCanceledException)
+			catch (OperationCanceledException)
 			{
 
 			}
