@@ -20,12 +20,13 @@
             <GroupBox Header="Info">
                 <Grid>
                     <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
-                        <RowDefinition Height="Auto" />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
+                        <RowDefinition />
                     </Grid.RowDefinitions>
                     <Grid.ColumnDefinitions>
                         <ColumnDefinition Width="Auto" />
@@ -33,10 +34,10 @@
                     </Grid.ColumnDefinitions>
 
                     <TextBlock Grid.Row="0" Grid.Column="0" Margin="2">Model / Base board</TextBlock>
-                    <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Text="{Binding ElementName=wnd, Path=Aero.BaseBoard, Mode=OneWay}" />
+                    <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Text="{Binding Path=Aero.BaseBoard, Mode=OneWay}" />
 
                     <TextBlock Grid.Row="1" Grid.Column="0" Margin="2">Serial Number</TextBlock>
-                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="snTextBox" IsReadOnly="True" Text="{Binding ElementName=wnd, Path=Aero.SerialNumber, Mode=OneWay}">
+                    <TextBox Grid.Row="1" Grid.Column="1" x:Name="snTextBox" IsReadOnly="True" Text="{Binding Path=Aero.SerialNumber, Mode=OneWay}">
                         <TextBox.Resources>
                             <Style TargetType="{x:Type ScrollViewer}">
                                 <Style.Triggers>
@@ -53,19 +54,22 @@
                     </TextBox>
 
                     <TextBlock Grid.Row="2" Grid.Column="0" Margin="2">BIOS Version(s)</TextBlock>
-                    <TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" Text="{Binding ElementName=wnd, Path=Aero.BiosVersion, Mode=OneWay}" />
+                    <TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" Text="{Binding Path=Aero.BiosVersion, Mode=OneWay}" />
 
                     <TextBlock Grid.Row="3" Grid.Column="0" Margin="2">Keyboard firmware version</TextBlock>
-                    <TextBox Grid.Row="3" Grid.Column="1" IsReadOnly="True" Text="{Binding ElementName=wnd, Path=Aero.KeyboardFWVersion, Mode=OneWay}" />
+                    <TextBox Grid.Row="3" Grid.Column="1" IsReadOnly="True" Text="{Binding Path=Aero.KeyboardFWVersion, Mode=OneWay}" />
 
                     <TextBlock Grid.Row="4" Grid.Column="0" Margin="2">CPU Temperature</TextBlock>
                     <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
-                        <TextBlock Text="{Binding ElementName=wnd, Path=Aero.CpuTemperature, Mode=OneWay}" />
+                        <TextBlock Text="{Binding Path=Aero.CpuTemperature, Mode=OneWay}" />
                         <TextBlock Margin="5 0 0 0">°C</TextBlock>
                     </StackPanel>
 
                     <TextBlock Grid.Row="5" Grid.Column="0" Margin="2">Wifi Enabled</TextBlock>
-                    <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding ElementName=wnd, Path=Aero.WifiEnabled}" />
+                    <CheckBox Grid.Row="5" Grid.Column="1" IsChecked="{Binding Aero.WifiEnabled}" />
+
+                    <TextBlock Grid.Row="6" Grid.Column="0" Margin="2">Start minimized</TextBlock>
+                    <CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding Aero.StartMinimized}" />
                 </Grid>
             </GroupBox>
 
@@ -74,25 +78,25 @@
                     <Label Target="{Binding ElementName=screenBrightness}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Margin="0 0 5 0">Screen brightness:</TextBlock>
-                            <TextBlock Text="{Binding ElementName=wnd, Path=Aero.ScreenBrightness, Mode=OneWay}" />
+                            <TextBlock Text="{Binding Path=Aero.ScreenBrightness, Mode=OneWay}" />
                         </StackPanel>
                     </Label>
-                    <Slider Name="screenBrightness" Minimum="0" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding ElementName=wnd, Path=Aero.ScreenBrightness}" />
+                    <Slider Name="screenBrightness" Minimum="0" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding Path=Aero.ScreenBrightness}" />
                 </StackPanel>
             </GroupBox>
 
             <GroupBox Header="Battery">
                 <StackPanel>
-                    <CheckBox IsChecked="{Binding ElementName=wnd, Path=Aero.ChargeStopEnabled}">Enable charge stop</CheckBox>
+                    <CheckBox IsChecked="{Binding Path=Aero.ChargeStopEnabled}">Enable charge stop</CheckBox>
 
                     <Label Target="{Binding ElementName=chargeStop}">
                         <StackPanel Orientation="Horizontal">
                             <TextBlock Margin="0 0 5 0">Charge stop:</TextBlock>
-                            <TextBlock Text="{Binding ElementName=wnd, Path=Aero.ChargeStop, Mode=OneWay}" />
+                            <TextBlock Text="{Binding Path=Aero.ChargeStop, Mode=OneWay}" />
                             <TextBlock Margin="5 0 0 0">%</TextBlock>
                         </StackPanel>
                     </Label>
-                    <Slider Name="chargeStop" Minimum="1" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding ElementName=wnd, Path=Aero.ChargeStop}" />
+                    <Slider Name="chargeStop" Minimum="1" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding Path=Aero.ChargeStop}" />
                 </StackPanel>
             </GroupBox>
             
@@ -100,8 +104,8 @@
                 <StackPanel>
                     <StackPanel Orientation="Horizontal">
                         <TextBlock Margin="0 0 5 0">RPM:</TextBlock>
-                        <TextBlock Margin="0 0 5 0" Text="{Binding ElementName=wnd, Path=Aero.FanRpm1, Mode=OneWay}" />
-                        <TextBlock Margin="0 0 5 0" Text="{Binding ElementName=wnd, Path=Aero.FanRpm2, Mode=OneWay}" />
+                        <TextBlock Margin="0 0 5 0" Text="{Binding Path=Aero.FanRpm1, Mode=OneWay}" />
+                        <TextBlock Margin="0 0 5 0" Text="{Binding Path=Aero.FanRpm2, Mode=OneWay}" />
                     </StackPanel>
 
                     <Grid>
@@ -125,22 +129,22 @@
                             <ColumnDefinition Width="*" />
                         </Grid.ColumnDefinitions>
                         
-                        <RadioButton Grid.Row="0" Grid.Column="0" IsChecked="{Binding ElementName=wnd, Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Quiet}}">Quiet</RadioButton>
+                        <RadioButton Grid.Row="0" Grid.Column="0" IsChecked="{Binding Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Quiet}}">Quiet</RadioButton>
                         
-                        <RadioButton Grid.Row="1" Grid.Column="0" IsChecked="{Binding ElementName=wnd, Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Normal}}">Normal</RadioButton>
+                        <RadioButton Grid.Row="1" Grid.Column="0" IsChecked="{Binding Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Normal}}">Normal</RadioButton>
                         
-                        <RadioButton Grid.Row="2" Grid.Column="0" IsChecked="{Binding ElementName=wnd, Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Gaming}}">Gaming</RadioButton>
+                        <RadioButton Grid.Row="2" Grid.Column="0" IsChecked="{Binding Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Gaming}}">Gaming</RadioButton>
                         
-                        <RadioButton Grid.Row="3" Grid.Column="0" IsChecked="{Binding ElementName=wnd, Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Fixed}}" DockPanel.Dock="Left" Name="fanProfileFixed">Fixed</RadioButton>
-                        <Slider Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="False" Value="{Binding ElementName=wnd, Path=Aero.FixedFanSpeed}" IsEnabled="{Binding ElementName=fanProfileFixed, Path=IsChecked}" />
+                        <RadioButton Grid.Row="3" Grid.Column="0" IsChecked="{Binding Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Fixed}}" DockPanel.Dock="Left" Name="fanProfileFixed">Fixed</RadioButton>
+                        <Slider Grid.Row="3" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="False" Value="{Binding Path=Aero.FixedFanSpeed}" IsEnabled="{Binding ElementName=fanProfileFixed, Path=IsChecked}" />
                    
-                        <RadioButton Grid.Row="4" Grid.Column="0" IsChecked="{Binding ElementName=wnd, Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Auto}}" DockPanel.Dock="Left" Name="fanProfileAuto">Auto</RadioButton>
-                        <Slider Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="False" Value="{Binding ElementName=wnd, Path=Aero.AutoFanAdjust}" IsEnabled="{Binding ElementName=fanProfileAuto, Path=IsChecked}" />
+                        <RadioButton Grid.Row="4" Grid.Column="0" IsChecked="{Binding Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Auto}}" DockPanel.Dock="Left" Name="fanProfileAuto">Auto</RadioButton>
+                        <Slider Grid.Row="4" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="False" Value="{Binding Path=Aero.AutoFanAdjust}" IsEnabled="{Binding ElementName=fanProfileAuto, Path=IsChecked}" />
 
-                        <RadioButton Grid.Row="5" Grid.Column="0" IsChecked="{Binding ElementName=wnd, Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Custom}}" DockPanel.Dock="Left" Name="fanProfileCustom">Custom</RadioButton>
+                        <RadioButton Grid.Row="5" Grid.Column="0" IsChecked="{Binding Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Custom}}" DockPanel.Dock="Left" Name="fanProfileCustom">Custom</RadioButton>
                         <Button Grid.Row="5" Grid.Column="1" Width="100" Height="23" HorizontalAlignment="Left" IsEnabled="{Binding ElementName=fanProfileCustom, Path=IsChecked}" Click="onEditHwCurveClicked">Edit Curve</Button>
 
-                        <RadioButton Grid.Row="6" Grid.Column="0" IsChecked="{Binding ElementName=wnd, Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Software}}" DockPanel.Dock="Left" Name="fanProfileSoftware">Software</RadioButton>
+                        <RadioButton Grid.Row="6" Grid.Column="0" IsChecked="{Binding Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Software}}" DockPanel.Dock="Left" Name="fanProfileSoftware">Software</RadioButton>
                         <Button Grid.Row="6" Grid.Column="1" Width="100" Height="23" HorizontalAlignment="Left" IsEnabled="{Binding ElementName=fanProfileSoftware, Path=IsChecked}" Click="onEditSwCurveClicked">Edit Curve</Button>
 
                     </Grid>

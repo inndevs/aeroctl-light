@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -27,11 +28,13 @@ namespace AeroCtl.UI
 			this.Aero = new AeroController(this.aero);
 			this.Aero.Load();
 
+			this.InitializeComponent();
+
 			System.Windows.Forms.NotifyIcon trayIcon = new System.Windows.Forms.NotifyIcon
 			{
 				Icon = Properties.Resources.Main,
 				Visible = true,
-				Text = "AERO Controls"
+				Text = this.Title
 			};
 
 			trayIcon.DoubleClick += (s, e) =>
@@ -40,7 +43,11 @@ namespace AeroCtl.UI
 				this.WindowState = WindowState.Normal;
 			};
 
-			this.InitializeComponent();
+			if (this.Aero.StartMinimized && !Debugger.IsAttached)
+			{
+				this.WindowState = WindowState.Minimized;
+				this.Hide();
+			}
 
 			CancellationTokenSource cts = new CancellationTokenSource();
 			Task updateTask = this.updateLoop(cts.Token);
@@ -124,7 +131,7 @@ namespace AeroCtl.UI
 
 			if (this.Aero.FanProfile == FanProfile.Software)
 			{
-				this.aero.Fans.SetNormalAsync().Wait();
+				this.aero.Fans.SetNormalAsync();
 			}
 		}
 

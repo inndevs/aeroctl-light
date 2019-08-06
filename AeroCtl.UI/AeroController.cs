@@ -9,6 +9,7 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using AeroCtl.UI.Properties;
 
 namespace AeroCtl.UI
 {
@@ -130,6 +131,25 @@ namespace AeroCtl.UI
 			}
 		}
 
+
+		private bool startMinimized;
+		public bool StartMinimized
+		{
+			get => this.startMinimized;
+			set
+			{
+				this.startMinimized = value;
+				this.OnPropertyChanged();
+
+				if (!this.updating)
+				{
+					Settings.Default.StartMinimized = value;
+					Settings.Default.Save();
+				}
+			}
+		}
+
+
 		private int chargeStop;
 		public int ChargeStop
 		{
@@ -171,10 +191,12 @@ namespace AeroCtl.UI
 				this.fanProfile = value;
 				this.OnPropertyChanged();
 
-				Properties.Settings.Default.FanProfile = (int)value;
-				Properties.Settings.Default.Save();
-
-				this.fanProfileInvalid = true;
+				if (!this.updating)
+				{
+					Settings.Default.FanProfile = (int)value;
+					Settings.Default.Save();
+					this.fanProfileInvalid = true;
+				}
 			}
 		}
 
@@ -187,10 +209,12 @@ namespace AeroCtl.UI
 				this.fixedFanSpeed = value;
 				this.OnPropertyChanged();
 
-				Properties.Settings.Default.FixedFanSpeed = value;
-				Properties.Settings.Default.Save();
-
-				this.fanProfileInvalid = true;
+				if (!this.updating)
+				{
+					Settings.Default.FixedFanSpeed = value;
+					Settings.Default.Save();
+					this.fanProfileInvalid = true;
+				}
 			}
 		}
 
@@ -203,10 +227,12 @@ namespace AeroCtl.UI
 				this.autoFanAdjust = value;
 				this.OnPropertyChanged();
 
-				Properties.Settings.Default.AutoFanAdjust = value;
-				Properties.Settings.Default.Save();
-
-				this.fanProfileInvalid = true;
+				if (!this.updating)
+				{
+					Settings.Default.AutoFanAdjust = value;
+					Settings.Default.Save();
+					this.fanProfileInvalid = true;
+				}
 			}
 		}
 
@@ -219,10 +245,12 @@ namespace AeroCtl.UI
 				this.softwareFanCurve = value;
 				this.OnPropertyChanged();
 
-				Properties.Settings.Default.SoftwareFanCurve = string.Join(" ", value.Select(p => $"{p.Temperature.ToString(CultureInfo.InvariantCulture)} {p.FanSpeed.ToString(CultureInfo.InvariantCulture)}"));
-				Properties.Settings.Default.Save();
-
-				this.fanProfileInvalid = true;
+				if (!this.updating)
+				{
+					Settings.Default.SoftwareFanCurve = string.Join(" ", value.Select(p => $"{p.Temperature.ToString(CultureInfo.InvariantCulture)} {p.FanSpeed.ToString(CultureInfo.InvariantCulture)}"));
+					Settings.Default.Save();
+					this.fanProfileInvalid = true;
+				}
 			}
 		}
 
@@ -233,16 +261,26 @@ namespace AeroCtl.UI
 
 		public void Load()
 		{
-			this.FanProfile = (FanProfile)Properties.Settings.Default.FanProfile;
-			this.FixedFanSpeed = Properties.Settings.Default.FixedFanSpeed;
-			this.AutoFanAdjust = Properties.Settings.Default.AutoFanAdjust;
-			this.SoftwareFanCurve = Properties.Settings.Default.SoftwareFanCurve
-				.Split(new[] { ' ' }, StringSplitOptions.RemoveEmptyEntries)
-				.Select((str, i) => (i, str))
-				.GroupBy(x => x.i / 2, x => x.str)
-				.Select(g => (double.Parse(g.First(), CultureInfo.InvariantCulture), double.Parse(g.Last(), CultureInfo.InvariantCulture)))
-				.Select(t => new FanPoint(t.Item1, t.Item2))
-				.ToArray();
+			this.updating = true;
+			try
+			{
+				Settings s = Settings.Default;
+				this.StartMinimized = s.StartMinimized;
+				this.FanProfile = (FanProfile)s.FanProfile;
+				this.FixedFanSpeed = s.FixedFanSpeed;
+				this.AutoFanAdjust = s.AutoFanAdjust;
+				this.SoftwareFanCurve = s.SoftwareFanCurve
+					.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries)
+					.Select((str, i) => (i, str))
+					.GroupBy(x => x.i / 2, x => x.str)
+					.Select(g => (double.Parse(g.First(), CultureInfo.InvariantCulture), double.Parse(g.Last(), CultureInfo.InvariantCulture)))
+					.Select(t => new FanPoint(t.Item1, t.Item2))
+					.ToArray();
+			}
+			finally
+			{
+				this.updating = false;
+			}
 		}
 
 		private async Task applyFanProfileAsync()

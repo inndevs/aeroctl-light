@@ -21,80 +21,6 @@ namespace AeroCtl
 
 		#endregion
 
-		#region Properties
-
-		public bool AutoFan
-		{
-			get => this.wmi.InvokeGet<byte>("GetAutoFanStatus") != 0;
-			set => this.wmi.InvokeSet<byte>("SetAutoFanStatus", value ? (byte)1 : (byte)0);
-		}
-
-		public int FanAdjust
-		{
-			get => this.wmi.InvokeGet<byte>("GetFanAdjustStatus");
-			set
-			{
-				if (value < minFanSpeed || value > maxFanSpeed)
-					throw new ArgumentOutOfRangeException(nameof(value));
-
-				this.wmi.InvokeSet<byte>("SetFanAdjustStatus", (byte)value);
-			}
-		}
-
-		public bool MaxFan
-		{
-			get => this.wmi.InvokeGet<byte>("GetFanSpeed") != 0;
-			set
-			{
-				try
-				{
-					this.wmi.InvokeSet<byte>("SetFanSpeed", value ? (byte) 1 : (byte) 0);
-				}
-				catch (ManagementException)
-				{
-					// Always throws an exception even though it has an effect.
-				}
-			}
-		}
-
-		public bool FixedFan
-		{
-			get => this.wmi.InvokeGet<ushort>("GetFixedFanStatus") != 0;
-			set => this.wmi.InvokeSet<byte>("SetFixedFanStatus", value ? (byte)1 : (byte)0);
-		}
-
-		public int FixedFanSpeed
-		{
-			get => (byte)this.wmi.InvokeGet<ushort>("GetFixedFanSpeed");
-			set
-			{
-				if (value < minFanSpeed || value > maxFanSpeed)
-					throw new ArgumentOutOfRangeException(nameof(value));
-
-				this.wmi.InvokeSet<byte>("SetFixedFanSpeed", (byte)value);
-			}
-		}
-
-		public bool StepFan
-		{
-			get => this.wmi.InvokeGet<ushort>("GetStepFanStatus") != 0;
-			set => this.wmi.InvokeSet<byte>("SetStepFanStatus", value ? (byte)1 : (byte)0);
-		}
-
-		public bool NvThermalTarget
-		{
-			get => this.wmi.InvokeGet<byte>("GetNvThermalTarget") != 0;
-			set => this.wmi.InvokeSet<byte>("SetNvThermalTarget", value ? (byte)1 : (byte)0);
-		}
-
-		public bool NvPowerConfig
-		{
-			get => this.wmi.InvokeGet<byte>("GetNvPowerConfig") != 0;
-			set => this.wmi.InvokeSet<byte>("SetNvPowerCfg", value ? (byte)1 : (byte)0);
-		}
-
-		#endregion
-
 		#region Constructors
 
 		public Aero2019FanController(AeroWmi wmi)
@@ -106,10 +32,15 @@ namespace AeroCtl
 
 		#region Methods
 
+		private static ushort reverse(ushort val)
+		{
+			return (ushort)((val << 8) | (val >> 8));
+		}
+
 		public async Task<(int fan1, int fan2)> GetRpmAsync()
 		{
 			int rpm1 = reverse(await this.wmi.InvokeGetAsync<ushort>("getRpm1"));
-			int rpm2 = reverse(await this.wmi.InvokeGetAsync<ushort>("getRpm1"));
+			int rpm2 = reverse(await this.wmi.InvokeGetAsync<ushort>("getRpm2"));
 
 			return (rpm1, rpm2);
 		}
@@ -126,73 +57,60 @@ namespace AeroCtl
 			return (double) (fanSpeed - minFanSpeed) / (maxFanSpeed - minFanSpeed);
 		}
 
-		public Task SetQuietAsync()
+		public async Task SetQuietAsync()
 		{
-			this.FixedFan = false;
-			this.MaxFan = false;
-			this.StepFan = false;
-			this.AutoFan = false;
-			this.NvThermalTarget = true;
-
-			return Task.CompletedTask;
+			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 0);
+			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetStepFanStatus", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetAutoFanStatus", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 1);
 		}
 
-		public Task SetNormalAsync()
+		public async Task SetNormalAsync()
 		{
-			this.FixedFan = false;
-			this.MaxFan = false;
-			this.StepFan = false;
-			this.AutoFan = false;
-			this.NvThermalTarget = false;
-
-			return Task.CompletedTask;
-
+			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 0);
+			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetStepFanStatus", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetAutoFanStatus", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
 		}
 
-		public Task SetGamingAsync()
+		public async Task SetGamingAsync()
 		{
-			this.FixedFan = false;
-			this.MaxFan = false;
-			this.StepFan = false;
-			this.AutoFan = true;
-			this.NvThermalTarget = false;
-
-			return Task.CompletedTask;
+			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 0);
+			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetStepFanStatus", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetAutoFanStatus", 1);
+			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
 		}
 
-		public Task SetAutoAsync(double fanAdjust = 0.25)
+		public async Task SetAutoAsync(double fanAdjust = 0.25)
 		{
-			this.MaxFan = false;
-			this.AutoFan = false;
-			this.FixedFan = false;
-			this.StepFan = true;
-			this.NvThermalTarget = false;
-			this.FanAdjust = (byte)relToAbs(fanAdjust);
-
-			return Task.CompletedTask;
+			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetAutoFanStatus", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetStepFanStatus", 1);
+			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetFanAdjustStatus", (byte)relToAbs(fanAdjust));
 		}
 
-		public Task SetFixedAsync(double fanSpeed = 0.25)
+		public async Task SetFixedAsync(double fanSpeed = 0.25)
 		{
-			this.MaxFan = false;
-			this.AutoFan = false;
-			this.StepFan = true;
-			this.NvThermalTarget = false;
-			this.FixedFan = true;
-			this.FixedFanSpeed = (byte)relToAbs(fanSpeed);
-
-			return Task.CompletedTask;
+			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetAutoFanStatus", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetStepFanStatus", 1);
+			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 1);
+			await this.wmi.InvokeSetAsync<byte>("SetFixedFanSpeed", (byte)relToAbs(fanSpeed));
 		}
 
-		public Task SetCustomAsync()
+		public async Task SetCustomAsync()
 		{
-			this.AutoFan = false;
-			this.FixedFan = false;
-			this.MaxFan = false;
-			this.StepFan = true;
-			this.NvThermalTarget = false;
-
-			return Task.CompletedTask;
+			await this.wmi.InvokeSetAsync<byte>("SetAutoFanStatus", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 0);
+			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
+			await this.wmi.InvokeSetAsync<byte>("SetStepFanStatus", 1);
+			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
 		}
 
 		public FanCurve GetFanCurve()
@@ -236,16 +154,6 @@ namespace AeroCtl
 			inParams["Temperture"] = (byte)point.Temperature;
 			inParams["Value"] = (byte)relToAbs(point.FanSpeed);
 			this.wmi.Set.InvokeMethod("SetFanIndexValue", inParams, null);
-		}
-
-		/// <summary>
-		/// Reverse a 16-bit integer byte order.
-		/// </summary>
-		/// <param name="val"></param>
-		/// <returns></returns>
-		private static ushort reverse(ushort val)
-		{
-			return (ushort)((val << 8) | (val >> 8));
 		}
 
 		#endregion
