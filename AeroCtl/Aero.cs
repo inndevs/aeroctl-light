@@ -111,7 +111,19 @@ namespace AeroCtl
 		{
 			this.Wmi = wmi;
 			this.Keyboard = new KeyboardController();
-			this.Fans = new Aero2019FanController(wmi);
+
+			switch (this.BaseBoard.ToUpper())
+			{
+				case "AERO 15XV8":
+					this.Fans = new Aero15Xv8FanController(wmi);
+					break;
+				case "AERO 15-SA":
+					this.Fans = new Aero2019FanController(wmi);
+					break;
+				default:
+					throw new NotSupportedException("No fan controller for your BaseBoard.");
+			}
+
 			this.Screen = new ScreenController(wmi);
 			this.Battery = new BatteryController(wmi);
 			this.wlanClient = new WlanClient();
