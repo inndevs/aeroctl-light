@@ -34,13 +34,13 @@ namespace AeroCtl
 				B6 = (byte)color,
 				B7 = (byte)direction
 			});
-			await Task.Delay(defaultWait);
+			//await Task.Delay(defaultWait);
 		}
 
 		public async Task SetImageAsync(int index, ReadOnlyMemory<byte> image)
 		{
 			this.Set(new Packet {B1 = 18, B3 = (byte)index, B4 = 8});
-			await Task.Delay(defaultWait);
+			//await Task.Delay(defaultWait);
 
 			byte[] temp = new byte[65];
 
