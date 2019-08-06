@@ -1,7 +1,5 @@
 ﻿using System;
 using System.Management;
-using System.Reflection;
-using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace AeroCtl

@@ -1,14 +1,10 @@
 ﻿using System;
-using System.Collections.Generic;
 using System.ComponentModel;
-using System.Configuration;
 using System.Globalization;
 using System.Linq;
-using System.Management.Instrumentation;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows;
 using AeroCtl.UI.Properties;
 
 namespace AeroCtl.UI
@@ -279,6 +275,7 @@ namespace AeroCtl.UI
 			}
 			finally
 			{
+				this.fanProfileInvalid = true;
 				this.updating = false;
 			}
 		}
