@@ -98,7 +98,7 @@ namespace AeroCtl.UI
 			{
 				for (;;)
 				{
-					if (this.WindowState != WindowState.Minimized)
+					if (first || this.WindowState != WindowState.Minimized)
 					{
 						await this.Aero.UpdateAsync(first);
 						first = false;
