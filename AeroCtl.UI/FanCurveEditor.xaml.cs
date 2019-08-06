@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.ComponentModel;
 using System.Windows;
 using System.Windows.Controls;
+using System.Windows.Input;
 using System.Windows.Media;
 using System.Windows.Media.Animation;
 using System.Windows.Shapes;
@@ -17,22 +18,28 @@ namespace AeroCtl.UI
 	{
 		#region Fields
 
-		private readonly IList<FanPoint> curve;
-		
+		private List<UIElement> graphElements;
+
 		#endregion
 
 		#region Properties
 
+		public IList<FanPoint> Curve { get; }
+		public FanCurveKind CurveKind { get; }
+		public bool IsCurveEditable => !this.Curve.IsReadOnly;
 		public Canvas Canvas => this.canvas;
-		public FanGraphPoint[] Points { get; }
+		public FanGraphPoint[] Points { get; private set; }
 		public FanGraphPoint[] GridPoints { get; }
 
 		#endregion
 
 		#region Constructors
 
-		public FanCurveEditor(IList<FanPoint> curve)
+		public FanCurveEditor(IList<FanPoint> curve, FanCurveKind curveKind)
 		{
+			this.Curve = curve;
+			this.CurveKind = curveKind;
+
 			this.InitializeComponent();
 
 			#region Grid
@@ -40,11 +47,8 @@ namespace AeroCtl.UI
 			this.GridPoints = new FanGraphPoint[11];
 			for (int i = 0; i < this.GridPoints.Length; ++i)
 			{
-				this.GridPoints[i] = new FanGraphPoint(this)
-				{
-					Temperature = i * 10.0,
-					FanSpeed = i * 0.1
-				};
+				FanPoint p = new FanPoint(i * 10.0, i * 0.1);
+				this.GridPoints[i] = new FanGraphPoint(this, () => p, null);
 			}
 
 			for (int i = 0; i < this.GridPoints.Length; ++i)
@@ -83,30 +87,45 @@ namespace AeroCtl.UI
 
 			#endregion
 
-			this.curve = curve;
-			this.canvas.DataContext = this;
+			this.updatePoints();
+		}
 
-			this.Points = new FanGraphPoint[curve.Count];
-			for (int i = 0; i < this.Points.Length; ++i)
+		#endregion
+
+		#region Methods
+
+		private void updatePoints(int? focused = null)
+		{
+			if (this.graphElements != null)
 			{
-				this.Points[i] = new FanGraphPoint(this)
-				{
-					Temperature = curve[i].Temperature,
-					FanSpeed = curve[i].FanSpeed
-				};
+				foreach (UIElement el in this.graphElements)
+					this.canvas.Children.Remove(el);
 			}
 
+			this.graphElements = new List<UIElement>();
 
-			Brush ellipseBrush = new SolidColorBrush(Colors.Black);
+			this.Points = new FanGraphPoint[this.Curve.Count];
+			for (int i = 0; i < this.Points.Length; ++i)
+			{
+				int j = i;
+				this.Points[i] = new FanGraphPoint(this, () => this.Curve[j], v => this.Curve[j] = v);
+			}
+
 			Brush lineBrush = new SolidColorBrush(Colors.DodgerBlue);
+			Ellipse focusedEllipse = null;
 
 			for (int i = 0; i < this.Points.Length; ++i)
 			{
 				int j = i;
 				Ellipse ellipse = new Ellipse
 				{
-					Fill = new SolidColorBrush(Colors.Black)
+					Focusable = true,
+					Style = (Style) this.Resources["EllipseStyle"],
+					Tag = i
 				};
+
+				if (focused != null && focused.Value == i)
+					focusedEllipse = ellipse;
 
 				ellipse.SetBinding(Canvas.LeftProperty, $"Points[{i}].EllipseX");
 				ellipse.SetBinding(Canvas.TopProperty, $"Points[{i}].EllipseY");
@@ -115,35 +134,53 @@ namespace AeroCtl.UI
 
 				if (i < this.Points.Length - 1)
 				{
-					Line line1 = new Line()
+					if (this.CurveKind == FanCurveKind.Step)
 					{
-						StrokeThickness = 2,
-						Stroke = lineBrush,
-					};
-					this.canvas.Children.Add(line1);
+						Line line1 = new Line
+						{
+							StrokeThickness = 2,
+							Stroke = lineBrush,
+						};
+						this.graphElements.Add(line1);
 
-					Line line2 = new Line()
+						Line line2 = new Line
+						{
+							StrokeThickness = 2,
+							Stroke = lineBrush,
+						};
+						this.graphElements.Add(line2);
+
+						line1.SetBinding(Line.X1Property, $"Points[{i}].X");
+						line1.SetBinding(Line.Y1Property, $"Points[{i}].Y");
+						line1.SetBinding(Line.X2Property, $"Points[{i + 1}].X");
+						line1.SetBinding(Line.Y2Property, $"Points[{i}].Y");
+
+						line2.SetBinding(Line.X1Property, $"Points[{i + 1}].X");
+						line2.SetBinding(Line.Y1Property, $"Points[{i}].Y");
+						line2.SetBinding(Line.X2Property, $"Points[{i + 1}].X");
+						line2.SetBinding(Line.Y2Property, $"Points[{i + 1}].Y");
+					}
+					else if (this.CurveKind == FanCurveKind.Linear)
 					{
-						StrokeThickness = 2,
-						Stroke = lineBrush,
-					};
-					this.canvas.Children.Add(line2);
+						Line line = new Line
+						{
+							StrokeThickness = 2,
+							Stroke = lineBrush,
+						};
+						this.graphElements.Add(line);
 
-					line1.SetBinding(Line.X1Property, $"Points[{i}].X");
-					line1.SetBinding(Line.Y1Property, $"Points[{i}].Y");
-					line1.SetBinding(Line.X2Property, $"Points[{i + 1}].X");
-					line1.SetBinding(Line.Y2Property, $"Points[{i}].Y");
-
-					line2.SetBinding(Line.X1Property, $"Points[{i + 1}].X");
-					line2.SetBinding(Line.Y1Property, $"Points[{i}].Y");
-					line2.SetBinding(Line.X2Property, $"Points[{i + 1}].X");
-					line2.SetBinding(Line.Y2Property, $"Points[{i + 1}].Y");
+						line.SetBinding(Line.X1Property, $"Points[{i}].X");
+						line.SetBinding(Line.Y1Property, $"Points[{i}].Y");
+						line.SetBinding(Line.X2Property, $"Points[{i + 1}].X");
+						line.SetBinding(Line.Y2Property, $"Points[{i + 1}].Y");
+					}
 				}
 
-				this.canvas.Children.Add(ellipse);
+				this.graphElements.Add(ellipse);
 
 				ellipse.MouseDown += (s, e) =>
 				{
+					ellipse.Focus();
 					ellipse.CaptureMouse();
 				};
 
@@ -157,29 +194,29 @@ namespace AeroCtl.UI
 					if (!ellipse.IsMouseCaptured)
 						return;
 
-					Point p = this.canvasToPoint(e.GetPosition(this.canvas));
-					p.X = Math.Max(0.0, Math.Min(100.0, p.X));
-					p.Y = Math.Max(0.0, Math.Min(1.0, p.Y));
+					FanPoint p = this.canvasToPoint(e.GetPosition(this.canvas));
+					p.Temperature = Math.Max(0.0, Math.Min(100.0, p.Temperature));
+					p.FanSpeed = Math.Max(0.0, Math.Min(1.0, p.FanSpeed));
 
 					if (j == 0)
 					{
-						p.X = 0.0;
+						p.Temperature = 0.0;
 					}
 
 					if (j > 0)
 					{
-						Point p2 = this.Points[j - 1].Point;
-						if (p.X < p2.X)
-							p.X = p2.X;
+						FanPoint p2 = this.Points[j - 1].Point;
+						if (p.Temperature < p2.Temperature)
+							p.Temperature = p2.Temperature;
 						//if (p.Y < p2.Y)
 						//	p.Y = p2.Y;
 					}
 
 					if (j < this.Points.Length - 1)
 					{
-						Point p2 = this.Points[j + 1].Point;
-						if (p.X > p2.X)
-							p.X = p2.X;
+						FanPoint p2 = this.Points[j + 1].Point;
+						if (p.Temperature > p2.Temperature)
+							p.Temperature = p2.Temperature;
 						//if (p.Y > p2.Y)
 						//	p.Y = p2.Y;
 					}
@@ -187,11 +224,13 @@ namespace AeroCtl.UI
 					this.Points[j].Point = p;
 				};
 			}
+
+			foreach (UIElement el in this.graphElements)
+				this.canvas.Children.Add(el);
+
+			if (focusedEllipse != null)
+				focusedEllipse.Focus();
 		}
-
-		#endregion
-
-		#region Methods
 
 		protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
 		{
@@ -213,16 +252,16 @@ namespace AeroCtl.UI
 			return new Point(this.canvas.ActualWidth, this.canvas.ActualHeight);
 		}
 
-		private Point pointToCanvas(Point p)
+		private Point pointToCanvas(FanPoint p)
 		{
 			Point s = this.getGraphSize();
-			return new Point(p.X / 100 * s.X, (1.0 - p.Y) * s.Y);
+			return new Point(p.Temperature / 100 * s.X, (1.0 - p.FanSpeed) * s.Y);
 		}
 
-		private Point canvasToPoint(Point p)
+		private FanPoint canvasToPoint(Point p)
 		{
 			Point s = this.getGraphSize();
-			return new Point(p.X / s.X * 100, 1.0 - p.Y / s.Y);
+			return new FanPoint(p.X / s.X * 100, 1.0 - p.Y / s.Y);
 		}
 
 		public event EventHandler CurveApplied;
@@ -231,7 +270,7 @@ namespace AeroCtl.UI
 		{
 			for (int i = 0; i < this.Points.Length; ++i)
 			{
-				this.curve[i] = new FanPoint
+				this.Curve[i] = new FanPoint
 				{
 					Temperature = this.Points[i].Temperature,
 					FanSpeed = this.Points[i].FanSpeed
@@ -241,6 +280,64 @@ namespace AeroCtl.UI
 			this.CurveApplied?.Invoke(this, EventArgs.Empty);
 		}
 
+		private void addButton_OnClick(object sender, RoutedEventArgs e)
+		{
+			int insertIndex;
+			if (this.Curve.Count == 0)
+			{
+				this.Curve.Add(new FanPoint
+				{
+					Temperature = 0.0,
+					FanSpeed = 0.25,
+				});
+				insertIndex = 0;
+			}
+			else if (this.Curve.Count == 1)
+			{
+				this.Curve.Add(new FanPoint(100.0, 1.0));
+				insertIndex = 1;
+			}
+			else
+			{
+				if (Keyboard.FocusedElement is Ellipse ellipse && ellipse.Tag is int index)
+				{
+					FanPoint p1;
+					FanPoint p2;
+					if (index == this.Curve.Count - 1)
+					{
+						p1 = this.Curve[this.Curve.Count - 1];
+						p2 = this.Curve[this.Curve.Count - 2];
+						insertIndex = this.Curve.Count - 1;
+					}
+					else
+					{
+						p1 = this.Curve[index];
+						p2 = this.Curve[index + 1];
+						insertIndex = index + 1;
+					}
+
+					this.Curve.Insert(insertIndex, new FanPoint(0.5 * (p1.Temperature + p2.Temperature), 0.5 * (p1.FanSpeed + p2.FanSpeed)));
+				}
+				else
+				{
+					FanPoint p = this.Curve[this.Curve.Count - 1];
+					this.Curve.Add(new FanPoint(p.Temperature, Math.Max(0.0, p.FanSpeed - 0.1)));
+					insertIndex = this.Curve.Count - 1;
+				}
+			}
+
+			this.updatePoints(insertIndex);
+		}
+
+		private void deleteButton_OnClick(object sender, RoutedEventArgs e)
+		{
+			if (!(Keyboard.FocusedElement is Ellipse ellipse) || !(ellipse.Tag is int index))
+				return;
+
+			this.Curve.RemoveAt(index);
+			this.updatePoints(Math.Max(0, index - 1));
+		}
+
 		#endregion
 
 		#region Nested Types
@@ -248,43 +345,35 @@ namespace AeroCtl.UI
 		public class FanGraphPoint : INotifyPropertyChanged
 		{
 			private readonly FanCurveEditor editor;
+			private readonly Func<FanPoint> get;
+			private readonly Action<FanPoint> set;
 
-			private double temperature;
-			private double fanSpeed;
-
-			public double Temperature
+			public FanPoint Point
 			{
-				get => this.temperature;
+				get => this.get();
 				set
 				{
-					this.temperature = value;
+					this.set(value);
 					this.OnPropertyChanged();
 					this.OnPropertyChanged(nameof(X));
 					this.OnPropertyChanged(nameof(EllipseX));
-				}
-			}
-
-			public double FanSpeed
-			{
-				get => this.fanSpeed;
-				set
-				{
-					this.fanSpeed = value;
-					this.OnPropertyChanged();
 					this.OnPropertyChanged(nameof(Y));
 					this.OnPropertyChanged(nameof(EllipseY));
 				}
 			}
 
-			public Point Point
+			public double Temperature
 			{
-				get => new Point(this.Temperature, this.FanSpeed);
-				set
-				{
-					this.Temperature = value.X;
-					this.FanSpeed = value.Y;
-				}
+				get => this.Point.Temperature;
+				set => this.Point = new FanPoint(value, this.Temperature);
 			}
+
+			public double FanSpeed
+			{
+				get => this.Point.FanSpeed;
+				set => this.Point = new FanPoint(value, this.FanSpeed);
+			}
+
 
 			public double X => this.editor.pointToCanvas(this.Point).X;
 
@@ -298,10 +387,11 @@ namespace AeroCtl.UI
 
 			public double EllipseH => 10.0;
 
-
-			public FanGraphPoint(FanCurveEditor editor)
+			public FanGraphPoint(FanCurveEditor editor, Func<FanPoint> get, Action<FanPoint> set)
 			{
 				this.editor = editor;
+				this.get = get;
+				this.set = set;
 			}
 
 			public void Invalidate()
@@ -320,5 +410,11 @@ namespace AeroCtl.UI
 		}
 
 		#endregion
+	}
+
+	public enum FanCurveKind
+	{
+		Step,
+		Linear
 	}
 }

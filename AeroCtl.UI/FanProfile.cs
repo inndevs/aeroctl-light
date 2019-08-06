@@ -13,6 +13,7 @@ namespace AeroCtl.UI
 		Gaming,
 		Fixed,
 		Auto,
-		Custom
+		Custom,
+		Software,
 	}
 }

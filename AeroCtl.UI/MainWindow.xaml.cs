@@ -116,16 +116,11 @@ namespace AeroCtl.UI
 				this.Hide();
 		}
 
-		private void onEditFanCurveClicked(object sender, RoutedEventArgs e)
+		private void onEditHwCurveClicked(object sender, RoutedEventArgs e)
 		{
 			FanCurve curve = this.aero.Fans.GetFanCurve();
-			if (curve == null)
-				return;
-
 			FanPoint[] clone = curve.ToArray();
-			FanCurveEditor editor = new FanCurveEditor(clone);
-			editor.Show();
-
+			FanCurveEditor editor = new FanCurveEditor(clone, FanCurveKind.Step);
 			editor.CurveApplied += (s, e2) =>
 			{
 				for (int i = 0; i < curve.Count; ++i)
@@ -133,6 +128,26 @@ namespace AeroCtl.UI
 					curve[i] = clone[i];
 				}
 			};
+			editor.ShowDialog();
+		}
+
+		private void onEditSwCurveClicked(object sender, RoutedEventArgs e)
+		{
+			List<FanPoint> curve = new List<FanPoint>
+			{
+				new FanPoint
+				{
+					Temperature = 40,
+					FanSpeed = 0.25
+				},
+				new FanPoint
+				{
+					Temperature = 50,
+					FanSpeed = 0.3
+				}
+			};
+			FanCurveEditor editor = new FanCurveEditor(curve, FanCurveKind.Linear);
+			editor.ShowDialog();
 		}
 	}
 }

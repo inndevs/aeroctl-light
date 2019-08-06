@@ -217,6 +217,8 @@ namespace AeroCtl.UI
 				case FanProfile.Custom:
 					this.aero.Fans.SetCustom();
 					break;
+				case FanProfile.Software:
+					break;
 				default:
 					throw new InvalidEnumArgumentException(nameof(this.FanProfile), (int) this.FanProfile, typeof(FanProfile));
 			}

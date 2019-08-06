@@ -7,7 +7,7 @@ using System.Threading.Tasks;
 
 namespace AeroCtl
 {
-	public class Aero15Xv8FanController : IFanController, IFanCurveController
+	public class Aero15Xv8FanController : IFanController
 	{
 		private readonly AeroWmi wmi;
 
@@ -115,20 +115,17 @@ namespace AeroCtl
 		{
 			throw new NotSupportedException();
 		}
-		#endregion
 
-		#region IFanCurveController
-		public int FanCurvePointCount { get; }
-
-		public FanPoint GetFanCurvePoint(int index)
+		public void SetCustom()
 		{
 			throw new NotImplementedException();
 		}
 
-		public void SetFanCurvePoint(int index, FanPoint point)
+		public FanCurve GetFanCurve()
 		{
 			throw new NotImplementedException();
 		}
+
 		#endregion
 	}
 }

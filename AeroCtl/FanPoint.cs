@@ -17,6 +17,12 @@ namespace AeroCtl
 		/// </summary>
 		public double FanSpeed { get; set; }
 
+		public FanPoint(double temperature, double fanSpeed)
+		{
+			this.Temperature = temperature;
+			this.FanSpeed = fanSpeed;
+		}
+
 		public bool Equals(FanPoint other)
 		{
 			return Temperature == other.Temperature && this.FanSpeed == other.FanSpeed;
