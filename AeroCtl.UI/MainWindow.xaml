@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AeroCtl.UI"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="AERO Controls" Height="600" Width="500">
+        Title="AERO Controls" Height="620" Width="500">
     <Window.Resources>
         <local:EnumBooleanConverter x:Key="EnumConv" />
     </Window.Resources>
