@@ -1,6 +1,8 @@
 ﻿using System;
 using System.Management;
+using System.Reflection;
 using System.Runtime.InteropServices;
+using System.Threading.Tasks;
 
 namespace AeroCtl
 {
@@ -20,16 +22,6 @@ namespace AeroCtl
 		#endregion
 
 		#region Properties
-
-		/// <summary>
-		/// Gets the current RPM of fan 1.
-		/// </summary>
-		public int Rpm1 => reverse(this.wmi.InvokeGet<ushort>("getRpm1"));
-
-		/// <summary>
-		/// Gets the current RPM of fan 2.
-		/// </summary>
-		public int Rpm2 => reverse(this.wmi.InvokeGet<ushort>("getRpm2"));
 
 		public bool AutoFan
 		{
@@ -114,6 +106,14 @@ namespace AeroCtl
 
 		#region Methods
 
+		public async Task<(int fan1, int fan2)> GetRpmAsync()
+		{
+			int rpm1 = reverse(await this.wmi.InvokeGetAsync<ushort>("getRpm1"));
+			int rpm2 = reverse(await this.wmi.InvokeGetAsync<ushort>("getRpm1"));
+
+			return (rpm1, rpm2);
+		}
+
 		private static int relToAbs(double fanSpeed)
 		{
 			if (fanSpeed <= 0.0) return minFanSpeed;
@@ -126,34 +126,41 @@ namespace AeroCtl
 			return (double) (fanSpeed - minFanSpeed) / (maxFanSpeed - minFanSpeed);
 		}
 
-		public void SetQuiet()
+		public Task SetQuietAsync()
 		{
 			this.FixedFan = false;
 			this.MaxFan = false;
 			this.StepFan = false;
 			this.AutoFan = false;
 			this.NvThermalTarget = true;
+
+			return Task.CompletedTask;
 		}
 
-		public void SetNormal()
+		public Task SetNormalAsync()
 		{
 			this.FixedFan = false;
 			this.MaxFan = false;
 			this.StepFan = false;
 			this.AutoFan = false;
 			this.NvThermalTarget = false;
+
+			return Task.CompletedTask;
+
 		}
 
-		public void SetGaming()
+		public Task SetGamingAsync()
 		{
 			this.FixedFan = false;
 			this.MaxFan = false;
 			this.StepFan = false;
 			this.AutoFan = true;
 			this.NvThermalTarget = false;
+
+			return Task.CompletedTask;
 		}
 
-		public void SetAuto(double fanAdjust = 0.25)
+		public Task SetAutoAsync(double fanAdjust = 0.25)
 		{
 			this.MaxFan = false;
 			this.AutoFan = false;
@@ -161,9 +168,11 @@ namespace AeroCtl
 			this.StepFan = true;
 			this.NvThermalTarget = false;
 			this.FanAdjust = (byte)relToAbs(fanAdjust);
+
+			return Task.CompletedTask;
 		}
 
-		public void SetFixed(double fanSpeed = 0.25)
+		public Task SetFixedAsync(double fanSpeed = 0.25)
 		{
 			this.MaxFan = false;
 			this.AutoFan = false;
@@ -171,15 +180,19 @@ namespace AeroCtl
 			this.NvThermalTarget = false;
 			this.FixedFan = true;
 			this.FixedFanSpeed = (byte)relToAbs(fanSpeed);
+
+			return Task.CompletedTask;
 		}
 
-		public void SetCustom()
+		public Task SetCustomAsync()
 		{
 			this.AutoFan = false;
 			this.FixedFan = false;
 			this.MaxFan = false;
 			this.StepFan = true;
 			this.NvThermalTarget = false;
+
+			return Task.CompletedTask;
 		}
 
 		public FanCurve GetFanCurve()

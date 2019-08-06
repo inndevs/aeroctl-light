@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
@@ -24,6 +25,7 @@ namespace AeroCtl.UI
 			this.aero = new Aero(this.wmi);
 			this.aero.Keyboard.FnKeyPressed += onFnKeyPressed;
 			this.Aero = new AeroController(this.aero);
+			this.Aero.Load();
 
 			System.Windows.Forms.NotifyIcon trayIcon = new System.Windows.Forms.NotifyIcon
 			{
@@ -115,6 +117,16 @@ namespace AeroCtl.UI
 			if (this.WindowState == WindowState.Minimized)
 				this.Hide();
 		}
+		
+		protected override void OnClosing(CancelEventArgs e)
+		{
+			base.OnClosing(e);
+
+			if (this.Aero.FanProfile == FanProfile.Software)
+			{
+				this.aero.Fans.SetNormalAsync().Wait();
+			}
+		}
 
 		private void onEditHwCurveClicked(object sender, RoutedEventArgs e)
 		{
@@ -133,20 +145,12 @@ namespace AeroCtl.UI
 
 		private void onEditSwCurveClicked(object sender, RoutedEventArgs e)
 		{
-			List<FanPoint> curve = new List<FanPoint>
-			{
-				new FanPoint
-				{
-					Temperature = 40,
-					FanSpeed = 0.25
-				},
-				new FanPoint
-				{
-					Temperature = 50,
-					FanSpeed = 0.3
-				}
-			};
+			List<FanPoint> curve = new List<FanPoint>(this.Aero.SoftwareFanCurve);
 			FanCurveEditor editor = new FanCurveEditor(curve, FanCurveKind.Linear);
+			editor.CurveApplied += (s, e2) =>
+			{
+				this.Aero.SoftwareFanCurve = curve.ToArray();
+			};
 			editor.ShowDialog();
 		}
 	}

@@ -140,7 +140,7 @@
                         <RadioButton Grid.Row="5" Grid.Column="0" IsChecked="{Binding ElementName=wnd, Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Custom}}" DockPanel.Dock="Left" Name="fanProfileCustom">Custom</RadioButton>
                         <Button Grid.Row="5" Grid.Column="1" Width="100" Height="23" HorizontalAlignment="Left" IsEnabled="{Binding ElementName=fanProfileCustom, Path=IsChecked}" Click="onEditHwCurveClicked">Edit Curve</Button>
 
-                        <RadioButton Grid.Row="6" Grid.Column="0" IsChecked="{Binding ElementName=wnd, Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Custom}}" DockPanel.Dock="Left" Name="fanProfileSoftware">Software</RadioButton>
+                        <RadioButton Grid.Row="6" Grid.Column="0" IsChecked="{Binding ElementName=wnd, Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Software}}" DockPanel.Dock="Left" Name="fanProfileSoftware">Software</RadioButton>
                         <Button Grid.Row="6" Grid.Column="1" Width="100" Height="23" HorizontalAlignment="Left" IsEnabled="{Binding ElementName=fanProfileSoftware, Path=IsChecked}" Click="onEditSwCurveClicked">Edit Curve</Button>
 
                     </Grid>

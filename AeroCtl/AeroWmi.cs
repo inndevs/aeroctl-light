@@ -2,6 +2,7 @@
 using System.Collections.Generic;
 using System.Linq;
 using System.Management;
+using System.Threading.Tasks;
 
 namespace AeroCtl
 {
@@ -80,11 +81,20 @@ namespace AeroCtl
 			return (T)outParams["DataOut"];
 		}
 
+		public Task<T> InvokeSetAsync<T>(string methodName, T value)
+		{
+			return Task.Run(() => this.InvokeSet(methodName, value));
+		}
+
 		public T InvokeGet<T>(string methodName)
 		{
-			//ManagementBaseObject inParams = this.GetClass.GetMethodParameters(methodName);
 			ManagementBaseObject outParams = this.Get.InvokeMethod(methodName, null, null);
 			return (T)outParams["Data"];
+		}
+
+		public Task<T> InvokeGetAsync<T>(string methodName)
+		{
+			return Task.Run(() => this.InvokeGet<T>(methodName));
 		}
 
 		public void Dispose()

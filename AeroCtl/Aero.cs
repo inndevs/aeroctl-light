@@ -2,6 +2,7 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Threading.Tasks;
 
 namespace AeroCtl
 {
@@ -59,11 +60,6 @@ namespace AeroCtl
 		public BatteryController Battery { get; }
 
 		/// <summary>
-		/// Gets the CPU temperature as reported by the Gigabyte ACPI interface.
-		/// </summary>
-		public int CpuTemperature => this.Wmi.InvokeGet<ushort>("getCpuTemp");
-
-		/// <summary>
 		/// Gets or sets the software wifi enable state.
 		/// </summary>
 		public bool WifiEnabled
@@ -117,6 +113,11 @@ namespace AeroCtl
 		#endregion
 
 		#region Methods
+
+		public async Task<double> GetCpuTemperatureAsync()
+		{
+			return await this.Wmi.InvokeGetAsync<ushort>("getCpuTemp");
+		}
 
 		public void Dispose()
 		{
