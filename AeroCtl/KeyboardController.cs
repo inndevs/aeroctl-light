@@ -50,7 +50,7 @@ namespace AeroCtl
 			}
 		};
 
-		private readonly DummyForm form;
+		private DummyForm form;
 		private readonly HidDevice[] usbDevs;
 
 		#endregion
@@ -141,12 +141,19 @@ namespace AeroCtl
 				}
 			}
 
-			// Create a dummy form to capture the input events.
-			this.form = new DummyForm();
-			this.form.RawInputReceived += this.onRawInput;
 		}
 
-		public event EventHandler<FnKeyEventArgs> FnKeyPressed;
+		private event EventHandler<FnKeyEventArgs> fnKeyPressed;
+
+		public event EventHandler<FnKeyEventArgs> FnKeyPressed
+		{
+			add
+			{
+				this.fnKeyPressed += value;
+				this.StartKeyHandling();
+			}
+			remove => this.fnKeyPressed -= value;
+		}
 
 		private void onRawInput(object sender, RAWINPUT e)
 		{
@@ -155,27 +162,27 @@ namespace AeroCtl
 				switch(e.data.keyboard.Message)
 				{
 					case 0x7C000004: // Wifi.
-						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleWifi));
+						this.fnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleWifi));
 						return;
 
 					case 0x7D000004: // Decrease brightness.
-						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.DecreaseBrightness));
+						this.fnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.DecreaseBrightness));
 						return;
 
 					case 0x7E000004: // Increase brightness.
-						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.IncreaseBrightness));
+						this.fnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.IncreaseBrightness));
 						return;
 
 					case 0x80000004: // Screen toggle.
-						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleScreen));
+						this.fnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleScreen));
 						return;
 
 					case 0x81000004: // Toggle touchpad on/off.
-						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleTouchpad));
+						this.fnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleTouchpad));
 						return;
 
 					case 0x84000004: // Max fan.
-						this.FnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleFan));
+						this.fnKeyPressed?.Invoke(this, new FnKeyEventArgs(FnKey.ToggleFan));
 						return;
 				}
 			}
@@ -185,6 +192,16 @@ namespace AeroCtl
 		#endregion
 
 		#region Methods
+
+		public void StartKeyHandling()
+		{
+			if (this.form != null)
+				return;
+
+			// Create a dummy form to capture the input events.
+			this.form = new DummyForm();
+			this.form.RawInputReceived += this.onRawInput;
+		}
 
 		public void Dispose()
 		{
