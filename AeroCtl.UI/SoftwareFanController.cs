@@ -1,24 +1,50 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
 namespace AeroCtl.UI
 {
+	public struct FanConfig
+	{
+		/// <summary>
+		/// Time between updates.
+		/// </summary>
+		public TimeSpan Interval;
+
+		/// <summary>
+		/// Maximum fan ramp up speed per second.
+		/// </summary>
+		public double RampUpSpeed;
+
+		/// <summary>
+		/// Maximum fan ramp down speed per second.
+		/// </summary>
+		public double RampDownSpeed;
+
+		public static readonly FanConfig Default = new FanConfig
+		{
+			Interval = TimeSpan.FromSeconds(0.8),
+			RampUpSpeed = 0.25,
+			RampDownSpeed = 0.03,
+		};
+	}
+
 	public class SoftwareFanController
 	{
 		private readonly CancellationTokenSource cts;
 		private readonly FanPoint[] curve;
-		private readonly TimeSpan interval;
+		private readonly FanConfig config;
 		private readonly ISoftwareFanProvider provider;
 		private readonly Task task;
 
-		public SoftwareFanController(FanPoint[] curve, TimeSpan interval, ISoftwareFanProvider provider)
+		public SoftwareFanController(FanPoint[] curve, FanConfig config, ISoftwareFanProvider provider)
 		{
 			this.curve = curve ?? throw new ArgumentNullException(nameof(curve));
 			if (this.curve.Length == 0)
 				throw new ArgumentException("Invalid curve.", nameof(curve));
 
-			this.interval = interval;
+			this.config = config;
 			this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
 
 			this.cts = new CancellationTokenSource();
@@ -43,14 +69,21 @@ namespace AeroCtl.UI
 		{
 			await Task.Yield();
 
+			double currentSpeed = double.NaN;
+			Stopwatch watch = Stopwatch.StartNew();
+
 			for (;;)
 			{
 				cancellationToken.ThrowIfCancellationRequested();
 
-				await Task.Delay(interval, cancellationToken);
+				TimeSpan sleep = this.config.Interval - watch.Elapsed;
+				if (sleep < TimeSpan.Zero)
+					sleep = TimeSpan.Zero;
+				watch.Restart();
+				await Task.Delay(sleep, cancellationToken);
 
 				double temperature = await this.provider.GetTemperatureAsync(cancellationToken);
-				double fanSpeed;
+				double newTarget;
 
 				int index = 0;
 
@@ -65,14 +98,35 @@ namespace AeroCtl.UI
 				if (index < this.curve.Length - 1)
 				{
 					double t = (temperature - this.curve[index].Temperature) / (this.curve[index + 1].Temperature - this.curve[index].Temperature);
-					fanSpeed = this.curve[index].FanSpeed * (1.0 - t) + this.curve[index + 1].FanSpeed * t;
+					newTarget = this.curve[index].FanSpeed * (1.0 - t) + this.curve[index + 1].FanSpeed * t;
 				}
 				else
 				{
-					fanSpeed = this.curve[index].FanSpeed;
+					newTarget = this.curve[index].FanSpeed;
 				}
 
-				await this.provider.SetSpeedAsync(fanSpeed, cancellationToken);
+				if (double.IsNaN(currentSpeed))
+				{
+					currentSpeed = newTarget;
+				}
+				else
+				{
+					double diff = newTarget - currentSpeed;
+					double rampScale = watch.Elapsed.TotalSeconds;
+
+					if (diff > 0.0)
+					{
+						diff = Math.Min(diff, this.config.RampUpSpeed * rampScale);
+					}
+					else if (diff < 0.0)
+					{
+						diff = -Math.Min(-diff, this.config.RampDownSpeed * rampScale);
+					}
+
+					currentSpeed += diff;
+				}
+
+				await this.provider.SetSpeedAsync(currentSpeed, cancellationToken);
 			}
 		}
 	}

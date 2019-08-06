@@ -327,7 +327,7 @@ namespace AeroCtl.UI
 					}
 					else
 					{
-						this.swFanController = new SoftwareFanController(this.SoftwareFanCurve, TimeSpan.FromSeconds(1.0), new AeroFanProvider(this.aero));
+						this.swFanController = new SoftwareFanController(this.SoftwareFanCurve, FanConfig.Default, new AeroFanProvider(this.aero));
 					}
 
 					break;
