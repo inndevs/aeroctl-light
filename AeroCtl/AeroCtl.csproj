@@ -51,6 +51,7 @@
   </ItemGroup>
   <ItemGroup>
     <Compile Include="Aero.cs" />
+    <Compile Include="Aero15Xv8FanController.cs" />
     <Compile Include="AeroWmi.cs" />
     <Compile Include="BatteryController.cs" />
     <Compile Include="ChargePolicy.cs" />
