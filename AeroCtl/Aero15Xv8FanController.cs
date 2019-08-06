@@ -108,20 +108,20 @@ namespace AeroCtl
 		{
 			await SetFanFixedStatus(false);
 			await SetFanSpeed(false);
+			await SetSmartCoolingStatus(false);
 			await SetStepFanStatus(false);
 			await SetCurrentFanStep(0);
 			await SetAutoFanStatus(false);
-			await SetSmartCoolingStatus(false);
 		}
 
 		public async Task SetGamingAsync()
 		{
 			await SetFanFixedStatus(false);
 			await SetFanSpeed(false);
+			await SetSmartCoolingStatus(false);
 			await SetStepFanStatus(false);
 			await SetCurrentFanStep(0);
 			await SetAutoFanStatus(true);
-			await SetSmartCoolingStatus(false);
 		}
 
 		public async Task SetFixedAsync(double fanSpeed = 0.25)
@@ -130,10 +130,10 @@ namespace AeroCtl
 
 			await SetFanFixedStatus(true);
 			await SetFanSpeed(false);
+			await SetSmartCoolingStatus(false);
 			await SetStepFanStatus(false);
 			await SetCurrentFanStep(0);
 			await SetAutoFanStatus(false);
-			await SetSmartCoolingStatus(true);
 			await SetFixedFanSpeed((byte)Math.Round(fanSpeed * 229.0));
 		}
 
