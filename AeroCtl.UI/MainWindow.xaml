@@ -6,11 +6,11 @@
 		xmlns:local="clr-namespace:AeroCtl.UI"
 		mc:Ignorable="d"
 		DataContext="{Binding RelativeSource={RelativeSource Self}}"
-		Title="AERO Controls" Width="500" SizeToContent="Height">
+		Title="AERO Controls" MinWidth="400" Width="480" SizeToContent="Height">
 	<Window.Resources>
 		<local:EnumBooleanConverter x:Key="EnumConv" />
 	</Window.Resources>
-	<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
+	<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
 		<StackPanel>
 			<StackPanel.Resources >
 				<Style TargetType="GroupBox" >
