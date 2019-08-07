@@ -93,10 +93,13 @@ namespace HighlightLockKeys
 					await Task.Delay(200, cancellationToken);
 
 					State newState = 0;
+					
 					if (Control.IsKeyLocked(Keys.CapsLock))
 						newState |= State.Caps;
+					
 					if (Control.IsKeyLocked(Keys.NumLock))
 						newState |= State.Num;
+
 					if (Control.IsKeyLocked(Keys.Scroll))
 						newState |= State.Scroll;
 

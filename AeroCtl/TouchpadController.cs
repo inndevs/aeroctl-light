@@ -17,10 +17,5 @@ namespace AeroCtl
 		{
 			this.wmi = wmi;
 		}
-
-		public void ToggleTouchpad()
-		{
-			this.Enabled = !this.Enabled;
-		}
 	}
 }

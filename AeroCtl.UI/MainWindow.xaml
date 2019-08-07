@@ -36,10 +36,10 @@
 						<ColumnDefinition Width="*" />
 					</Grid.ColumnDefinitions>
 
-					<TextBlock Grid.Row="0" Grid.Column="0" Margin="2">Model / Base board</TextBlock>
+					<TextBlock Grid.Row="0" Grid.Column="0" Margin="2">Model / base board</TextBlock>
 					<TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Text="{Binding Path=Aero.BaseBoard, Mode=OneWay}" />
 
-					<TextBlock Grid.Row="1" Grid.Column="0" Margin="2">Serial Number</TextBlock>
+					<TextBlock Grid.Row="1" Grid.Column="0" Margin="2">Serial number</TextBlock>
 					<TextBox Grid.Row="1" Grid.Column="1" x:Name="snTextBox" IsReadOnly="True" Text="{Binding Path=Aero.SerialNumber, Mode=OneWay}">
 						<TextBox.Resources>
 							<Style TargetType="{x:Type ScrollViewer}">
@@ -56,28 +56,28 @@
 						</TextBox.Resources>
 					</TextBox>
 
-					<TextBlock Grid.Row="2" Grid.Column="0" Margin="2">BIOS Version(s)</TextBlock>
+					<TextBlock Grid.Row="2" Grid.Column="0" Margin="2">BIOS version(s)</TextBlock>
 					<TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" Text="{Binding Path=Aero.BiosVersion, Mode=OneWay}" />
 
 					<TextBlock Grid.Row="3" Grid.Column="0" Margin="2">Keyboard firmware version</TextBlock>
 					<TextBox Grid.Row="3" Grid.Column="1" IsReadOnly="True" Text="{Binding Path=Aero.KeyboardFWVersion, Mode=OneWay}" />
 
-					<TextBlock Grid.Row="4" Grid.Column="0" Margin="2">CPU Temperature</TextBlock>
+					<TextBlock Grid.Row="4" Grid.Column="0" Margin="2">CPU temperature</TextBlock>
 					<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
 						<TextBlock Text="{Binding Path=Aero.CpuTemperature, Mode=OneWay}" />
 						<TextBlock Margin="2 0 0 0">°C</TextBlock>
 					</StackPanel>
 
-					<TextBlock Grid.Row="5" Grid.Column="0" Margin="2">GPU Temperature</TextBlock>
+					<TextBlock Grid.Row="5" Grid.Column="0" Margin="2">GPU temperature</TextBlock>
 					<StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
 						<TextBlock Text="{Binding Path=Aero.GpuTemperature, Mode=OneWay}" />
 						<TextBlock Margin="2 0 0 0">°C</TextBlock>
 					</StackPanel>
 
-					<TextBlock Grid.Row="6" Grid.Column="0" Margin="2">Wifi Enabled</TextBlock>
+					<TextBlock Grid.Row="6" Grid.Column="0" Margin="2">Wifi enabled</TextBlock>
 					<CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding Aero.WifiEnabled}" />
 
-					<TextBlock Grid.Row="7" Grid.Column="0" Margin="2">Touchpad Enabled</TextBlock>
+					<TextBlock Grid.Row="7" Grid.Column="0" Margin="2">Touchpad enabled</TextBlock>
 					<CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding Aero.TouchpadEnabled}" />
 
 					<TextBlock Grid.Row="8" Grid.Column="0" Margin="2">Start minimized</TextBlock>
@@ -102,8 +102,8 @@
 				<StackPanel>
 					<Grid>
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="100" />
-							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="120" />
+							<ColumnDefinition Width="120" />
 						</Grid.ColumnDefinitions>
 						
 						<StackPanel Orientation="Horizontal" Grid.Column="0">
@@ -119,9 +119,9 @@
 
 					<Separator Background="#D5DFE5" />
 
-					<CheckBox IsChecked="{Binding Path=Aero.SmartCharge}">Enable smart charge</CheckBox>
+					<CheckBox IsChecked="{Binding Path=Aero.SmartCharge}">"Smart Charge" enabled</CheckBox>
 
-					<CheckBox IsChecked="{Binding Path=Aero.ChargeStopEnabled}">Enable charge stop</CheckBox>
+					<CheckBox IsChecked="{Binding Path=Aero.ChargeStopEnabled}">Charge stop enabled</CheckBox>
 
 					<Label Target="{Binding ElementName=chargeStop}">
 						<StackPanel Orientation="Horizontal">
@@ -138,21 +138,27 @@
 				<StackPanel>
 					<Grid>
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="100" />
+							<ColumnDefinition Width="120" />
+							<ColumnDefinition Width="120" />
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 						
-						<StackPanel Orientation="Horizontal" Grid.Column="0">
+						<StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
 							<TextBlock Margin="0 0 5 0">PWM:</TextBlock>
 							<TextBlock Text="{Binding Path=Aero.FanPwm, Mode=OneWay, StringFormat=F1}" />
 							<TextBlock Margin="2 0 0 0">%</TextBlock>
 						</StackPanel>
 
-						<StackPanel Orientation="Horizontal" Grid.Column="1">
+						<StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
 							<TextBlock Margin="0 0 5 0">RPM:</TextBlock>
 							<TextBlock Text="{Binding Path=Aero.FanRpm1, Mode=OneWay}" />
 							<TextBlock Margin="5 0 5 0">/</TextBlock>
 							<TextBlock Text="{Binding Path=Aero.FanRpm2, Mode=OneWay}" />
+						</StackPanel>
+
+						<StackPanel Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Center">
+							<TextBlock Margin="0 0 5 0" VerticalAlignment="Center">Alt. profile</TextBlock>
+							<ComboBox ItemsSource="{Binding Source={local:Enumeration {x:Type local:FanProfile}}}" DisplayMemberPath="Description" SelectedValue="{Binding Aero.FanProfileAlt}" SelectedValuePath="Value" />
 						</StackPanel>
 					</Grid>
 
@@ -199,7 +205,6 @@
 						<Button Grid.Row="6" Grid.Column="1" Width="100" Height="23" HorizontalAlignment="Left" IsEnabled="{Binding ElementName=fanProfileSoftware, Path=IsChecked}" Click="onEditSwCurveClicked">Edit Curve</Button>
 
 					</Grid>
-
 				</StackPanel>
 			</GroupBox>
 		</StackPanel>

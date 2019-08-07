@@ -1,5 +1,6 @@
 ﻿using System;
 using System.ComponentModel;
+using System.Diagnostics;
 using System.Globalization;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -18,6 +19,7 @@ namespace AeroCtl.UI
 		private readonly Aero aero;
 		private SoftwareFanController swFanController;
 		private bool updating;
+		private bool loading;
 
 		private string baseBoard;
 		public string BaseBoard
@@ -56,7 +58,7 @@ namespace AeroCtl.UI
 		public Version KeyboardFWVersion
 		{
 			get => this.keyboardFWVersion;
-			set
+			private set
 			{
 				this.keyboardFWVersion = value;
 				this.OnPropertyChanged();
@@ -128,9 +130,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating)
-				{
 					this.aero.Screen.Brightness = value;
-				}
 			}
 		}
 
@@ -172,7 +172,7 @@ namespace AeroCtl.UI
 				this.startMinimized = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
+				if (!this.loading)
 				{
 					Settings.Default.StartMinimized = value;
 					Settings.Default.Save();
@@ -189,10 +189,9 @@ namespace AeroCtl.UI
 			{
 				this.chargeStop = value;
 				this.OnPropertyChanged();
+
 				if (!this.updating)
-				{
 					this.aero.Battery.ChargeStop = value;
-				}
 			}
 		}
 
@@ -226,10 +225,9 @@ namespace AeroCtl.UI
 			{
 				this.smartCharge = value;
 				this.OnPropertyChanged();
+
 				if (!this.updating)
-				{
 					this.aero.Battery.SmartCharge = value;
-				}
 			}
 		}
 
@@ -241,10 +239,9 @@ namespace AeroCtl.UI
 			{
 				this.chargeStopEnabled = value;
 				this.OnPropertyChanged();
+
 				if (!this.updating)
-				{
 					this.aero.Battery.ChargePolicy = value ? ChargePolicy.CustomStop : ChargePolicy.Full;
-				}
 			}
 		}
 
@@ -259,15 +256,33 @@ namespace AeroCtl.UI
 				this.fanProfile = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
+				this.fanProfileInvalid = true;
+
+				if (!this.loading)
 				{
 					Settings.Default.FanProfile = (int)value;
 					Settings.Default.Save();
-					this.fanProfileInvalid = true;
 				}
 			}
 		}
 
+		private FanProfile fanProfileAlt;
+		public FanProfile FanProfileAlt
+		{
+			get => this.fanProfileAlt;
+			set
+			{
+				this.fanProfileAlt = value;
+				this.OnPropertyChanged();
+
+				if (!this.loading)
+				{
+					Settings.Default.FanProfileAlt = (int)value;
+					Settings.Default.Save();
+				}
+			}
+		}
+		
 		private double fixedFanSpeed = 0.25;
 		public double FixedFanSpeed
 		{
@@ -277,11 +292,12 @@ namespace AeroCtl.UI
 				this.fixedFanSpeed = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
+				this.fanProfileInvalid = true;
+
+				if (!this.loading)
 				{
 					Settings.Default.FixedFanSpeed = value;
 					Settings.Default.Save();
-					this.fanProfileInvalid = true;
 				}
 			}
 		}
@@ -295,11 +311,12 @@ namespace AeroCtl.UI
 				this.autoFanAdjust = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
+				this.fanProfileInvalid = true;
+
+				if (!this.loading)
 				{
 					Settings.Default.AutoFanAdjust = value;
 					Settings.Default.Save();
-					this.fanProfileInvalid = true;
 				}
 			}
 		}
@@ -313,11 +330,12 @@ namespace AeroCtl.UI
 				this.softwareFanCurve = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
+				this.fanProfileInvalid = true;
+
+				if (!this.loading)
 				{
 					Settings.Default.SoftwareFanCurve = string.Join(" ", value.Select(p => $"{p.Temperature.ToString(CultureInfo.InvariantCulture)} {p.FanSpeed.ToString(CultureInfo.InvariantCulture)}"));
 					Settings.Default.Save();
-					this.fanProfileInvalid = true;
 				}
 			}
 		}
@@ -329,12 +347,13 @@ namespace AeroCtl.UI
 
 		public void Load()
 		{
-			this.updating = true;
+			this.loading = true;
 			try
 			{
 				Settings s = Settings.Default;
 				this.StartMinimized = s.StartMinimized;
 				this.FanProfile = (FanProfile)s.FanProfile;
+				this.FanProfileAlt = (FanProfile)s.FanProfileAlt;
 				this.FixedFanSpeed = s.FixedFanSpeed;
 				this.AutoFanAdjust = s.AutoFanAdjust;
 				this.SoftwareFanCurve = s.SoftwareFanCurve
@@ -348,19 +367,24 @@ namespace AeroCtl.UI
 			finally
 			{
 				this.fanProfileInvalid = true;
-				this.updating = false;
+				this.loading = false;
 			}
 		}
 
 		private async Task applyFanProfileAsync()
 		{
+			FanProfile newProfile = this.FanProfile;
+			Debug.WriteLine($"Applying fan profile {newProfile}");
+			
 			if (this.swFanController != null)
 			{
-				await this.swFanController.StopAsync();
+				SoftwareFanController swCtl = this.swFanController;
 				this.swFanController = null;
+
+				await swCtl.StopAsync();
 			}
 
-			switch (this.FanProfile)
+			switch (newProfile)
 			{
 				case FanProfile.Quiet:
 					await this.aero.Fans.SetQuietAsync();
@@ -392,12 +416,14 @@ namespace AeroCtl.UI
 
 					break;
 				default:
-					throw new InvalidEnumArgumentException(nameof(this.FanProfile), (int) this.FanProfile, typeof(FanProfile));
+					throw new InvalidEnumArgumentException(nameof(this.FanProfile), (int)newProfile, typeof(FanProfile));
 			}
 		}
 
 		public async Task UpdateAsync(bool full = false)
 		{
+			Debug.Assert(!this.updating);
+
 			this.updating = true;
 			try
 			{
@@ -415,8 +441,8 @@ namespace AeroCtl.UI
 
 				if (this.fanProfileInvalid)
 				{
-					await this.applyFanProfileAsync();
 					this.fanProfileInvalid = false;
+					await this.applyFanProfileAsync();
 				}
 
 				this.CpuTemperature = await this.aero.GetCpuTemperatureAsync();

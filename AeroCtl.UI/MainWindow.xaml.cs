@@ -6,6 +6,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
+using System.Windows.Forms;
 
 namespace AeroCtl.UI
 {
@@ -14,6 +15,9 @@ namespace AeroCtl.UI
 	/// </summary>
 	public partial class MainWindow : Window
 	{
+		private const int notificationTimeout = 3000;
+
+		private readonly NotifyIcon trayIcon;
 		private readonly Aero aero;
 		private readonly AeroWmi wmi;
 
@@ -29,14 +33,14 @@ namespace AeroCtl.UI
 
 			this.InitializeComponent();
 
-			System.Windows.Forms.NotifyIcon trayIcon = new System.Windows.Forms.NotifyIcon
+			this.trayIcon = new NotifyIcon
 			{
 				Icon = Properties.Resources.Main,
 				Visible = true,
 				Text = this.Title
 			};
 
-			trayIcon.DoubleClick += (s, e) =>
+			this.trayIcon.DoubleClick += (s, e) =>
 			{
 				this.Show();
 				this.WindowState = WindowState.Normal;
@@ -63,7 +67,7 @@ namespace AeroCtl.UI
 
 				}
 
-				trayIcon.Dispose();
+				this.trayIcon.Dispose();
 			};
 		}
 
@@ -80,10 +84,18 @@ namespace AeroCtl.UI
 					break;
 
 				case FnKey.ToggleFan:
+					FanProfile fanProfile = this.Aero.FanProfileAlt;
+					this.Aero.FanProfileAlt = this.Aero.FanProfile;
+					this.Aero.FanProfile = fanProfile;
+				
+					this.trayIcon.ShowBalloonTip(notificationTimeout, this.Title, $"Fan profile switched to \"{fanProfile}\".", ToolTipIcon.Info);
 					break;
 
 				case FnKey.ToggleWifi:
-					this.aero.WifiEnabled = !this.aero.WifiEnabled;
+					bool wifi = !this.aero.WifiEnabled;
+					this.aero.WifiEnabled = wifi;
+
+					this.trayIcon.ShowBalloonTip(notificationTimeout, this.Title, $"Wifi {(wifi ? "enabled" : "disabled")}.", ToolTipIcon.Info);
 					break;
 
 				case FnKey.ToggleScreen:
@@ -91,7 +103,10 @@ namespace AeroCtl.UI
 					break;
 
 				case FnKey.ToggleTouchpad:
-					this.aero.Touchpad.ToggleTouchpad();
+					bool touchPad = !this.aero.Touchpad.Enabled;
+					this.aero.Touchpad.Enabled = touchPad;
+
+					this.trayIcon.ShowBalloonTip(notificationTimeout, this.Title, $"Touchpad {(touchPad ? "enabled" : "disabled")}.", ToolTipIcon.Info);
 					break;
 			}
 		}

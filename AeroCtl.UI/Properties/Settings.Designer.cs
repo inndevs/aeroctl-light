@@ -82,5 +82,17 @@ namespace AeroCtl.UI.Properties {
                 this["StartMinimized"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public int FanProfileAlt {
+            get {
+                return ((int)(this["FanProfileAlt"]));
+            }
+            set {
+                this["FanProfileAlt"] = value;
+            }
+        }
     }
 }
