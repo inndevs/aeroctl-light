@@ -18,7 +18,6 @@ namespace AeroCtl
 		#region Fields
 
 		private readonly WlanClient wlanClient;
-		private readonly PhysicalGPU gpu;
 
 		#endregion
 
@@ -33,6 +32,11 @@ namespace AeroCtl
 		/// Gets the base board / notebook model name.
 		/// </summary>
 		public string BaseBoard => this.Wmi.BaseBoard;
+
+		/// <summary>
+		/// Gets the SKU name of the notebook.
+		/// </summary>
+		public string Sku => this.Wmi.Sku;
 
 		/// <summary>
 		/// Gets the serial number. Should match the one found on the underside of the notebook.
@@ -64,6 +68,9 @@ namespace AeroCtl
 		/// </summary>
 		public BatteryController Battery { get; }
 
+		/// <summary>
+		/// Gets the touchpad controller.
+		/// </summary>
 		public TouchpadController Touchpad { get; }
 
 		/// <summary>
@@ -103,6 +110,11 @@ namespace AeroCtl
 			}
 		}
 
+		/// <summary>
+		/// Gets the GPU controller.
+		/// </summary>
+		public IGpuController Gpu { get; }
+
 		#endregion
 
 		#region Constructors
@@ -110,27 +122,26 @@ namespace AeroCtl
 		public Aero(AeroWmi wmi)
 		{
 			this.Wmi = wmi;
-			this.Keyboard = new KeyboardController();
 
-			switch (this.BaseBoard.ToUpper())
+			NVIDIA.Initialize();
+			PhysicalGPU gpu = PhysicalGPU.GetPhysicalGPUs().FirstOrDefault();
+			
+			if (this.Sku.StartsWith("P75"))
+			{ 
+				this.Fans = new Aero2019FanController(wmi);
+				this.Gpu = new Aero2019GpuController(gpu, wmi);
+			}
+			else
 			{
-				case "AERO 15XV8":
-					this.Fans = new Aero15Xv8FanController(wmi);
-					break;
-				case "AERO 15-SA":
-					this.Fans = new Aero2019FanController(wmi);
-					break;
-				default:
-					throw new NotSupportedException("No fan controller for your BaseBoard.");
+				this.Fans = new Aero15Xv8FanController(wmi);
+				this.Gpu = new NvGpuController(gpu);
 			}
 
+			this.Keyboard = new KeyboardController();
 			this.Screen = new ScreenController(wmi);
 			this.Battery = new BatteryController(wmi);
 			this.wlanClient = new WlanClient();
 			this.Touchpad = new TouchpadController(wmi);
-
-			NVIDIA.Initialize();
-			this.gpu = PhysicalGPU.GetPhysicalGPUs().FirstOrDefault();
 		}
 
 		#endregion
@@ -140,28 +151,6 @@ namespace AeroCtl
 		public async Task<double> GetCpuTemperatureAsync()
 		{
 			return await this.Wmi.InvokeGetAsync<ushort>("getCpuTemp");
-		}
-
-		public Task<double> GetGpuTemperatureAsync()
-		{
-			double max = 0.0;
-
-			if (this.gpu != null)
-			{
-				try
-				{
-					foreach (var sensor in this.gpu.ThermalInformation.ThermalSensors)
-					{
-						max = Math.Max(sensor.CurrentTemperature, max);
-					}
-				}
-				catch (NVIDIAApiException ex) when (ex.Status == (Status)(-220)) /* gpu not powered */
-				{
-
-				}
-			}
-
-			return Task.FromResult(max);
 		}
 
 		public void Dispose()

@@ -16,6 +16,7 @@ namespace AeroCtl
 
 		public string BaseBoard { get; }
 		public string SerialNumber { get; }
+		public string Sku { get; }
 		public IReadOnlyList<string> BiosVersions { get; }
 
 		public AeroWmi()
@@ -30,6 +31,11 @@ namespace AeroCtl
 				.OfType<ManagementObject>()
 				.FirstOrDefault();
 
+			ManagementObject win32ComputerSystem = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_ComputerSystem")
+				.Get()
+				.OfType<ManagementObject>()
+				.FirstOrDefault();
+
 			if (win32BaseBoard != null)
 			{
 				this.BaseBoard = (string)win32BaseBoard["Product"];
@@ -39,6 +45,11 @@ namespace AeroCtl
 			{
 				this.SerialNumber = (string)win32Bios["SerialNumber"];
 				this.BiosVersions = (string[])win32Bios["BIOSVersion"];
+			}
+
+			if (win32ComputerSystem != null)
+			{
+				this.Sku = (string)win32ComputerSystem["SystemSKUNumber"];
 			}
 
 			ManagementScope scope = new ManagementScope("root\\WMI", new ConnectionOptions

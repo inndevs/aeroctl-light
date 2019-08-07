@@ -1,18 +1,21 @@
 ﻿using System;
 using System.ComponentModel;
-using System.Diagnostics.SymbolStore;
 using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AeroCtl.Native;
 
 namespace AeroCtl
 {
-	public class Aero2019RgbController : IRgbController
+	/// <summary>
+	/// Implements logic to talk with the USB HID device that controls keyboard LEDs.
+	/// The chip appears to be called "ITE8291" according to its firmware blob.
+	/// </summary>
+	public class ITE8291RgbController : IRgbController
 	{
 		private readonly HidDevice device;
 		private const int defaultWait = 1;
 
-		public Aero2019RgbController(HidDevice device)
+		public ITE8291RgbController(HidDevice device)
 		{
 			this.device = device;
 		}
@@ -112,8 +115,8 @@ namespace AeroCtl
 
 		public struct Packet
 		{
-			public byte B0;
-			public byte B1;
+			public byte B0; // Always 0 it seems.
+			public byte B1; // This is the command byte.
 			public byte B2;
 			public byte B3;
 			public byte B4;

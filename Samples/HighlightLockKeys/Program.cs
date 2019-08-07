@@ -144,7 +144,7 @@ namespace HighlightLockKeys
 							setColor(capsLockKey, (currentState & State.Caps) != 0 ? highlightColor : baseColor);
 							setColor(numLockKey, (currentState & State.Scroll) != 0 ? highlightColor : baseColor);
 							foreach (int k in numPadKeys)
-								setColor(k, (currentState & State.Num) != 0 ? highlightColor : baseColor);
+								setColor(k, (currentState & State.Num) == 0 ? highlightColor : baseColor);
 							
 							cancellationToken.ThrowIfCancellationRequested();
 

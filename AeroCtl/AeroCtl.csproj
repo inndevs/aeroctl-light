@@ -52,6 +52,7 @@
   <ItemGroup>
     <Compile Include="Aero.cs" />
     <Compile Include="Aero15Xv8FanController.cs" />
+    <Compile Include="Aero2019GpuController.cs" />
     <Compile Include="AeroWmi.cs" />
     <Compile Include="BatteryController.cs" />
     <Compile Include="ChargePolicy.cs" />
@@ -62,9 +63,11 @@
     <Compile Include="FnKeyEventArgs.cs" />
     <Compile Include="HidDevice.cs" />
     <Compile Include="IFanController.cs" />
+    <Compile Include="IGpuController.cs" />
     <Compile Include="IRgbController.cs" />
     <Compile Include="KeyboardController.cs" />
-    <Compile Include="Aero2019RgbController.cs" />
+    <Compile Include="ITE8291RgbController.cs" />
+    <Compile Include="NvGpuController.cs" />
     <Compile Include="RgbEffect.cs" />
     <Compile Include="RgbEffectColor.cs" />
     <Compile Include="RgbEffectType.cs" />

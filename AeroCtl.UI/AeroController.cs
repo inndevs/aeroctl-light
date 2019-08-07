@@ -7,7 +7,9 @@ using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Media.Converters;
 using AeroCtl.UI.Properties;
+using NvAPIWrapper.DRS.SettingValues;
 
 namespace AeroCtl.UI
 {
@@ -28,6 +30,17 @@ namespace AeroCtl.UI
 			private set
 			{
 				this.baseBoard = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		private string sku;
+		public string Sku
+		{
+			get => this.sku;
+			private set
+			{
+				this.sku = value;
 				this.OnPropertyChanged();
 			}
 		}
@@ -360,6 +373,57 @@ namespace AeroCtl.UI
 			}
 		}
 
+		private bool gpuBoost;
+		public bool GpuBoost
+		{
+			get => this.gpuBoost;
+			set
+			{
+				this.gpuBoost = value;
+				this.OnPropertyChanged();
+
+				if (!this.updating)
+					((Aero2019GpuController)this.aero.Gpu).BoostEnabled = value;
+			}
+		}
+
+		private bool gpuBoostAvailable;
+		public bool GpuBoostAvailable
+		{
+			get => this.gpuBoostAvailable;
+			private set
+			{
+				this.gpuBoostAvailable = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		private bool gpuPowerConfig;
+		public bool GpuPowerConfig
+		{
+			get => this.gpuPowerConfig;
+			set
+			{
+				this.gpuPowerConfig = value;
+				this.OnPropertyChanged();
+
+				if (!this.updating)
+					((Aero2019GpuController)this.aero.Gpu).PowerConfig = value;
+			}
+		}
+
+		private bool gpuPowerConfigAvailable;
+		public bool GpuPowerConfigAvailable
+		{
+			get => this.gpuPowerConfigAvailable;
+			private set
+			{
+				this.gpuPowerConfigAvailable = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+
 		public AeroController(Aero aero)
 		{
 			this.aero = aero;
@@ -450,6 +514,7 @@ namespace AeroCtl.UI
 				if (full)
 				{
 					this.BaseBoard = this.aero.BaseBoard;
+					this.Sku = this.aero.Sku;
 					this.SerialNumber = this.aero.SerialNumber;
 					this.BiosVersion = string.Join("; ", this.aero.BiosVersions);
 
@@ -466,7 +531,15 @@ namespace AeroCtl.UI
 				}
 
 				this.CpuTemperature = await this.aero.GetCpuTemperatureAsync();
-				this.GpuTemperature = await this.aero.GetGpuTemperatureAsync();
+				this.GpuTemperature = await this.aero.Gpu.GetTemperatureAsync();
+
+				if (this.aero.Gpu is Aero2019GpuController newGpu)
+				{
+					this.GpuBoostAvailable = this.GpuPowerConfigAvailable = true;
+					this.GpuBoost = newGpu.BoostEnabled;
+					this.GpuPowerConfig = newGpu.PowerConfig;
+				}
+
 				this.SmartCharge = this.aero.Battery.SmartCharge;
 				this.BatteryCycles = await this.aero.Battery.GetCyclesAsync();
 				this.BatteryHealth = await this.aero.Battery.GetHealthAsync();
@@ -503,7 +576,7 @@ namespace AeroCtl.UI
 			public async Task<double> GetTemperatureAsync(CancellationToken cancellationToken)
 			{
 				double cpu = await this.aero.GetCpuTemperatureAsync();
-				double gpu = await this.aero.GetGpuTemperatureAsync();
+				double gpu = await this.aero.Gpu.GetTemperatureAsync();
 
 				return Math.Max(cpu, gpu);
 			}

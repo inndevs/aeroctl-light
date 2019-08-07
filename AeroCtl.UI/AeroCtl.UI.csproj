@@ -66,6 +66,7 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="EnumExtension.cs" />
+    <Compile Include="FanConfig.cs" />
     <Compile Include="ISoftwareFanProvider.cs" />
     <Compile Include="SoftwareFanController.cs" />
     <Page Include="FanCurveEditor.xaml">
