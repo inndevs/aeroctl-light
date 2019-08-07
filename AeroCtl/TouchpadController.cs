@@ -8,13 +8,7 @@ namespace AeroCtl
 		public bool Enabled
 		{
 			get => this.wmi.InvokeGet<byte>("GetTouchPad") != 0;
-			set
-			{
-				if (value)
-					EnableTouchpad();
-				else
-					DisableTouchpad();
-			}
+			set => this.wmi.InvokeSet("SetTouchPad", value ? (byte)1 : (byte)0);
 		}
 
 		private readonly AeroWmi wmi;
@@ -24,19 +18,9 @@ namespace AeroCtl
 			this.wmi = wmi;
 		}
 
-		public void EnableTouchpad()
-		{
-			this.wmi.InvokeSet("SetTouchPad", (byte)1);
-		}
-
-		public void DisableTouchpad()
-		{
-			this.wmi.InvokeSet("SetTouchPad", (byte)0);
-		}
-
 		public void ToggleTouchpad()
 		{
-			Enabled = !Enabled;
+			this.Enabled = !this.Enabled;
 		}
 	}
 }

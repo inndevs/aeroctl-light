@@ -79,6 +79,9 @@ namespace AeroCtl.UI
 					this.aero.Screen.Brightness = Math.Max(0, this.aero.Screen.Brightness - 10);
 					break;
 
+				case FnKey.ToggleFan:
+					break;
+
 				case FnKey.ToggleWifi:
 					this.aero.WifiEnabled = !this.aero.WifiEnabled;
 					break;

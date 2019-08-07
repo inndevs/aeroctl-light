@@ -94,6 +94,11 @@ namespace AeroCtl
 			return (rpm1, rpm2);
 		}
 
+		public async Task<double> GetPwmAsync()
+		{
+			return (await this.wmi.InvokeGetAsync<byte>("GetFanPWMStatus")) / 229.0;
+		}
+
 		public async Task SetQuietAsync()
 		{
 			await SetFanFixedStatus(false);

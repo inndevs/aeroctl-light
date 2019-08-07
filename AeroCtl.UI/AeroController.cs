@@ -107,6 +107,17 @@ namespace AeroCtl.UI
 			}
 		}
 
+		private double fanPwm;
+		public double FanPwm
+		{
+			get => this.fanPwm;
+			private set
+			{
+				this.fanPwm = value;
+				this.OnPropertyChanged();
+			}
+		}
+
 		private int screenBrightness;
 		public int ScreenBrightness
 		{
@@ -133,21 +144,21 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating)
-				{
 					this.aero.WifiEnabled = value;
-				}
 			}
 		}
 
+		private bool touchpadEnabled;
 		public bool TouchpadEnabled
 		{
-			get => this.aero.Touchpad.Enabled;
+			get => this.touchpadEnabled;
 			set
 			{
+				this.touchpadEnabled = value;
+				this.OnPropertyChanged();
+
 				if (!this.updating)
 					this.aero.Touchpad.Enabled = value;
-
-				this.OnPropertyChanged();
 			}
 		}
 
@@ -374,10 +385,12 @@ namespace AeroCtl.UI
 				this.CpuTemperature = await this.aero.GetCpuTemperatureAsync();
 				this.GpuTemperature = await this.aero.GetGpuTemperatureAsync();
 				(this.FanRpm1, this.FanRpm2) = await this.aero.Fans.GetRpmAsync();
+				this.FanPwm = (await this.aero.Fans.GetPwmAsync()) * 100;
 				this.ScreenBrightness = (int)this.aero.Screen.Brightness;
 				this.ChargeStopEnabled = this.aero.Battery.ChargePolicy == ChargePolicy.CustomStop;
 				this.ChargeStop = this.aero.Battery.ChargeStop;
 				this.WifiEnabled = this.aero.WifiEnabled;
+				this.TouchpadEnabled = this.aero.Touchpad.Enabled;
 			}
 			finally
 			{

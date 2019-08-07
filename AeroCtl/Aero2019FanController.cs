@@ -43,6 +43,11 @@ namespace AeroCtl
 			return (rpm1, rpm2);
 		}
 
+		public async Task<double> GetPwmAsync()
+		{
+			return absToRel(await this.wmi.InvokeGetAsync<byte>("GetFanPWMStatus"));
+		}
+
 		private static int relToAbs(double fanSpeed)
 		{
 			if (fanSpeed <= 0.0) return minFanSpeed;
