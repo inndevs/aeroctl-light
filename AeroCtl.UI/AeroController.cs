@@ -206,6 +206,17 @@ namespace AeroCtl.UI
 			}
 		}
 		
+		private int batteryCharge;
+		public int BatteryCharge
+		{
+			get => this.batteryCharge;
+			private set
+			{
+				this.batteryCharge = value;
+				this.OnPropertyChanged();
+			}
+		}
+
 		private int batteryHealth;
 		public int BatteryHealth
 		{
@@ -450,6 +461,7 @@ namespace AeroCtl.UI
 				this.SmartCharge = this.aero.Battery.SmartCharge;
 				this.BatteryCycles = await this.aero.Battery.GetCyclesAsync();
 				this.BatteryHealth = await this.aero.Battery.GetHealthAsync();
+				this.BatteryCharge = await this.aero.Battery.GetRemainingCharge();
 				(this.FanRpm1, this.FanRpm2) = await this.aero.Fans.GetRpmAsync();
 				this.FanPwm = (await this.aero.Fans.GetPwmAsync()) * 100;
 				this.ScreenBrightness = (int)this.aero.Screen.Brightness;

@@ -1,4 +1,6 @@
 ﻿using System;
+using System.Linq;
+using System.Management;
 using System.Threading.Tasks;
 
 namespace AeroCtl
@@ -34,8 +36,25 @@ namespace AeroCtl
 		public BatteryController(AeroWmi wmi)
 		{
 			this.wmi = wmi;
+
 		}
 
+		public async Task<int> GetRemainingCharge()
+		{
+			return await Task.Run(() =>
+			{
+				ManagementObject batt = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Battery")
+					.Get()
+					.OfType<ManagementObject>()
+					.FirstOrDefault();
+
+				if (batt == null)
+					return 0;
+
+				return (ushort)batt["EstimatedChargeRemaining"];
+			});
+		}
+		
 		public async Task<int> GetHealthAsync()
 		{
 			return await this.wmi.InvokeGetAsync<byte>("GetBatteryHealth");

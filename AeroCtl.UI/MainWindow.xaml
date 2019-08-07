@@ -16,14 +16,14 @@
 				<Style TargetType="GroupBox" >
 					<Setter Property="Margin" Value="5,5,5,0" />
 				</Style>
+				<Style TargetType="Separator">
+					<Setter Property="Background" Value="#D5DFE5" />
+				</Style>
 			</StackPanel.Resources>
 		
 			<GroupBox Header="Info">
 				<Grid>
 					<Grid.RowDefinitions>
-						<RowDefinition />
-						<RowDefinition />
-						<RowDefinition />
 						<RowDefinition />
 						<RowDefinition />
 						<RowDefinition />
@@ -62,26 +62,23 @@
 					<TextBlock Grid.Row="3" Grid.Column="0" Margin="2">Keyboard firmware version</TextBlock>
 					<TextBox Grid.Row="3" Grid.Column="1" IsReadOnly="True" Text="{Binding Path=Aero.KeyboardFWVersion, Mode=OneWay}" />
 
-					<TextBlock Grid.Row="4" Grid.Column="0" Margin="2">CPU temperature</TextBlock>
+					<TextBlock Grid.Row="4" Grid.Column="0" Margin="2">Temperature</TextBlock>
 					<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+						<TextBlock Margin="0 0 5 0">CPU</TextBlock>
 						<TextBlock Text="{Binding Path=Aero.CpuTemperature, Mode=OneWay}" />
 						<TextBlock Margin="2 0 0 0">°C</TextBlock>
-					</StackPanel>
-
-					<TextBlock Grid.Row="5" Grid.Column="0" Margin="2">GPU temperature</TextBlock>
-					<StackPanel Grid.Row="5" Grid.Column="1" Orientation="Horizontal">
+						<TextBlock Margin="5 0 5 0">/</TextBlock>
+						<TextBlock Margin="0 0 5 0">GPU</TextBlock>
 						<TextBlock Text="{Binding Path=Aero.GpuTemperature, Mode=OneWay}" />
 						<TextBlock Margin="2 0 0 0">°C</TextBlock>
 					</StackPanel>
 
-					<TextBlock Grid.Row="6" Grid.Column="0" Margin="2">Wifi enabled</TextBlock>
-					<CheckBox Grid.Row="6" Grid.Column="1" IsChecked="{Binding Aero.WifiEnabled}" />
-
-					<TextBlock Grid.Row="7" Grid.Column="0" Margin="2">Touchpad enabled</TextBlock>
-					<CheckBox Grid.Row="7" Grid.Column="1" IsChecked="{Binding Aero.TouchpadEnabled}" />
-
-					<TextBlock Grid.Row="8" Grid.Column="0" Margin="2">Start minimized</TextBlock>
-					<CheckBox Grid.Row="8" Grid.Column="1" IsChecked="{Binding Aero.StartMinimized}" />
+					<StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
+						<Separator />
+						<CheckBox IsChecked="{Binding Aero.WifiEnabled}">Wifi enabled</CheckBox>
+						<CheckBox IsChecked="{Binding Aero.TouchpadEnabled}">Touchpad enabled</CheckBox>
+						<CheckBox IsChecked="{Binding Aero.StartMinimized}">Start minimized</CheckBox>
+					</StackPanel>
 				</Grid>
 			</GroupBox>
 
@@ -102,22 +99,29 @@
 				<StackPanel>
 					<Grid>
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="120" />
-							<ColumnDefinition Width="120" />
+							<ColumnDefinition Width="100" />
+							<ColumnDefinition Width="100" />
+							<ColumnDefinition Width="100" />
 						</Grid.ColumnDefinitions>
 						
 						<StackPanel Orientation="Horizontal" Grid.Column="0">
+							<TextBlock Margin="0 0 5 0">Charge:</TextBlock>
+							<TextBlock Text="{Binding Path=Aero.BatteryCharge, Mode=OneWay}" />
+							<TextBlock Margin="2 0 0 0">%</TextBlock>
+						</StackPanel>
+
+						<StackPanel Orientation="Horizontal" Grid.Column="1">
 							<TextBlock Margin="0 0 5 0">Cycles:</TextBlock>
 							<TextBlock Text="{Binding Path=Aero.BatteryCycles, Mode=OneWay}" />
 						</StackPanel>
 
-						<StackPanel Orientation="Horizontal" Grid.Column="1">
+						<StackPanel Orientation="Horizontal" Grid.Column="2">
 							<TextBlock Margin="0 0 5 0">Health:</TextBlock>
 							<TextBlock Text="{Binding Path=Aero.BatteryHealth, Mode=OneWay}" />
 						</StackPanel>
 					</Grid>
 
-					<Separator Background="#D5DFE5" />
+					<Separator />
 
 					<CheckBox IsChecked="{Binding Path=Aero.SmartCharge}">"Smart Charge" enabled</CheckBox>
 
@@ -138,7 +142,7 @@
 				<StackPanel>
 					<Grid>
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="120" />
+							<ColumnDefinition Width="100" />
 							<ColumnDefinition Width="120" />
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
@@ -162,13 +166,13 @@
 						</StackPanel>
 					</Grid>
 
-					<Separator Background="#D5DFE5" />
+					<Separator />
 
 					<Grid>
 						<Grid.Resources>
 							<Style TargetType="RadioButton">
 								<Setter Property="VerticalAlignment" Value="Center" />
-								<Setter Property="Margin" Value="6" />
+								<Setter Property="Margin" Value="5" />
 							</Style>
 						</Grid.Resources>
 						<Grid.RowDefinitions>
