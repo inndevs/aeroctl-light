@@ -1,5 +1,7 @@
 ﻿using System;
+using System.ComponentModel;
 using System.Diagnostics.SymbolStore;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 using AeroCtl.Native;
 
@@ -86,13 +88,15 @@ namespace AeroCtl
 			buf[6] = p.B6;
 			buf[7] = p.B7;
 			buf[8] = (byte) (0xFF - (p.B0 + p.B1 + p.B2 + p.B3 + p.B4 + p.B5 + p.B6 + p.B7));
-			Hid.HidD_SetFeature(this.device.Handle, ref buf[0], 9);
+			if (!Hid.HidD_SetFeature(this.device.Handle, ref buf[0], 9))
+				throw new Win32Exception(Marshal.GetLastWin32Error());
 		}
 
 		public Packet Get()
 		{
 			Span<byte> buf = stackalloc byte[9];
-			Hid.HidD_GetFeature(this.device.Handle, ref buf[0], 9);
+			if (!Hid.HidD_GetFeature(this.device.Handle, ref buf[0], 9))
+				throw new Win32Exception(Marshal.GetLastWin32Error());
 
 			Packet p;
 			p.B0 = buf[0];
