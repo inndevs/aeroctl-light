@@ -1,10 +1,11 @@
 ﻿using System;
+using System.Diagnostics.SymbolStore;
 using System.Threading.Tasks;
 using AeroCtl.Native;
 
 namespace AeroCtl
 {
-	public class Aero2019RgbController : IKeyboardRgbController
+	public class Aero2019RgbController : IRgbController
 	{
 		private readonly HidDevice device;
 		private const int defaultWait = 1;
@@ -23,18 +24,31 @@ namespace AeroCtl
 			return new Version(res.B2, res.B3);
 		}
 
-		public async Task SetEffectAsync(LightEffect effect, int speed, int brightness, LightColor color, int direction)
+		public async Task SetEffectAsync(RgbEffect effect)
 		{
 			this.Set(new Packet
 			{
 				B1 = 8,
-				B3 = (byte)effect,
-				B4 = (byte)speed,
-				B5 = (byte)brightness,
-				B6 = (byte)color,
-				B7 = (byte)direction
+				B3 = (byte)effect.Type,
+				B4 = (byte)effect.Speed,
+				B5 = (byte)effect.Brightness,
+				B6 = (byte)effect.Color,
+				B7 = (byte)effect.Direction
 			});
 			await Task.Delay(defaultWait);
+		}
+
+		public async Task<RgbEffect> GetEffectAsync()
+		{
+			Packet res = await this.ExecAsync(new Packet {B1 = 136});
+			return new RgbEffect
+			{
+				Type = (RgbEffectType)res.B3,
+				Speed = res.B4,
+				Brightness = res.B5,
+				Color = (RgbEffectColor)res.B6,
+				Direction = res.B7
+			};
 		}
 
 		public async Task SetImageAsync(int index, ReadOnlyMemory<byte> image)

@@ -1,6 +1,6 @@
 ﻿namespace AeroCtl
 {
-	public enum LightColor
+	public enum RgbEffectColor
 	{
 		Black,
 		Red,

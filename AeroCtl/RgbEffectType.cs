@@ -1,6 +1,6 @@
 ﻿namespace AeroCtl
 {
-	public enum LightEffect
+	public enum RgbEffectType
 	{
 		Static = 1,
 		Breathing = 2,
@@ -15,10 +15,11 @@
 		CircleMarquee = 11, 
 		Hedge = 12,
 		Rotate = 13,
-		Custom1 = 51, 
-		Custom2 = 52,
-		Custom3 = 53, 
-		Custom4 = 54,
-		Custom5 = 55, 
+
+		Custom0 = 51, 
+		Custom1 = 52,
+		Custom2 = 53, 
+		Custom3 = 54,
+		Custom4 = 55, 
 	}
 }

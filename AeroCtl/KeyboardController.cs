@@ -57,7 +57,7 @@ namespace AeroCtl
 
 		#region Properties
 
-		public IKeyboardRgbController Rgb { get; }
+		public IRgbController Rgb { get; }
 
 		#endregion
 
