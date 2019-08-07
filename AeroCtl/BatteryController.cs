@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Threading.Tasks;
 
 namespace AeroCtl
 {
@@ -24,11 +25,25 @@ namespace AeroCtl
 			}
 		}
 
-		public int BatteryHealth => this.wmi.InvokeGet<byte>("GetBatteryHealth");
+		public bool SmartCharge
+		{
+			get => this.wmi.InvokeGet<byte>("GetSmartCharge") != 0;
+			set => this.wmi.InvokeSet<byte>("SetSmartCharge", value ? (byte)1 : (byte)0);
+		}
 
 		public BatteryController(AeroWmi wmi)
 		{
 			this.wmi = wmi;
+		}
+
+		public async Task<int> GetHealthAsync()
+		{
+			return await this.wmi.InvokeGetAsync<byte>("GetBatteryHealth");
+		}
+
+		public async Task<int> GetCyclesAsync()
+		{
+			return await this.wmi.InvokeGetAsync<ushort>("getBattCyc1");
 		}
 	}
 }

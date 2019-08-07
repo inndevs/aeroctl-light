@@ -196,6 +196,43 @@ namespace AeroCtl.UI
 			}
 		}
 
+		private int batteryCycles;
+		public int BatteryCycles
+		{
+			get => this.batteryCycles;
+			private set
+			{
+				this.batteryCycles = value;
+				this.OnPropertyChanged();
+			}
+		}
+		
+		private int batteryHealth;
+		public int BatteryHealth
+		{
+			get => this.batteryHealth;
+			private set
+			{
+				this.batteryHealth = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		private bool smartCharge;
+		public bool SmartCharge
+		{
+			get => this.smartCharge;
+			set
+			{
+				this.smartCharge = value;
+				this.OnPropertyChanged();
+				if (!this.updating)
+				{
+					this.aero.Battery.SmartCharge = value;
+				}
+			}
+		}
+
 		private bool chargeStopEnabled;
 		public bool ChargeStopEnabled
 		{
@@ -384,6 +421,9 @@ namespace AeroCtl.UI
 
 				this.CpuTemperature = await this.aero.GetCpuTemperatureAsync();
 				this.GpuTemperature = await this.aero.GetGpuTemperatureAsync();
+				this.SmartCharge = this.aero.Battery.SmartCharge;
+				this.BatteryCycles = await this.aero.Battery.GetCyclesAsync();
+				this.BatteryHealth = await this.aero.Battery.GetHealthAsync();
 				(this.FanRpm1, this.FanRpm2) = await this.aero.Fans.GetRpmAsync();
 				this.FanPwm = (await this.aero.Fans.GetPwmAsync()) * 100;
 				this.ScreenBrightness = (int)this.aero.Screen.Brightness;

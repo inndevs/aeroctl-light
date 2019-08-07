@@ -6,17 +6,18 @@
 		xmlns:local="clr-namespace:AeroCtl.UI"
 		mc:Ignorable="d"
 		DataContext="{Binding RelativeSource={RelativeSource Self}}"
-		Title="AERO Controls" Height="650" Width="500">
+		Title="AERO Controls" Width="500" SizeToContent="Height">
 	<Window.Resources>
 		<local:EnumBooleanConverter x:Key="EnumConv" />
 	</Window.Resources>
-	<ScrollViewer>
+	<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto">
 		<StackPanel>
 			<StackPanel.Resources >
 				<Style TargetType="GroupBox" >
 					<Setter Property="Margin" Value="5,5,5,0" />
 				</Style>
 			</StackPanel.Resources>
+		
 			<GroupBox Header="Info">
 				<Grid>
 					<Grid.RowDefinitions>
@@ -99,6 +100,27 @@
 
 			<GroupBox Header="Battery">
 				<StackPanel>
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="100" />
+							<ColumnDefinition Width="Auto" />
+						</Grid.ColumnDefinitions>
+						
+						<StackPanel Orientation="Horizontal" Grid.Column="0">
+							<TextBlock Margin="0 0 5 0">Cycles:</TextBlock>
+							<TextBlock Text="{Binding Path=Aero.BatteryCycles, Mode=OneWay}" />
+						</StackPanel>
+
+						<StackPanel Orientation="Horizontal" Grid.Column="1">
+							<TextBlock Margin="0 0 5 0">Health:</TextBlock>
+							<TextBlock Text="{Binding Path=Aero.BatteryHealth, Mode=OneWay}" />
+						</StackPanel>
+					</Grid>
+
+					<Separator Background="#D5DFE5" />
+
+					<CheckBox IsChecked="{Binding Path=Aero.SmartCharge}">Enable smart charge</CheckBox>
+
 					<CheckBox IsChecked="{Binding Path=Aero.ChargeStopEnabled}">Enable charge stop</CheckBox>
 
 					<Label Target="{Binding ElementName=chargeStop}">
