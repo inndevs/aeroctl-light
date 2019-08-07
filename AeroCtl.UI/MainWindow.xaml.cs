@@ -120,13 +120,13 @@ namespace AeroCtl.UI
 			{
 				for (;;)
 				{
-					if (first || this.WindowState != WindowState.Minimized)
+					if (first || this.Aero.FanProfileInvalid || this.WindowState != WindowState.Minimized)
 					{
 						await this.Aero.UpdateAsync(first);
 						first = false;
 					}
 
-					await Task.Delay(500, token);
+					await Task.Delay(750, token);
 				}
 			}
 			finally

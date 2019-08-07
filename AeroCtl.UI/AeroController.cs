@@ -257,6 +257,15 @@ namespace AeroCtl.UI
 		}
 
 		private bool fanProfileInvalid;
+		public bool FanProfileInvalid
+		{
+			get => this.fanProfileInvalid;
+			set
+			{
+				this.fanProfileInvalid = value;
+				this.OnPropertyChanged();
+			}
+		}
 
 		private FanProfile fanProfile;
 		public FanProfile FanProfile
@@ -267,7 +276,7 @@ namespace AeroCtl.UI
 				this.fanProfile = value;
 				this.OnPropertyChanged();
 
-				this.fanProfileInvalid = true;
+				this.FanProfileInvalid = true;
 
 				if (!this.loading)
 				{
@@ -303,7 +312,7 @@ namespace AeroCtl.UI
 				this.fixedFanSpeed = value;
 				this.OnPropertyChanged();
 
-				this.fanProfileInvalid = true;
+				this.FanProfileInvalid = true;
 
 				if (!this.loading)
 				{
@@ -322,7 +331,7 @@ namespace AeroCtl.UI
 				this.autoFanAdjust = value;
 				this.OnPropertyChanged();
 
-				this.fanProfileInvalid = true;
+				this.FanProfileInvalid = true;
 
 				if (!this.loading)
 				{
@@ -341,7 +350,7 @@ namespace AeroCtl.UI
 				this.softwareFanCurve = value;
 				this.OnPropertyChanged();
 
-				this.fanProfileInvalid = true;
+				this.FanProfileInvalid = true;
 
 				if (!this.loading)
 				{
@@ -377,7 +386,7 @@ namespace AeroCtl.UI
 			}
 			finally
 			{
-				this.fanProfileInvalid = true;
+				this.FanProfileInvalid = true;
 				this.loading = false;
 			}
 		}
@@ -450,9 +459,9 @@ namespace AeroCtl.UI
 					}
 				}
 
-				if (this.fanProfileInvalid)
+				if (this.FanProfileInvalid)
 				{
-					this.fanProfileInvalid = false;
+					this.FanProfileInvalid = false;
 					await this.applyFanProfileAsync();
 				}
 
