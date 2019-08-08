@@ -37,7 +37,7 @@ namespace AeroCtl.Native
 		public const int HIDP_STATUS_SUCCESS = 0x11 << 16;
 
 		[DllImport(lib, SetLastError = true)]
-		public static extern void HidD_GetHidGuid(ref Guid hidGuid);
+		public static extern void HidD_GetHidGuid(out Guid hidGuid);
 
 		[DllImport(lib, SetLastError = true)]
 		public static extern bool HidD_GetAttributes(
@@ -87,14 +87,5 @@ namespace AeroCtl.Native
 			SafeFileHandle hidDeviceObject,
 			ref byte lpReportBuffer,
 			int reportBufferLength);
-
-		[StructLayout(LayoutKind.Sequential)]
-		public class SP_DEVINFO_DATA
-		{
-			public int cbSize = Marshal.SizeOf(typeof(SP_DEVINFO_DATA));
-			public Guid classGuid = Guid.Empty;
-			public int devInst;
-			public int reserved;
-		}
 	}
 }

@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using Microsoft.Win32;
 
 namespace AeroCtl.UI
 {
@@ -78,6 +79,21 @@ namespace AeroCtl.UI
 				}
 
 				this.trayIcon.Dispose();
+			};
+
+			// To re-apply fan profile after wake up:
+
+			SystemEvents.PowerModeChanged += (s, e) =>
+			{
+				if (e.Mode == PowerModes.Resume)
+					this.Aero.FanProfileInvalid = true;
+			};
+
+			SystemEvents.SessionSwitch += (s, e) =>
+			{
+				if (e.Reason == SessionSwitchReason.SessionUnlock || 
+				    e.Reason == SessionSwitchReason.SessionLock)
+					this.Aero.FanProfileInvalid = true;
 			};
 		}
 

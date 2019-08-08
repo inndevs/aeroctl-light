@@ -15,11 +15,6 @@ namespace AeroCtl
 		#region Fields
 
 		/// <summary>
-		/// Probably the keyboard device GUID.
-		/// </summary>
-		private static readonly Guid deviceGuid = new Guid("4D1E55B2-F16F-11CF-88CB-001111000030");
-
-		/// <summary>
 		/// Keyboard vendor IDs and product IDs for Gigabyte laptop keyboards.
 		/// Taken from Gigabyte ControlCenter.
 		/// </summary>
@@ -68,18 +63,18 @@ namespace AeroCtl
 
 		public KeyboardController()
 		{
-			Guid guid = deviceGuid;
-			Hid.HidD_GetHidGuid(ref guid);
+			// Get HID GUID.
+			Hid.HidD_GetHidGuid(out Guid hidGuid);
 
 			List<HidDevice> devs = new List<HidDevice>();
-			IntPtr classDevs = SetupApi.SetupDiGetClassDevs(ref guid, IntPtr.Zero, IntPtr.Zero, DiGetClassFlags.Present | DiGetClassFlags.DeviceInterface);
+			IntPtr classDevs = SetupApi.SetupDiGetClassDevs(ref hidGuid, IntPtr.Zero, IntPtr.Zero, DiGetClassFlags.Present | DiGetClassFlags.DeviceInterface);
 			try
 			{
-				// Enumerable all devices for that GUID.
+				// Enumerate HID devices.
 				for (uint index = 0;; ++index)
 				{
 					SP_DEVICE_INTERFACE_DATA deviceInterfaceData = new SP_DEVICE_INTERFACE_DATA { cbSize = (uint)Marshal.SizeOf<SP_DEVICE_INTERFACE_DATA>() };
-					if (!SetupApi.SetupDiEnumDeviceInterfaces(classDevs, IntPtr.Zero, ref guid, index, ref deviceInterfaceData))
+					if (!SetupApi.SetupDiEnumDeviceInterfaces(classDevs, IntPtr.Zero, ref hidGuid, index, ref deviceInterfaceData))
 						break; // End of list.
 
 					SP_DEVICE_INTERFACE_DETAIL_DATA deviceInterfaceDetailData = new SP_DEVICE_INTERFACE_DETAIL_DATA { cbSize = IntPtr.Size == 8 ? 8U : (uint)(4 + Marshal.SystemDefaultCharSize) };

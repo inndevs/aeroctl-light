@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using AeroCtl;
+using Microsoft.Win32;
 
 namespace HighlightLockKeys
 {
@@ -118,6 +119,13 @@ namespace HighlightLockKeys
 
 					State currentState = (State)(-1);
 					int page = 0;
+
+					SystemEvents.SessionSwitch += (s, e) =>
+					{
+						if (e.Reason == SessionSwitchReason.SessionUnlock ||
+						    e.Reason == SessionSwitchReason.SessionLock)
+							currentState = (State)(-1);
+					};
 
 					for (;;)
 					{

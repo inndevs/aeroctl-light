@@ -18,7 +18,7 @@ namespace AeroCtl
 		public ValueTask<double> GetTemperatureAsync()
 		{
 			double max = 0.0;
-
+			
 			if (this.Gpu != null)
 			{
 				try
@@ -35,7 +35,6 @@ namespace AeroCtl
 			}
 
 			return new ValueTask<double>(max);
-
 		}
 	}
 }

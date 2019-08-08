@@ -6,7 +6,7 @@
         xmlns:local="clr-namespace:AeroCtl.UI"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
-        Title="Fan Configuration" SizeToContent="WidthAndHeight" Width="400">
+        Title="Fan Configuration" SizeToContent="Height" Width="400">
     <DockPanel>
         <StackPanel DockPanel.Dock="Bottom" HorizontalAlignment="Right" >
             <Button Width="80" Margin="5" Click="onOkClicked">OK</Button>

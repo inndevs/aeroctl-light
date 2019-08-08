@@ -72,7 +72,6 @@
     <Compile Include="RgbEffect.cs" />
     <Compile Include="RgbEffectColor.cs" />
     <Compile Include="RgbEffectType.cs" />
-    <Compile Include="Native\DEVPROPKEY.cs" />
     <Compile Include="Native\DiGetClassFlags.cs" />
     <Compile Include="Native\HIDD_ATTRIBUTES.cs" />
     <Compile Include="Native\HIDP_CAPS.cs" />

@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.ComponentModel;
+using System.Globalization;
 using System.Json;
 using System.Linq;
 using System.Runtime.CompilerServices;
@@ -142,6 +143,7 @@ namespace AeroCtl.UI
 				["curve"] = curve,
 				["rampUpSpeed"] = this.RampUpSpeed,
 				["rampDownSpeed"] = this.RampDownSpeed,
+				["interval"] = this.Interval.ToString("G", CultureInfo.InvariantCulture),
 				["schedMode"] = this.SchedulingMode.ToString()
 			};
 		}
@@ -160,6 +162,7 @@ namespace AeroCtl.UI
 				Curve = curve.ToImmutable(),
 				RampUpSpeed = obj["rampUpSpeed"],
 				RampDownSpeed = obj["rampDownSpeed"],
+				Interval = TimeSpan.Parse(obj["interval"], CultureInfo.InvariantCulture),
 				SchedulingMode = (FanSchedulingMode)Enum.Parse(typeof(FanSchedulingMode), obj["schedMode"], true)
 			};
 		}
