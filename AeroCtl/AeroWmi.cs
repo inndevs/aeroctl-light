@@ -1,23 +1,35 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using System.Management;
+using System.Reflection;
 using System.Threading.Tasks;
 
 namespace AeroCtl
 {
+	/// <summary>
+	/// Wraps the Gigabyte WMI interface.
+	/// </summary>
 	public class AeroWmi : IDisposable
 	{
-		public ManagementClass GetClass { get; }
-		public ManagementObject Get { get; }
+		#region Fields
 
-		public ManagementClass SetClass { get; }
-		public ManagementObject Set { get; }
+		private readonly ManagementClass getClass;
+		private readonly ManagementClass setClass;
+		private readonly ManagementObject get;
+		private readonly ManagementObject set;
+
+		#endregion
+
+		#region Properties
 
 		public string BaseBoard { get; }
 		public string SerialNumber { get; }
 		public string Sku { get; }
 		public IReadOnlyList<string> BiosVersions { get; }
+
+		#endregion
 
 		public AeroWmi()
 		{
@@ -58,33 +70,94 @@ namespace AeroCtl
 				Impersonation = ImpersonationLevel.Impersonate
 			});
 
-			this.GetClass = new ManagementClass(scope, new ManagementPath("GB_WMIACPI_Get"), null);
-			this.SetClass = new ManagementClass(scope, new ManagementPath("GB_WMIACPI_Set"), null);
+			this.getClass = new ManagementClass(scope, new ManagementPath("GB_WMIACPI_Get"), null);
+			this.setClass = new ManagementClass(scope, new ManagementPath("GB_WMIACPI_Set"), null);
 
-			foreach (ManagementObject obj in this.GetClass.GetInstances().OfType<ManagementObject>())
+			foreach (ManagementObject obj in this.getClass.GetInstances().OfType<ManagementObject>())
 			{
-				this.Get = obj;
+				this.get = obj;
 				break;
 			}
 
-			foreach (ManagementObject obj in this.SetClass.GetInstances().OfType<ManagementObject>())
+			foreach (ManagementObject obj in this.setClass.GetInstances().OfType<ManagementObject>())
 			{
-				this.Set = obj;
+				this.set = obj;
 				break;
 			}
 
-			if (this.Get == null)
+			if (this.get == null)
 				throw new InvalidOperationException("Failed to find instance for GB_WMIACPI_Get. Your device is probably not supported.");
 
-			if (this.Set == null)
+			if (this.set == null)
 				throw new InvalidOperationException("Failed to find instance for GB_WMIACPI_Set. Your device is probably not supported.");
+		}
+		
+		/// <summary>
+		/// Invokes a WMI method.
+		/// </summary>
+		/// <param name="methodName"></param>
+		/// <param name="parameters"></param>
+		/// <returns></returns>
+		public ImmutableDictionary<string, object> Invoke(string methodName, params (string, object)[] parameters)
+		{
+			ManagementObject target = this.get;
+			MethodData m ;
+
+			try
+			{
+				m = this.getClass.Methods[methodName];
+			}
+			catch (ManagementException ex) when (ex.ErrorCode == ManagementStatus.NotFound)
+			{
+				target = this.set;
+				m = this.setClass.Methods[methodName];
+			}
+
+			ManagementBaseObject inParams = m.InParameters;
+
+			if (inParams != null)
+			{
+				foreach ((string name, object value) in parameters)
+				{
+					inParams[name] = value;
+				}
+			}
+			else
+			{
+				if (parameters.Length != 0)
+					throw new TargetParameterCountException($"Method does not take any parameters, but {parameters.Length} were supplied.");
+			}
+
+			ManagementBaseObject outParams = target.InvokeMethod(methodName, inParams, null);
+			ImmutableDictionary<string, object> result = ImmutableDictionary<string, object>.Empty;
+
+			if (outParams != null)
+			{
+				foreach (var res in outParams.Properties)
+				{
+					result = result.Add(res.Name, res.Value);
+				}
+			}
+
+			return result;
+		}
+
+		/// <summary>
+		/// Invokes a WMI method asynchronously.
+		/// </summary>
+		/// <param name="methodName"></param>
+		/// <param name="parameters"></param>
+		/// <returns></returns>
+		public Task<ImmutableDictionary<string, object>> InvokeAsync(string methodName, params (string, object)[] parameters)
+		{
+			return Task.Run(() => this.Invoke(methodName, parameters));
 		}
 
 		public T InvokeSet<T>(string methodName, T value)
 		{
-			ManagementBaseObject inParams = this.SetClass.GetMethodParameters(methodName);
+			ManagementBaseObject inParams = this.set.GetMethodParameters(methodName);
 			inParams["Data"] = value;
-			ManagementBaseObject outParams = this.Set.InvokeMethod(methodName, inParams, null);
+			ManagementBaseObject outParams = this.set.InvokeMethod(methodName, inParams, null);
 
 			if (outParams == null)
 				return default;
@@ -99,7 +172,7 @@ namespace AeroCtl
 
 		public T InvokeGet<T>(string methodName)
 		{
-			ManagementBaseObject outParams = this.Get.InvokeMethod(methodName, null, null);
+			ManagementBaseObject outParams = this.get.InvokeMethod(methodName, null, null);
 			return (T)outParams["Data"];
 		}
 
@@ -110,11 +183,11 @@ namespace AeroCtl
 
 		public void Dispose()
 		{
-			this.Get?.Dispose();
-			this.GetClass?.Dispose();
+			this.get?.Dispose();
+			this.getClass?.Dispose();
 
-			this.Set?.Dispose();
-			this.SetClass?.Dispose();
+			this.set?.Dispose();
+			this.setClass?.Dispose();
 		}
 	}
 }

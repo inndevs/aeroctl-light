@@ -57,6 +57,9 @@ namespace AeroCtl
 
 		#region Properties
 
+		/// <summary>
+		/// Gets the RGB LED controller, if present.
+		/// </summary>
 		public IRgbController Rgb { get; }
 
 		#endregion
@@ -124,7 +127,7 @@ namespace AeroCtl
 						// Find RGB controller.
 						if (caps.UsagePage == 0xFF01 && caps.Usage == 1 && caps.FeatureReportByteLength == 9)
 						{
-							this.Rgb = new ITE8291RgbController(dev);
+							this.Rgb = new Ite8291RgbController(dev);
 						}
 					}
 				}

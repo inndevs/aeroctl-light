@@ -19,11 +19,17 @@ namespace AeroCtl.UI
 		/// </summary>
 		public double RampDownSpeed;
 
+		/// <summary>
+		/// The fan controller scheduling mode.
+		/// </summary>
+		public FanSchedulingMode SchedulingMode;
+
 		public static readonly FanConfig Default = new FanConfig
 		{
-			Interval = TimeSpan.FromSeconds(0.75),
+			Interval = TimeSpan.FromSeconds(1.0 / 3.0),
 			RampUpSpeed = 0.2,
 			RampDownSpeed = 0.03,
+			SchedulingMode = FanSchedulingMode.AboveNormalThread
 		};
 	}
 }

@@ -35,7 +35,7 @@ namespace AeroCtl
 			return (ushort)((val << 8) | (val >> 8));
 		}
 
-		public async Task<(int fan1, int fan2)> GetRpmAsync()
+		public async ValueTask<(int fan1, int fan2)> GetRpmAsync()
 		{
 			int rpm1 = reverse(await this.wmi.InvokeGetAsync<ushort>("getRpm1"));
 			int rpm2 = reverse(await this.wmi.InvokeGetAsync<ushort>("getRpm2"));
@@ -43,7 +43,7 @@ namespace AeroCtl
 			return (rpm1, rpm2);
 		}
 
-		public async Task<double> GetPwmAsync()
+		public async ValueTask<double> GetPwmAsync()
 		{
 			return absToRel(await this.wmi.InvokeGetAsync<byte>("GetFanPWMStatus"));
 		}
@@ -60,7 +60,7 @@ namespace AeroCtl
 			return (double) (fanSpeed - minFanSpeed) / (maxFanSpeed - minFanSpeed);
 		}
 
-		public async Task SetQuietAsync()
+		public async ValueTask SetQuietAsync()
 		{
 			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 0);
 			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
@@ -69,7 +69,7 @@ namespace AeroCtl
 			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 1);
 		}
 
-		public async Task SetNormalAsync()
+		public async ValueTask SetNormalAsync()
 		{
 			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 0);
 			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
@@ -78,7 +78,7 @@ namespace AeroCtl
 			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
 		}
 
-		public async Task SetGamingAsync()
+		public async ValueTask SetGamingAsync()
 		{
 			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 0);
 			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
@@ -87,7 +87,7 @@ namespace AeroCtl
 			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
 		}
 
-		public async Task SetAutoAsync(double fanAdjust = 0.25)
+		public async ValueTask SetAutoAsync(double fanAdjust = 0.25)
 		{
 			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
 			await this.wmi.InvokeSetAsync<byte>("SetAutoFanStatus", 0);
@@ -97,7 +97,7 @@ namespace AeroCtl
 			await this.wmi.InvokeSetAsync<byte>("SetFanAdjustStatus", (byte)relToAbs(fanAdjust));
 		}
 
-		public async Task SetFixedAsync(double fanSpeed = 0.25)
+		public async ValueTask SetFixedAsync(double fanSpeed = 0.25)
 		{
 			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
 			await this.wmi.InvokeSetAsync<byte>("SetAutoFanStatus", 0);
@@ -107,7 +107,7 @@ namespace AeroCtl
 			await this.wmi.InvokeSetAsync<byte>("SetFixedFanSpeed", (byte)relToAbs(fanSpeed));
 		}
 
-		public async Task SetCustomAsync()
+		public async ValueTask SetCustomAsync()
 		{
 			await this.wmi.InvokeSetAsync<byte>("SetAutoFanStatus", 0);
 			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 0);
@@ -131,14 +131,12 @@ namespace AeroCtl
 			if (index < 0 || index >= fanCurvePointCount)
 				throw new ArgumentOutOfRangeException(nameof(index));
 
-			ManagementBaseObject inParams = this.wmi.GetClass.GetMethodParameters("GetFanIndexValue");
-			inParams["Index"] = (byte)index;
-			ManagementBaseObject outParams = this.wmi.Get.InvokeMethod("GetFanIndexValue", inParams, null);
+			var res = this.wmi.Invoke("GetFanIndexValue", ("Index", (byte)index));
 
 			return new FanPoint
 			{
-				Temperature = (byte)outParams["Temperture"], // sic
-				FanSpeed = absToRel((byte)outParams["Value"]),
+				Temperature = (byte)res["Temperture"], // sic
+				FanSpeed = absToRel((byte)res["Value"]),
 			};
 		}
 
@@ -152,11 +150,10 @@ namespace AeroCtl
 			if (index < 0 || index >= fanCurvePointCount)
 				throw new ArgumentOutOfRangeException(nameof(index));
 
-			ManagementBaseObject inParams = this.wmi.SetClass.GetMethodParameters("SetFanIndexValue");
-			inParams["Index"] = (byte)index;
-			inParams["Temperture"] = (byte)point.Temperature;
-			inParams["Value"] = (byte)relToAbs(point.FanSpeed);
-			this.wmi.Set.InvokeMethod("SetFanIndexValue", inParams, null);
+			this.wmi.Invoke("SetFanIndexValue",
+				("Index", (byte)index), 
+				("Temperture", (byte)point.Temperature), // sic
+				("Value", (byte)relToAbs(point.FanSpeed)));
 		}
 
 		#endregion

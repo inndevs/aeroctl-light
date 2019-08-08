@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Concurrent;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
@@ -22,6 +23,7 @@ namespace AeroCtl.UI
 		private SoftwareFanController swFanController;
 		private bool updating;
 		private bool loading;
+		private readonly ConcurrentQueue<Func<Task>> updates;
 
 		private string baseBoard;
 		public string BaseBoard
@@ -171,7 +173,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating)
-					this.aero.Touchpad.Enabled = value;
+					this.updates.Enqueue(() => this.aero.Touchpad.SetEnabledAsync(value));
 			}
 		}
 
@@ -204,7 +206,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating)
-					this.aero.Battery.ChargeStop = value;
+					this.updates.Enqueue(() => this.aero.Battery.SetChargeStopAsync(value));
 			}
 		}
 
@@ -251,7 +253,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating)
-					this.aero.Battery.SmartCharge = value;
+					this.updates.Enqueue(() => this.aero.Battery.SetSmargeChargeAsync(value));
 			}
 		}
 
@@ -265,7 +267,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating)
-					this.aero.Battery.ChargePolicy = value ? ChargePolicy.CustomStop : ChargePolicy.Full;
+					this.updates.Enqueue(() => this.aero.Battery.SetChargePolicyAsync(value ? ChargePolicy.CustomStop : ChargePolicy.Full));
 			}
 		}
 
@@ -427,6 +429,7 @@ namespace AeroCtl.UI
 		public AeroController(Aero aero)
 		{
 			this.aero = aero;
+			this.updates = new ConcurrentQueue<Func<Task>>();
 		}
 
 		public void Load()
@@ -506,6 +509,11 @@ namespace AeroCtl.UI
 
 		public async Task UpdateAsync(bool full = false)
 		{
+			foreach (Func<Task> f in this.updates)
+			{
+				await f();
+			}
+
 			Debug.Assert(!this.updating);
 
 			this.updating = true;
@@ -530,7 +538,7 @@ namespace AeroCtl.UI
 					await this.applyFanProfileAsync();
 				}
 
-				this.CpuTemperature = await this.aero.GetCpuTemperatureAsync();
+				this.CpuTemperature = await this.aero.Cpu.GetTemperatureAsync();
 				this.GpuTemperature = await this.aero.Gpu.GetTemperatureAsync();
 
 				if (this.aero.Gpu is Aero2019GpuController newGpu)
@@ -540,17 +548,19 @@ namespace AeroCtl.UI
 					this.GpuPowerConfig = newGpu.PowerConfig;
 				}
 
-				this.SmartCharge = this.aero.Battery.SmartCharge;
+				(this.FanRpm1, this.FanRpm2) = await this.aero.Fans.GetRpmAsync();
+				this.FanPwm = await this.aero.Fans.GetPwmAsync() * 100;
+				this.ScreenBrightness = (int)this.aero.Screen.Brightness;
+
+				this.SmartCharge = await this.aero.Battery.GetSmartChargeAsync();
+				this.ChargeStopEnabled = await this.aero.Battery.GetChargePolicyAsync() == ChargePolicy.CustomStop;
+				this.ChargeStop = await this.aero.Battery.GetChargeStopAsync();
 				this.BatteryCycles = await this.aero.Battery.GetCyclesAsync();
 				this.BatteryHealth = await this.aero.Battery.GetHealthAsync();
-				this.BatteryCharge = await this.aero.Battery.GetRemainingCharge();
-				(this.FanRpm1, this.FanRpm2) = await this.aero.Fans.GetRpmAsync();
-				this.FanPwm = (await this.aero.Fans.GetPwmAsync()) * 100;
-				this.ScreenBrightness = (int)this.aero.Screen.Brightness;
-				this.ChargeStopEnabled = this.aero.Battery.ChargePolicy == ChargePolicy.CustomStop;
-				this.ChargeStop = this.aero.Battery.ChargeStop;
+				this.BatteryCharge = await this.aero.Battery.GetRemainingChargeAsync();
+				
 				this.WifiEnabled = this.aero.WifiEnabled;
-				this.TouchpadEnabled = this.aero.Touchpad.Enabled;
+				this.TouchpadEnabled = await this.aero.Touchpad.GetEnabledAsync();
 			}
 			finally
 			{
@@ -573,17 +583,25 @@ namespace AeroCtl.UI
 				this.aero = aero;
 			}
 
-			public async Task<double> GetTemperatureAsync(CancellationToken cancellationToken)
+			public async ValueTask<double> GetTemperatureAsync(CancellationToken cancellationToken)
 			{
-				double cpu = await this.aero.GetCpuTemperatureAsync();
+				double cpu = await this.aero.Cpu.GetTemperatureAsync();
 				double gpu = await this.aero.Gpu.GetTemperatureAsync();
 
 				return Math.Max(cpu, gpu);
 			}
 
-			public async Task SetSpeedAsync(double speed, CancellationToken cancellationToken)
+			public async ValueTask SetSpeedAsync(double speed, CancellationToken cancellationToken)
 			{
 				await this.aero.Fans.SetFixedAsync(speed);
+			}
+		}
+
+		public async ValueTask DisposeAsync()
+		{
+			if (this.swFanController != null)
+			{
+				await this.swFanController.StopAsync();
 			}
 		}
 	}

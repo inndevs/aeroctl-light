@@ -3,9 +3,9 @@
 namespace AeroCtl
 {
 	/// <summary>
-	/// GPU controller interface.
+	/// CPU controller interface.
 	/// </summary>
-	public interface IGpuController
+	public interface ICpuController
 	{
 		ValueTask<double> GetTemperatureAsync();
 	}

@@ -1,15 +1,19 @@
 ﻿using AeroCtl.Native;
 using System;
 using System.Management;
+using System.Threading.Tasks;
 
 namespace AeroCtl
 {
-	public class ScreenController
+	/// <summary>
+	/// Controls the built-in display.
+	/// </summary>
+	public class DisplayController
 	{
 		private readonly AeroWmi wmi;
 
-		public static Guid VIDEO_SUBGROUP = new Guid("7516b95f-f776-4464-8c53-06167f40cc99");
-		public static Guid VIDEO_NORMALLEVEL = new Guid("aded5e82-b909-4619-9949-f5d71dac0bcb");
+		private static readonly Guid VIDEO_SUBGROUP = new Guid("7516b95f-f776-4464-8c53-06167f40cc99");
+		private static readonly Guid VIDEO_NORMALLEVEL = new Guid("aded5e82-b909-4619-9949-f5d71dac0bcb");
 
 		public int Brightness
 		{
@@ -40,45 +44,24 @@ namespace AeroCtl
 		//	}
 		//}
 
-		public ScreenController(AeroWmi wmi)
+		public DisplayController(AeroWmi wmi)
 		{
 			this.wmi = wmi;
 		}
 
-		public bool ToggleScreen()
+		public async Task<bool> ToggleScreenAsync()
 		{
-			ManagementBaseObject inParams = this.wmi.SetClass.GetMethodParameters("SetBrightnessOff");
-			inParams["Data"] = (byte)1;
-
 			try
 			{
-				ManagementBaseObject outParams = this.wmi.Set.InvokeMethod("SetBrightnessOff", inParams, null);
-				byte dataOut = Convert.ToByte(outParams["DataOut"]);
+				await this.wmi.InvokeSetAsync<byte>("SetBrightnessOff", 1);
 				return true;
 			}
-			catch (ManagementException)
+			catch (ManagementException ex) when (ex.ErrorCode == ManagementStatus.InvalidObject)
 			{
 				// Apparently this is expected to throw an exception for whatever reason, even though it does toggle the screen.
 			}
 
 			return false;
 		}
-
-		public int IncreaseBrightness()
-		{
-			ManagementBaseObject inParams = this.wmi.SetClass.GetMethodParameters("IncreaseBrightness");
-			inParams["Data"] = (byte)0;
-			ManagementBaseObject outParams = this.wmi.Set.InvokeMethod("IncreaseBrightness", inParams, null);
-			return Convert.ToByte(outParams["DataOut"]);
-		}
-
-		public int DecreaseBrightness()
-		{
-			ManagementBaseObject inParams = this.wmi.SetClass.GetMethodParameters("DecreaseBrigtness"); // sic
-			inParams["Data"] = (byte)0;
-			ManagementBaseObject outParams = this.wmi.Set.InvokeMethod("DecreaseBrigtness", inParams, null);
-			return Convert.ToByte(outParams["DataOut"]);
-		}
-
 	}
 }

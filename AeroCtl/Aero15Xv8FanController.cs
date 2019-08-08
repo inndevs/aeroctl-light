@@ -86,7 +86,7 @@ namespace AeroCtl
 
 		#region IFanController
 
-		public async Task<(int fan1, int fan2)> GetRpmAsync()
+		public async ValueTask<(int fan1, int fan2)> GetRpmAsync()
 		{
 			int rpm1 = reverse(await this.wmi.InvokeGetAsync<ushort>("getRpm1"));
 			int rpm2 = reverse(await this.wmi.InvokeGetAsync<ushort>("getRpm2"));
@@ -94,12 +94,12 @@ namespace AeroCtl
 			return (rpm1, rpm2);
 		}
 
-		public async Task<double> GetPwmAsync()
+		public async ValueTask<double> GetPwmAsync()
 		{
-			return (await this.wmi.InvokeGetAsync<byte>("GetFanPWMStatus")) / 229.0;
+			return await this.wmi.InvokeGetAsync<byte>("GetFanPWMStatus") / 229.0;
 		}
 
-		public async Task SetQuietAsync()
+		public async ValueTask SetQuietAsync()
 		{
 			await SetFanFixedStatus(false);
 			await SetFanSpeed(false);
@@ -109,7 +109,7 @@ namespace AeroCtl
 			await SetSmartCoolingStatus(true);
 		}
 
-		public async Task SetNormalAsync()
+		public async ValueTask SetNormalAsync()
 		{
 			await SetFanFixedStatus(false);
 			await SetFanSpeed(false);
@@ -119,7 +119,7 @@ namespace AeroCtl
 			await SetAutoFanStatus(false);
 		}
 
-		public async Task SetGamingAsync()
+		public async ValueTask SetGamingAsync()
 		{
 			await SetFanFixedStatus(false);
 			await SetFanSpeed(false);
@@ -129,7 +129,7 @@ namespace AeroCtl
 			await SetAutoFanStatus(true);
 		}
 
-		public async Task SetFixedAsync(double fanSpeed = 0.25)
+		public async ValueTask SetFixedAsync(double fanSpeed = 0.25)
 		{
 			Debug.Assert(fanSpeed >= 0.0 && fanSpeed <= 1.0);
 
@@ -142,12 +142,12 @@ namespace AeroCtl
 			await SetFixedFanSpeed((byte)Math.Round(fanSpeed * 229.0));
 		}
 
-		public Task SetAutoAsync(double fanAdjust = 0.25)
+		public ValueTask SetAutoAsync(double fanAdjust = 0.25)
 		{
 			throw new NotSupportedException();
 		}
 
-		public Task SetCustomAsync()
+		public ValueTask SetCustomAsync()
 		{
 			throw new NotImplementedException();
 		}

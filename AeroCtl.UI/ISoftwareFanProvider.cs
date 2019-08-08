@@ -5,8 +5,7 @@ namespace AeroCtl.UI
 {
 	public interface ISoftwareFanProvider
 	{
-		Task<double> GetTemperatureAsync(CancellationToken cancellationToken);
-
-		Task SetSpeedAsync(double speed, CancellationToken cancellationToken);
+		ValueTask<double> GetTemperatureAsync(CancellationToken cancellationToken);
+		ValueTask SetSpeedAsync(double speed, CancellationToken cancellationToken);
 	}
 }

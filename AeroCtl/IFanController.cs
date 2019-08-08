@@ -4,15 +4,15 @@ namespace AeroCtl
 {
 	public interface IFanController
 	{
-		Task<(int fan1, int fan2)> GetRpmAsync();
-		Task<double> GetPwmAsync();
+		ValueTask<(int fan1, int fan2)> GetRpmAsync();
+		ValueTask<double> GetPwmAsync();
 		FanCurve GetFanCurve();
 
-		Task SetQuietAsync();
-		Task SetNormalAsync();
-		Task SetGamingAsync();
-		Task SetFixedAsync(double fanSpeed = 0.25);
-		Task SetAutoAsync(double fanAdjust = 0.25);
-		Task SetCustomAsync();
+		ValueTask SetQuietAsync();
+		ValueTask SetNormalAsync();
+		ValueTask SetGamingAsync();
+		ValueTask SetFixedAsync(double fanSpeed = 0.25);
+		ValueTask SetAutoAsync(double fanAdjust = 0.25);
+		ValueTask SetCustomAsync();
 	}
 }

@@ -2,11 +2,8 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
-using System.Threading.Tasks;
 using NvAPIWrapper;
 using NvAPIWrapper.GPU;
-using NvAPIWrapper.Native.Exceptions;
-using NvAPIWrapper.Native.General;
 
 namespace AeroCtl
 {
@@ -17,8 +14,6 @@ namespace AeroCtl
 	{
 		#region Fields
 
-		private readonly WlanClient wlanClient;
-
 		#endregion
 
 		#region Properties
@@ -27,6 +22,16 @@ namespace AeroCtl
 		/// Gets the WMI interface.
 		/// </summary>
 		private AeroWmi Wmi { get; }
+
+		/// <summary>
+		/// Gets the CPU controller.
+		/// </summary>
+		public ICpuController Cpu { get; }
+		
+		/// <summary>
+		/// Gets the GPU controller.
+		/// </summary>
+		public IGpuController Gpu { get; }
 
 		/// <summary>
 		/// Gets the base board / notebook model name.
@@ -61,7 +66,7 @@ namespace AeroCtl
 		/// <summary>
 		/// Gets the screen controller.
 		/// </summary>
-		public ScreenController Screen { get; }
+		public DisplayController Screen { get; }
 
 		/// <summary>
 		/// Gets the battery stats / controller.
@@ -80,40 +85,41 @@ namespace AeroCtl
 		{
 			get
 			{
-				Wlan.Dot11RadioState state = this.wlanClient.Interfaces.FirstOrDefault()?.RadioState.PhyRadioState.FirstOrDefault().dot11SoftwareRadioState ?? Wlan.Dot11RadioState.Unknown;
-				return state == Wlan.Dot11RadioState.On;
+				using (var wl = new WlanClient())
+				{
+					Wlan.Dot11RadioState state = wl.Interfaces.FirstOrDefault()?.RadioState.PhyRadioState.FirstOrDefault().dot11SoftwareRadioState ?? Wlan.Dot11RadioState.Unknown;
+					return state == Wlan.Dot11RadioState.On;
+				}
 			}
 			set
 			{
-				Wlan.WlanPhyRadioState newState;
-				if (value)
+				using (var wl = new WlanClient())
 				{
-					newState = new Wlan.WlanPhyRadioState
+					Wlan.WlanPhyRadioState newState;
+					if (value)
 					{
-						dwPhyIndex = (int)Wlan.Dot11PhyType.Any,
-						dot11SoftwareRadioState = Wlan.Dot11RadioState.On,
-					};
-				}
-				else
-				{
-					newState = new Wlan.WlanPhyRadioState
+						newState = new Wlan.WlanPhyRadioState
+						{
+							dwPhyIndex = (int)Wlan.Dot11PhyType.Any,
+							dot11SoftwareRadioState = Wlan.Dot11RadioState.On,
+						};
+					}
+					else
 					{
-						dwPhyIndex = (int)Wlan.Dot11PhyType.Any,
-						dot11SoftwareRadioState = Wlan.Dot11RadioState.Off,
-					};
-				}
+						newState = new Wlan.WlanPhyRadioState
+						{
+							dwPhyIndex = (int)Wlan.Dot11PhyType.Any,
+							dot11SoftwareRadioState = Wlan.Dot11RadioState.Off,
+						};
+					}
 
-				foreach (var iface in this.wlanClient.Interfaces)
-				{
-					iface.SetRadioState(newState);
+					foreach (var iface in wl.Interfaces)
+					{
+						iface.SetRadioState(newState);
+					}
 				}
 			}
 		}
-
-		/// <summary>
-		/// Gets the GPU controller.
-		/// </summary>
-		public IGpuController Gpu { get; }
 
 		#endregion
 
@@ -122,6 +128,8 @@ namespace AeroCtl
 		public Aero(AeroWmi wmi)
 		{
 			this.Wmi = wmi;
+
+			this.Cpu = new WmiCpuController(wmi);
 
 			NVIDIA.Initialize();
 			PhysicalGPU gpu = PhysicalGPU.GetPhysicalGPUs().FirstOrDefault();
@@ -138,20 +146,14 @@ namespace AeroCtl
 			}
 
 			this.Keyboard = new KeyboardController();
-			this.Screen = new ScreenController(wmi);
+			this.Screen = new DisplayController(wmi);
 			this.Battery = new BatteryController(wmi);
-			this.wlanClient = new WlanClient();
 			this.Touchpad = new TouchpadController(wmi);
 		}
 
 		#endregion
 
 		#region Methods
-
-		public async Task<double> GetCpuTemperatureAsync()
-		{
-			return await this.Wmi.InvokeGetAsync<ushort>("getCpuTemp");
-		}
 
 		public void Dispose()
 		{

@@ -9,37 +9,45 @@ namespace AeroCtl
 	{
 		private readonly AeroWmi wmi;
 
-		public ChargePolicy ChargePolicy
-		{
-			get => (ChargePolicy) this.wmi.InvokeGet<ushort>("GetChargePolicy");
-			set => this.wmi.InvokeSet<byte>("SetChargePolicy", (byte) value);
-		}
-
-		public int ChargeStop
-		{
-			get => this.wmi.InvokeGet<ushort>("GetChargeStop");
-			set
-			{
-				if (value <= 0 || value > 100)
-					throw new ArgumentOutOfRangeException(nameof(value));
-
-				this.wmi.InvokeSet<byte>("SetChargeStop", (byte) value);
-			}
-		}
-
-		public bool SmartCharge
-		{
-			get => this.wmi.InvokeGet<byte>("GetSmartCharge") != 0;
-			set => this.wmi.InvokeSet<byte>("SetSmartCharge", value ? (byte)1 : (byte)0);
-		}
-
 		public BatteryController(AeroWmi wmi)
 		{
 			this.wmi = wmi;
-
 		}
 
-		public async Task<int> GetRemainingCharge()
+		public async Task<ChargePolicy> GetChargePolicyAsync()
+		{
+			return (ChargePolicy)await this.wmi.InvokeGetAsync<ushort>("GetChargePolicy");
+		}
+
+		public async Task SetChargePolicyAsync(ChargePolicy policy)
+		{
+			await this.wmi.InvokeSetAsync<byte>("SetChargePolicy", (byte)policy);
+		}
+
+		public async Task<int> GetChargeStopAsync()
+		{
+			return await this.wmi.InvokeGetAsync<ushort>("GetChargeStop");
+		}
+
+		public async Task SetChargeStopAsync(int percent)
+		{
+			if (percent <= 0 || percent > 100)
+				throw new ArgumentOutOfRangeException(nameof(percent));
+
+			await this.wmi.InvokeSetAsync<byte>("SetChargeStop", (byte)percent);
+		}
+
+		public async Task<bool> GetSmartChargeAsync()
+		{
+			return await this.wmi.InvokeGetAsync<byte>("GetSmartCharge") != 0;
+		}
+
+		public async Task SetSmargeChargeAsync(bool enabled)
+		{
+			await this.wmi.InvokeSetAsync<byte>("SetSmartCharge", enabled ? (byte)1 : (byte)0);
+		}
+
+		public async Task<int> GetRemainingChargeAsync()
 		{
 			return await Task.Run(() =>
 			{

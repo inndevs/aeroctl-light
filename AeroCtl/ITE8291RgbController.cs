@@ -10,17 +10,17 @@ namespace AeroCtl
 	/// Implements logic to talk with the USB HID device that controls keyboard LEDs.
 	/// The chip appears to be called "ITE8291" according to its firmware blob.
 	/// </summary>
-	public class ITE8291RgbController : IRgbController
+	public class Ite8291RgbController : IRgbController
 	{
 		private readonly HidDevice device;
 		private const int defaultWait = 1;
 
-		public ITE8291RgbController(HidDevice device)
+		public Ite8291RgbController(HidDevice device)
 		{
 			this.device = device;
 		}
 
-		public async Task<Version> GetFirmwareVersionAsync()
+		public async ValueTask<Version> GetFirmwareVersionAsync()
 		{
 			Packet res = await this.ExecAsync(new Packet {B1 = 128});
 
@@ -29,7 +29,7 @@ namespace AeroCtl
 			return new Version(res.B2, res.B3);
 		}
 
-		public async Task SetEffectAsync(RgbEffect effect)
+		public async ValueTask SetEffectAsync(RgbEffect effect)
 		{
 			this.Set(new Packet
 			{
@@ -43,7 +43,7 @@ namespace AeroCtl
 			await Task.Delay(defaultWait);
 		}
 
-		public async Task<RgbEffect> GetEffectAsync()
+		public async ValueTask<RgbEffect> GetEffectAsync()
 		{
 			Packet res = await this.ExecAsync(new Packet {B1 = 136});
 			return new RgbEffect
@@ -56,7 +56,7 @@ namespace AeroCtl
 			};
 		}
 
-		public async Task SetImageAsync(int index, ReadOnlyMemory<byte> image)
+		public async ValueTask SetImageAsync(int index, ReadOnlyMemory<byte> image)
 		{
 			this.Set(new Packet {B1 = 18, B3 = (byte)index, B4 = 8});
 			await Task.Delay(defaultWait);
@@ -72,7 +72,7 @@ namespace AeroCtl
 			}
 		}
 
-		public async Task<Packet> ExecAsync(Packet p, int delay = defaultWait)
+		public async ValueTask<Packet> ExecAsync(Packet p, int delay = defaultWait)
 		{
 			this.Set(p);
 			await Task.Delay(delay);

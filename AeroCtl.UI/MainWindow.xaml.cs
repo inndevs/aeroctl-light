@@ -17,6 +17,9 @@ namespace AeroCtl.UI
 	{
 		private const int notificationTimeout = 3000;
 
+		private bool shutdownComplete;
+
+		private readonly TaskFactory taskFactory;
 		private readonly NotifyIcon trayIcon;
 		private readonly Aero aero;
 		private readonly AeroWmi wmi;
@@ -25,9 +28,15 @@ namespace AeroCtl.UI
 
 		public MainWindow()
 		{
+			TaskScheduler taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+			this.taskFactory = new TaskFactory(taskScheduler);
+
 			this.wmi = new AeroWmi();
 			this.aero = new Aero(this.wmi);
-			this.aero.Keyboard.FnKeyPressed += onFnKeyPressed;
+			this.aero.Keyboard.FnKeyPressed += (s, e) =>
+			{
+				this.taskFactory.StartNew(() => this.handleFnKey(e));
+			};
 			this.Aero = new AeroController(this.aero);
 			this.Aero.Load();
 
@@ -71,7 +80,7 @@ namespace AeroCtl.UI
 			};
 		}
 
-		private void onFnKeyPressed(object sender, FnKeyEventArgs e)
+		private async Task handleFnKey(FnKeyEventArgs e)
 		{
 			switch(e.Key)
 			{
@@ -99,12 +108,12 @@ namespace AeroCtl.UI
 					break;
 
 				case FnKey.ToggleScreen:
-					this.aero.Screen.ToggleScreen();
+					await this.aero.Screen.ToggleScreenAsync();
 					break;
 
 				case FnKey.ToggleTouchpad:
-					bool touchPad = !this.aero.Touchpad.Enabled;
-					this.aero.Touchpad.Enabled = touchPad;
+					bool touchPad = !await this.aero.Touchpad.GetEnabledAsync();
+					await this.aero.Touchpad.SetEnabledAsync(touchPad);
 
 					this.trayIcon.ShowBalloonTip(notificationTimeout, this.Title, $"Touchpad {(touchPad ? "enabled" : "disabled")}.", ToolTipIcon.Info);
 					break;
@@ -145,14 +154,29 @@ namespace AeroCtl.UI
 			if (this.WindowState == WindowState.Minimized)
 				this.Hide();
 		}
+
+		private async Task shutdown()
+		{
+			if (this.Aero.FanProfile == FanProfile.Software)
+			{
+				await this.aero.Fans.SetNormalAsync();
+			}
+
+			await this.Aero.DisposeAsync();
+			this.aero.Dispose();
+
+			this.trayIcon.Dispose();
+
+			this.shutdownComplete = true;
+			this.Close();
+		}
 		
 		protected override void OnClosing(CancelEventArgs e)
 		{
-			base.OnClosing(e);
-
-			if (this.Aero.FanProfile == FanProfile.Software)
+			if (!this.shutdownComplete)
 			{
-				this.aero.Fans.SetNormalAsync();
+				this.taskFactory.StartNew(this.shutdown);
+				e.Cancel = true;
 			}
 		}
 
