@@ -1,6 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 using System.Collections.Immutable;
+using System.Diagnostics;
 using System.Linq;
 using System.Management;
 using System.Reflection;
@@ -139,6 +140,8 @@ namespace AeroCtl
 				}
 			}
 
+			Debug.WriteLine($"{methodName}({string.Join(", ", parameters.Select(p => $"{p.Item1} = {p.Item2}"))}) = {string.Join(", ", result.Select(p => $"{p.Key} = {p.Value}"))}");
+
 			return result;
 		}
 
@@ -159,10 +162,14 @@ namespace AeroCtl
 			inParams["Data"] = value;
 			ManagementBaseObject outParams = this.set.InvokeMethod(methodName, inParams, null);
 
-			if (outParams == null)
-				return default;
+			T res = default;
+			if (outParams != null)
+			{
+				res = (T)outParams["DataOut"];
+			}
 
-			return (T)outParams["DataOut"];
+			Debug.WriteLine($"{methodName}({value}) = {res}");
+			return res;
 		}
 
 		public Task<T> InvokeSetAsync<T>(string methodName, T value)

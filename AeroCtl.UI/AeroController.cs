@@ -23,7 +23,7 @@ namespace AeroCtl.UI
 	{
 		private readonly Aero aero;
 		private SoftwareFanController swFanController;
-		private bool updating;
+		private readonly AsyncLocal<bool> updating;
 		private bool loading;
 		private readonly ConcurrentQueue<Func<Task>> updates;
 
@@ -146,7 +146,7 @@ namespace AeroCtl.UI
 				this.screenBrightness = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
+				if (!this.updating.Value)
 					this.aero.Screen.Brightness = value;
 			}
 		}
@@ -160,7 +160,7 @@ namespace AeroCtl.UI
 				this.wifiEnabled = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
+				if (!this.updating.Value)
 					this.aero.WifiEnabled = value;
 			}
 		}
@@ -174,7 +174,7 @@ namespace AeroCtl.UI
 				this.touchpadEnabled = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
+				if (!this.updating.Value)
 					this.updates.Enqueue(() => this.aero.Touchpad.SetEnabledAsync(value));
 			}
 		}
@@ -207,7 +207,7 @@ namespace AeroCtl.UI
 				this.chargeStop = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
+				if (!this.updating.Value)
 					this.updates.Enqueue(() => this.aero.Battery.SetChargeStopAsync(value));
 			}
 		}
@@ -254,7 +254,7 @@ namespace AeroCtl.UI
 				this.smartCharge = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
+				if (!this.updating.Value)
 					this.updates.Enqueue(() => this.aero.Battery.SetSmargeChargeAsync(value));
 			}
 		}
@@ -268,7 +268,7 @@ namespace AeroCtl.UI
 				this.chargeStopEnabled = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
+				if (!this.updating.Value)
 					this.updates.Enqueue(() => this.aero.Battery.SetChargePolicyAsync(value ? ChargePolicy.CustomStop : ChargePolicy.Full));
 			}
 		}
@@ -386,8 +386,8 @@ namespace AeroCtl.UI
 				this.gpuBoost = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
-					((Aero2019GpuController)this.aero.Gpu).BoostEnabled = value;
+				if (!this.updating.Value)
+					this.updates.Enqueue(() => ((Aero2019GpuController)this.aero.Gpu).SetBoostEnabledAsync(value));
 			}
 		}
 
@@ -411,8 +411,8 @@ namespace AeroCtl.UI
 				this.gpuPowerConfig = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating)
-					((Aero2019GpuController)this.aero.Gpu).PowerConfig = value;
+				if (!this.updating.Value)
+					this.updates.Enqueue(() => ((Aero2019GpuController)this.aero.Gpu).SetPowerConfigAsync(value));
 			}
 		}
 
@@ -431,6 +431,7 @@ namespace AeroCtl.UI
 		public AeroController(Aero aero)
 		{
 			this.aero = aero;
+			this.updating = new AsyncLocal<bool>();
 			this.updates = new ConcurrentQueue<Func<Task>>();
 		}
 
@@ -502,14 +503,12 @@ namespace AeroCtl.UI
 
 		public async Task UpdateAsync(bool full = false)
 		{
-			foreach (Func<Task> f in this.updates)
-			{
+			while (this.updates.TryDequeue(out var f))
 				await f();
-			}
 
-			Debug.Assert(!this.updating);
+			Debug.Assert(!this.updating.Value);
 
-			this.updating = true;
+			this.updating.Value = true;
 			try
 			{
 				if (full)
@@ -537,8 +536,8 @@ namespace AeroCtl.UI
 				if (this.aero.Gpu is Aero2019GpuController newGpu)
 				{
 					this.GpuBoostAvailable = this.GpuPowerConfigAvailable = true;
-					this.GpuBoost = newGpu.BoostEnabled;
-					this.GpuPowerConfig = newGpu.PowerConfig;
+					this.GpuBoost = await newGpu.GetBoostEnabledAsync();
+					this.GpuPowerConfig = await newGpu.GetPowerConfigAsync();
 				}
 
 				(this.FanRpm1, this.FanRpm2) = await this.aero.Fans.GetRpmAsync();
@@ -557,7 +556,7 @@ namespace AeroCtl.UI
 			}
 			finally
 			{
-				this.updating = false;
+				this.updating.Value = false;
 			}
 		}
 

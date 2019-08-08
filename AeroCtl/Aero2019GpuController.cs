@@ -1,4 +1,6 @@
-﻿using NvAPIWrapper.GPU;
+﻿using System.Runtime.CompilerServices;
+using System.Threading.Tasks;
+using NvAPIWrapper.GPU;
 
 namespace AeroCtl
 {
@@ -9,22 +11,30 @@ namespace AeroCtl
 	{
 		private readonly AeroWmi wmi;
 
-		public bool PowerConfig
-		{
-			get => this.wmi.InvokeGet<byte>("GetNvPowerConfig") != 0;
-			set => this.wmi.InvokeSet<byte>("SetNvPowerConfig", value ? (byte)1 : (byte)0);
-		}
-
-		public bool BoostEnabled
-		{
-			get => this.wmi.InvokeGet<byte>("GetAIBoostStatus") != 0;
-			set => this.wmi.InvokeSet<byte>("SetAIBoostStatus", value ? (byte)1 : (byte)0);
-		}
-
 		public Aero2019GpuController(PhysicalGPU gpu, AeroWmi wmi) 
 			: base(gpu)
 		{
 			this.wmi = wmi;
+		}
+
+		public async Task<bool> GetPowerConfigAsync()
+		{
+			return await this.wmi.InvokeGetAsync<byte>("GetNvPowerConfig") != 0;
+		}
+
+		public async Task SetPowerConfigAsync(bool value)
+		{
+			await this.wmi.InvokeSetAsync<byte>("SetNvPowerConfig", value ? (byte)1 : (byte)0);
+		}
+
+		public async Task<bool> GetBoostEnabledAsync()
+		{
+			return await this.wmi.InvokeGetAsync<byte>("GetAIBoostStatus") != 0;
+		}
+
+		public async Task SetBoostEnabledAsync(bool value)
+		{
+			await this.wmi.InvokeSetAsync<byte>("SetAIBoostStatus", value ? (byte)1 : (byte)0);
 		}
 	}
 }
