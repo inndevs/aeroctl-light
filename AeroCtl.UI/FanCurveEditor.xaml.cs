@@ -410,10 +410,4 @@ namespace AeroCtl.UI
 
 		#endregion
 	}
-
-	public enum FanCurveKind
-	{
-		Step,
-		Linear
-	}
 }

@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Linq;
@@ -197,13 +198,26 @@ namespace AeroCtl.UI
 
 		private void onEditSwCurveClicked(object sender, RoutedEventArgs e)
 		{
-			List<FanPoint> curve = new List<FanPoint>(this.Aero.SoftwareFanCurve);
+			FanConfig cfg = new FanConfig(this.Aero.SoftwareFanConfig);
+			List<FanPoint> curve = new List<FanPoint>(cfg.Curve);
 			FanCurveEditor editor = new FanCurveEditor(curve, FanCurveKind.Linear);
 			editor.CurveApplied += (s, e2) =>
 			{
-				this.Aero.SoftwareFanCurve = curve.ToArray();
+				cfg.Curve = curve.ToImmutableArray();
+				this.Aero.SoftwareFanConfig = cfg;
 			};
 			editor.ShowDialog();
+		}
+
+		private void onEditSwconfigClicked(object sender, RoutedEventArgs e)
+		{
+			FanConfig cfg = new FanConfig(this.Aero.SoftwareFanConfig);
+			FanConfigEditor editor = new FanConfigEditor(cfg);
+
+			if (editor.ShowDialog() == true)
+			{
+				this.Aero.SoftwareFanConfig = cfg;
+			}
 		}
 	}
 }

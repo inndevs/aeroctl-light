@@ -61,18 +61,6 @@ namespace AeroCtl.UI.Properties {
         
         [global::System.Configuration.UserScopedSettingAttribute()]
         [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
-        [global::System.Configuration.DefaultSettingValueAttribute("")]
-        public string SoftwareFanCurve {
-            get {
-                return ((string)(this["SoftwareFanCurve"]));
-            }
-            set {
-                this["SoftwareFanCurve"] = value;
-            }
-        }
-        
-        [global::System.Configuration.UserScopedSettingAttribute()]
-        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
         [global::System.Configuration.DefaultSettingValueAttribute("False")]
         public bool StartMinimized {
             get {
@@ -92,6 +80,17 @@ namespace AeroCtl.UI.Properties {
             }
             set {
                 this["FanProfileAlt"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        public global::System.Collections.Specialized.StringCollection SoftwareFanConfig {
+            get {
+                return ((global::System.Collections.Specialized.StringCollection)(this["SoftwareFanConfig"]));
+            }
+            set {
+                this["SoftwareFanConfig"] = value;
             }
         }
     }

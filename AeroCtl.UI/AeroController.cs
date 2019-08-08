@@ -1,8 +1,10 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Globalization;
+using System.Json;
 using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Runtime.InteropServices.WindowsRuntime;
@@ -356,20 +358,20 @@ namespace AeroCtl.UI
 			}
 		}
 
-		private FanPoint[] softwareFanCurve;
-		public FanPoint[] SoftwareFanCurve
+		private FanConfig softwareFanConfig;
+		public FanConfig SoftwareFanConfig
 		{
-			get => this.softwareFanCurve;
+			get => this.softwareFanConfig;
 			set
 			{
-				this.softwareFanCurve = value;
+				this.softwareFanConfig = value;
 				this.OnPropertyChanged();
 
 				this.FanProfileInvalid = true;
 
 				if (!this.loading)
 				{
-					Settings.Default.SoftwareFanCurve = string.Join(" ", value.Select(p => $"{p.Temperature.ToString(CultureInfo.InvariantCulture)} {p.FanSpeed.ToString(CultureInfo.InvariantCulture)}"));
+					Settings.Default.SoftwareFanConfig = new StringCollection() {value.ToJson().ToString()};
 					Settings.Default.Save();
 				}
 			}
@@ -443,13 +445,11 @@ namespace AeroCtl.UI
 				this.FanProfileAlt = (FanProfile)s.FanProfileAlt;
 				this.FixedFanSpeed = s.FixedFanSpeed;
 				this.AutoFanAdjust = s.AutoFanAdjust;
-				this.SoftwareFanCurve = s.SoftwareFanCurve
-					.Split(new[] {' '}, StringSplitOptions.RemoveEmptyEntries)
-					.Select((str, i) => (i, str))
-					.GroupBy(x => x.i / 2, x => x.str)
-					.Select(g => (double.Parse(g.First(), CultureInfo.InvariantCulture), double.Parse(g.Last(), CultureInfo.InvariantCulture)))
-					.Select(t => new FanPoint(t.Item1, t.Item2))
-					.ToArray();
+
+				this.SoftwareFanConfig = new FanConfig();
+				if (s.SoftwareFanConfig != null && s.SoftwareFanConfig.Count > 0)
+					this.SoftwareFanConfig = FanConfig.FromJson((JsonObject)JsonValue.Parse(s.SoftwareFanConfig[0]));
+
 			}
 			finally
 			{
@@ -492,14 +492,7 @@ namespace AeroCtl.UI
 					await this.aero.Fans.SetCustomAsync();
 					break;
 				case FanProfile.Software:
-					if ((this.SoftwareFanCurve?.Length ?? 0) < 1)
-					{
-						await this.aero.Fans.SetNormalAsync();
-					}
-					else
-					{
-						this.swFanController = new SoftwareFanController(this.SoftwareFanCurve, FanConfig.Default, new AeroFanProvider(this.aero));
-					}
+					this.swFanController = new SoftwareFanController(this.SoftwareFanConfig, new AeroFanProvider(this.aero));
 
 					break;
 				default:

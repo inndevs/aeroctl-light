@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Collections.Immutable;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
@@ -15,24 +16,27 @@ namespace AeroCtl.UI
 
 	public class SoftwareFanController
 	{
-		private readonly CancellationTokenSource cts;
-		private readonly FanPoint[] curve;
 		private readonly FanConfig config;
 		private readonly ISoftwareFanProvider provider;
-		
+		private readonly ImmutableArray<FanPoint> curve;
+
+		private readonly CancellationTokenSource cts;
 		private readonly Task task;
 		private readonly Thread thread;
 
 		private readonly Stopwatch watch;
 		private double currentSpeed;
 
-		public SoftwareFanController(FanPoint[] curve, FanConfig config, ISoftwareFanProvider provider)
+		public SoftwareFanController(FanConfig config, ISoftwareFanProvider provider)
 		{
-			this.curve = curve ?? throw new ArgumentNullException(nameof(curve));
-			if (this.curve.Length == 0)
-				throw new ArgumentException("Invalid curve.", nameof(curve));
+			if (config == null)
+				throw new ArgumentNullException(nameof(config));
 
-			this.config = config;
+			if (!config.IsValid)
+				throw new ArgumentException("Invalid fan config.", nameof(config));
+
+			this.config = new FanConfig(config);
+			this.curve = config.Curve;
 			this.provider = provider ?? throw new ArgumentNullException(nameof(provider));
 
 			this.watch = new Stopwatch();
