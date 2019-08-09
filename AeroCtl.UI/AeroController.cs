@@ -3,16 +3,12 @@ using System.Collections.Concurrent;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
-using System.Globalization;
 using System.Json;
-using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Runtime.InteropServices.WindowsRuntime;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Media.Converters;
 using AeroCtl.UI.Properties;
-using NvAPIWrapper.DRS.SettingValues;
+using AeroCtl.UI.SoftwareFan;
 
 namespace AeroCtl.UI
 {
@@ -21,164 +17,18 @@ namespace AeroCtl.UI
 	/// </summary>
 	public class AeroController : INotifyPropertyChanged
 	{
+		#region Fields
+
 		private readonly Aero aero;
+		private readonly HwMonitor hwMonitor;
 		private SoftwareFanController swFanController;
 		private readonly AsyncLocal<bool> updating;
 		private bool loading;
 		private readonly ConcurrentQueue<Func<Task>> updates;
 
-		private string baseBoard;
-		public string BaseBoard
-		{
-			get => this.baseBoard;
-			private set
-			{
-				this.baseBoard = value;
-				this.OnPropertyChanged();
-			}
-		}
+		#endregion
 
-		private string sku;
-		public string Sku
-		{
-			get => this.sku;
-			private set
-			{
-				this.sku = value;
-				this.OnPropertyChanged();
-			}
-		}
-
-		private string biosVersion;
-		public string BiosVersion
-		{
-			get => this.biosVersion;
-			private set
-			{
-				this.biosVersion = value;
-				this.OnPropertyChanged();
-			}
-		}
-
-		private string serialNumber;
-		public string SerialNumber
-		{
-			get => this.serialNumber;
-			private set
-			{
-				this.serialNumber = value;
-				this.OnPropertyChanged();
-			}
-		}
-
-		private Version keyboardFWVersion;
-		public Version KeyboardFWVersion
-		{
-			get => this.keyboardFWVersion;
-			private set
-			{
-				this.keyboardFWVersion = value;
-				this.OnPropertyChanged();
-			}
-		}
-
-		private double cpuTemperature;
-		public double CpuTemperature
-		{
-			get => this.cpuTemperature;
-			private set
-			{
-				this.cpuTemperature = value;
-				this.OnPropertyChanged();
-			}
-		}
-
-		private double gpuTemperature;
-		public double GpuTemperature
-		{
-			get => this.gpuTemperature;
-			private set
-			{
-				this.gpuTemperature = value;
-				this.OnPropertyChanged();
-			}
-		}
-
-		private int fanRpm1;
-		public int FanRpm1
-		{
-			get => this.fanRpm1;
-			private set
-			{
-				this.fanRpm1 = value;
-				this.OnPropertyChanged();
-			}
-		}
-
-		private int fanRpm2;
-		public int FanRpm2
-		{
-			get => this.fanRpm2;
-			private set
-			{
-				this.fanRpm2 = value;
-				this.OnPropertyChanged();
-			}
-		}
-
-		private double fanPwm;
-		public double FanPwm
-		{
-			get => this.fanPwm;
-			private set
-			{
-				this.fanPwm = value;
-				this.OnPropertyChanged();
-			}
-		}
-
-		private int screenBrightness;
-		public int ScreenBrightness
-		{
-			get => (int)this.screenBrightness;
-			set
-			{
-				this.screenBrightness = value;
-				this.OnPropertyChanged();
-
-				if (!this.updating.Value)
-					this.aero.Display.Brightness = value;
-			}
-		}
-
-		private bool wifiEnabled;
-		public bool WifiEnabled
-		{
-			get => this.wifiEnabled;
-			set
-			{
-				this.wifiEnabled = value;
-				this.OnPropertyChanged();
-
-				if (!this.updating.Value)
-					this.aero.WifiEnabled = value;
-			}
-		}
-
-		private bool touchpadEnabled;
-		public bool TouchpadEnabled
-		{
-			get => this.touchpadEnabled;
-			set
-			{
-				this.touchpadEnabled = value;
-				this.OnPropertyChanged();
-
-				if (!this.updating.Value)
-					this.updates.Enqueue(() => this.aero.Touchpad.SetEnabledAsync(value));
-			}
-		}
-
+		#region StartMinimized
 
 		private bool startMinimized;
 		public bool StartMinimized
@@ -197,20 +47,213 @@ namespace AeroCtl.UI
 			}
 		}
 
+		#endregion
+		
+		#region BaseBoard
 
-		private int chargeStop;
-		public int ChargeStop
+		private string baseBoard;
+		public string BaseBoard
 		{
-			get => this.chargeStop;
+			get => this.baseBoard;
+			private set
+			{
+				this.baseBoard = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region Sku
+
+		private string sku;
+		public string Sku
+		{
+			get => this.sku;
+			private set
+			{
+				this.sku = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region BiosVersion
+
+		private string biosVersion;
+		public string BiosVersion
+		{
+			get => this.biosVersion;
+			private set
+			{
+				this.biosVersion = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region SerialNumber
+
+		private string serialNumber;
+		public string SerialNumber
+		{
+			get => this.serialNumber;
+			private set
+			{
+				this.serialNumber = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region KeyboardFWVersion
+
+		private Version keyboardFWVersion;
+		public Version KeyboardFWVersion
+		{
+			get => this.keyboardFWVersion;
+			private set
+			{
+				this.keyboardFWVersion = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region CpuTemperature
+
+		private double cpuTemperature;
+		public double CpuTemperature
+		{
+			get => this.cpuTemperature;
+			private set
+			{
+				this.cpuTemperature = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region GpuTemperature
+
+		private double gpuTemperature;
+		public double GpuTemperature
+		{
+			get => this.gpuTemperature;
+			private set
+			{
+				this.gpuTemperature = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region FanRpm1
+
+		private int fanRpm1;
+		public int FanRpm1
+		{
+			get => this.fanRpm1;
+			private set
+			{
+				this.fanRpm1 = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region FanRpm2
+
+		private int fanRpm2;
+		public int FanRpm2
+		{
+			get => this.fanRpm2;
+			private set
+			{
+				this.fanRpm2 = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region FanPwm
+
+		private double fanPwm;
+		public double FanPwm
+		{
+			get => this.fanPwm;
+			private set
+			{
+				this.fanPwm = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region DisplayBrightness
+
+		private int displayBrightness;
+		public int DisplayBrightness
+		{
+			get => (int)this.displayBrightness;
 			set
 			{
-				this.chargeStop = value;
+				this.displayBrightness = value;
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => this.aero.Battery.SetChargeStopAsync(value));
+					this.aero.Display.Brightness = value;
 			}
 		}
+
+		#endregion
+
+		#region WifiEnabled
+
+		private bool wifiEnabled;
+		public bool WifiEnabled
+		{
+			get => this.wifiEnabled;
+			set
+			{
+				this.wifiEnabled = value;
+				this.OnPropertyChanged();
+
+				if (!this.updating.Value)
+					this.aero.WifiEnabled = value;
+			}
+		}
+
+		#endregion
+
+		#region TouchpadEnabled
+
+		private bool touchpadEnabled;
+		public bool TouchpadEnabled
+		{
+			get => this.touchpadEnabled;
+			set
+			{
+				this.touchpadEnabled = value;
+				this.OnPropertyChanged();
+
+				if (!this.updating.Value)
+					this.updates.Enqueue(() => this.aero.Touchpad.SetEnabledAsync(value));
+			}
+		}
+
+		#endregion
+
+		#region BatteryCycles
 
 		private int batteryCycles;
 		public int BatteryCycles
@@ -222,7 +265,11 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 			}
 		}
-		
+
+		#endregion
+
+		#region BatteryCharge
+
 		private int batteryCharge;
 		public int BatteryCharge
 		{
@@ -234,6 +281,10 @@ namespace AeroCtl.UI
 			}
 		}
 
+		#endregion
+
+		#region BatteryHealth
+
 		private int batteryHealth;
 		public int BatteryHealth
 		{
@@ -244,6 +295,10 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 			}
 		}
+
+		#endregion
+
+		#region SmartCharge
 
 		private bool smartCharge;
 		public bool SmartCharge
@@ -259,6 +314,10 @@ namespace AeroCtl.UI
 			}
 		}
 
+		#endregion
+
+		#region ChargeStopEnabled
+
 		private bool chargeStopEnabled;
 		public bool ChargeStopEnabled
 		{
@@ -273,6 +332,28 @@ namespace AeroCtl.UI
 			}
 		}
 
+		#endregion
+
+		#region ChargeStop
+
+		private int chargeStop;
+		public int ChargeStop
+		{
+			get => this.chargeStop;
+			set
+			{
+				this.chargeStop = value;
+				this.OnPropertyChanged();
+
+				if (!this.updating.Value)
+					this.updates.Enqueue(() => this.aero.Battery.SetChargeStopAsync(value));
+			}
+		}
+
+		#endregion
+
+		#region FanProfileInvalid
+
 		private bool fanProfileInvalid;
 		public bool FanProfileInvalid
 		{
@@ -283,6 +364,10 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 			}
 		}
+
+		#endregion
+
+		#region FanProfile
 
 		private FanProfile fanProfile;
 		public FanProfile FanProfile
@@ -303,6 +388,10 @@ namespace AeroCtl.UI
 			}
 		}
 
+		#endregion
+
+		#region FanProfileAlt
+
 		private FanProfile fanProfileAlt;
 		public FanProfile FanProfileAlt
 		{
@@ -319,7 +408,11 @@ namespace AeroCtl.UI
 				}
 			}
 		}
-		
+
+		#endregion
+
+		#region FixedFanSpeed
+
 		private double fixedFanSpeed = 0.25;
 		public double FixedFanSpeed
 		{
@@ -338,6 +431,10 @@ namespace AeroCtl.UI
 				}
 			}
 		}
+
+		#endregion
+
+		#region AutoFanAdjust
 
 		private double autoFanAdjust = 0.25;
 		public double AutoFanAdjust
@@ -358,6 +455,10 @@ namespace AeroCtl.UI
 			}
 		}
 
+		#endregion
+
+		#region SoftwareFanConfig
+
 		private FanConfig softwareFanConfig;
 		public FanConfig SoftwareFanConfig
 		{
@@ -377,6 +478,25 @@ namespace AeroCtl.UI
 			}
 		}
 
+		#endregion
+
+		#region GpuConfigAvailable
+
+		private bool gpuConfigAvailable;
+		public bool GpuConfigAvailable
+		{
+			get => this.gpuConfigAvailable;
+			private set
+			{
+				this.gpuConfigAvailable = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
+		#region GpuBoost
+
 		private bool gpuBoost;
 		public bool GpuBoost
 		{
@@ -387,20 +507,13 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => ((Aero2019GpuController)this.aero.Gpu).SetBoostEnabledAsync(value));
+					this.updates.Enqueue(() => ((P75GpuController)this.aero.Gpu).SetBoostEnabledAsync(value));
 			}
 		}
 
-		private bool gpuBoostAvailable;
-		public bool GpuBoostAvailable
-		{
-			get => this.gpuBoostAvailable;
-			private set
-			{
-				this.gpuBoostAvailable = value;
-				this.OnPropertyChanged();
-			}
-		}
+		#endregion
+
+		#region GpuPowerConfig
 
 		private bool gpuPowerConfig;
 		public bool GpuPowerConfig
@@ -412,28 +525,43 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => ((Aero2019GpuController)this.aero.Gpu).SetPowerConfigAsync(value));
+					this.updates.Enqueue(() => ((P75GpuController)this.aero.Gpu).SetPowerConfigAsync(value));
 			}
 		}
 
-		private bool gpuPowerConfigAvailable;
-		public bool GpuPowerConfigAvailable
+		#endregion
+
+		#region GpuThermalTarget
+
+		private bool gpuThermalTarget;
+		public bool GpuThermalTarget
 		{
-			get => this.gpuPowerConfigAvailable;
-			private set
+			get => this.gpuThermalTarget;
+			set
 			{
-				this.gpuPowerConfigAvailable = value;
+				this.gpuThermalTarget = value;
 				this.OnPropertyChanged();
+
+				if (!this.updating.Value)
+					this.updates.Enqueue(() => ((P75GpuController)this.aero.Gpu).SetThermalTargetEnabledAsync(value));
 			}
 		}
 
+		#endregion
+
+		#region Constructors
 
 		public AeroController(Aero aero)
 		{
 			this.aero = aero;
 			this.updating = new AsyncLocal<bool>();
 			this.updates = new ConcurrentQueue<Func<Task>>();
+			this.hwMonitor = new HwMonitor();
 		}
+
+		#endregion
+
+		#region Methods
 
 		public void Load()
 		{
@@ -493,8 +621,7 @@ namespace AeroCtl.UI
 					await this.aero.Fans.SetCustomAsync();
 					break;
 				case FanProfile.Software:
-					this.swFanController = new SoftwareFanController(this.SoftwareFanConfig, new AeroFanProvider(this.aero));
-
+					this.swFanController = new SoftwareFanController(this.SoftwareFanConfig, new AeroFanProvider(this.aero, this.hwMonitor));
 					break;
 				default:
 					throw new InvalidEnumArgumentException(nameof(this.FanProfile), (int)newProfile, typeof(FanProfile));
@@ -530,19 +657,24 @@ namespace AeroCtl.UI
 					await this.applyFanProfileAsync();
 				}
 
-				this.CpuTemperature = await this.aero.Cpu.GetTemperatureAsync();
-				this.GpuTemperature = await this.aero.Gpu.GetTemperatureAsync();
-
-				if (this.aero.Gpu is Aero2019GpuController newGpu)
+				lock (this.hwMonitor)
 				{
-					this.GpuBoostAvailable = this.GpuPowerConfigAvailable = true;
+					this.hwMonitor.Update();
+					this.CpuTemperature = this.hwMonitor.CpuTemperature;
+					this.GpuTemperature = this.hwMonitor.GpuTemperature;
+				}
+
+				if (this.aero.Gpu is P75GpuController newGpu)
+				{
+					this.GpuConfigAvailable = true;
 					this.GpuBoost = await newGpu.GetBoostEnabledAsync();
 					this.GpuPowerConfig = await newGpu.GetPowerConfigAsync();
+					this.GpuThermalTarget = await newGpu.GetThermalTargetEnabledAsync();
 				}
 
 				(this.FanRpm1, this.FanRpm2) = await this.aero.Fans.GetRpmAsync();
 				this.FanPwm = await this.aero.Fans.GetPwmAsync() * 100;
-				this.ScreenBrightness = (int)this.aero.Display.Brightness;
+				this.DisplayBrightness = (int)this.aero.Display.Brightness;
 
 				this.SmartCharge = await this.aero.Battery.GetSmartChargeAsync();
 				this.ChargeStopEnabled = await this.aero.Battery.GetChargePolicyAsync() == ChargePolicy.CustomStop;
@@ -566,35 +698,59 @@ namespace AeroCtl.UI
 			this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 		}
 
-		private sealed class AeroFanProvider : ISoftwareFanProvider
-		{
-			private readonly Aero aero;
-
-			public AeroFanProvider(Aero aero)
-			{
-				this.aero = aero;
-			}
-
-			public async ValueTask<double> GetTemperatureAsync(CancellationToken cancellationToken)
-			{
-				double cpu = await this.aero.Cpu.GetTemperatureAsync();
-				double gpu = await this.aero.Gpu.GetTemperatureAsync();
-
-				return Math.Max(cpu, gpu);
-			}
-
-			public async ValueTask SetSpeedAsync(double speed, CancellationToken cancellationToken)
-			{
-				await this.aero.Fans.SetFixedAsync(speed);
-			}
-		}
-
 		public async ValueTask DisposeAsync()
 		{
 			if (this.swFanController != null)
 			{
 				await this.swFanController.StopAsync();
+				this.swFanController = null;
+			}
+
+			this.hwMonitor?.Dispose();
+		}
+
+		#endregion
+
+		#region Nested Types
+
+		/// <summary>
+		/// Provider implementation for the software fan.
+		/// </summary>
+		private sealed class AeroFanProvider : ISoftwareFanProvider
+		{
+			private readonly Aero aero;
+			private readonly HwMonitor hwmon;
+
+			public AeroFanProvider(Aero aero, HwMonitor hwmon)
+			{
+				this.aero = aero;
+				this.hwmon = hwmon;
+			}
+
+			public ValueTask<double> GetTemperatureAsync(CancellationToken cancellationToken)
+			{
+				lock (this.hwmon)
+				{
+					this.hwmon.Update();
+					double cpu = this.hwmon.CpuTemperature;
+					double gpu = this.hwmon.GpuTemperature;
+					return new ValueTask<double>(Math.Max(cpu, gpu));
+				}
+			}
+
+			public async ValueTask SetSpeedAsync(double speed, CancellationToken cancellationToken)
+			{
+				if (this.aero.Fans is IDirectFanSpeedController direct)
+				{
+					direct.SetFixed(speed);
+				}
+				else
+				{
+					await this.aero.Fans.SetFixedAsync(speed);
+				}
 			}
 		}
+
+		#endregion
 	}
 }

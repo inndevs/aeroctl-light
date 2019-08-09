@@ -182,7 +182,6 @@ namespace HighlightLockKeys
 				{
 					State currentState = 0;
 					bool invalid = true;
-					int page = 0;
 
 					SystemEvents.SessionSwitch += (s, e) =>
 					{

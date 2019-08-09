@@ -4,6 +4,7 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:local="clr-namespace:AeroCtl.UI"
+        xmlns:softwareFan="clr-namespace:AeroCtl.UI.SoftwareFan"
         mc:Ignorable="d"
         DataContext="{Binding RelativeSource={RelativeSource Self}}"
         Title="Fan Configuration" SizeToContent="Height" Width="400">
@@ -44,7 +45,7 @@
             <TextBox Grid.Row="2" Grid.Column="1" Text="{Binding Config.Interval}" />
 
             <TextBlock Grid.Row="3" Grid.Column="0">Thread scheduling mode</TextBlock>
-            <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding Source={local:Enumeration {x:Type local:FanSchedulingMode}}}" DisplayMemberPath="Description" SelectedValue="{Binding Config.SchedulingMode}" SelectedValuePath="Value" />
+            <ComboBox Grid.Row="3" Grid.Column="1" ItemsSource="{Binding Source={local:Enumeration {x:Type softwareFan:FanSchedulingMode}}}" DisplayMemberPath="Description" SelectedValue="{Binding Config.SchedulingMode}" SelectedValuePath="Value" />
         </Grid>
     </DockPanel>
 </Window>

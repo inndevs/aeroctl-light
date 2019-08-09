@@ -91,9 +91,10 @@
 								<CheckBox IsChecked="{Binding Aero.TouchpadEnabled}">Touchpad enabled</CheckBox>
 								<CheckBox IsChecked="{Binding Aero.StartMinimized}">Start minimized</CheckBox>
 							</StackPanel>
-							<StackPanel>
-								<CheckBox IsChecked="{Binding Aero.GpuBoost}" IsEnabled="{Binding Aero.GpuBoostAvailable}">GPU boost / OC</CheckBox>
-								<CheckBox IsChecked="{Binding Aero.GpuPowerConfig}" IsEnabled="{Binding Aero.GpuPowerConfigAvailable}">GPU power config (?)</CheckBox>
+							<StackPanel IsEnabled="{Binding Aero.GpuConfigAvailable}">
+								<CheckBox IsChecked="{Binding Aero.GpuBoost}">GPU boost / OC</CheckBox>
+								<CheckBox IsChecked="{Binding Aero.GpuThermalTarget}">GPU thermal target (?)</CheckBox>
+								<CheckBox IsChecked="{Binding Aero.GpuPowerConfig}">GPU power config (?)</CheckBox>
 							</StackPanel>
 						</StackPanel>
 					</StackPanel>
@@ -105,11 +106,11 @@
 					<Label Target="{Binding ElementName=screenBrightness}">
 						<StackPanel Orientation="Horizontal">
 							<TextBlock Margin="0 0 5 0">Screen brightness:</TextBlock>
-							<TextBlock Text="{Binding Path=Aero.ScreenBrightness, Mode=OneWay}" />
+							<TextBlock Text="{Binding Path=Aero.DisplayBrightness, Mode=OneWay}" />
 							<TextBlock Margin="2 0 0 0">%</TextBlock>
 						</StackPanel>
 					</Label>
-					<Slider Name="screenBrightness" Minimum="0" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding Path=Aero.ScreenBrightness}" />
+					<Slider Name="screenBrightness" Minimum="0" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding Path=Aero.DisplayBrightness}" />
 				</StackPanel>
 			</GroupBox>
 

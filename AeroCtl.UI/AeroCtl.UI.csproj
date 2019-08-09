@@ -66,13 +66,15 @@
       <SubType>Designer</SubType>
     </ApplicationDefinition>
     <Compile Include="EnumExtension.cs" />
-    <Compile Include="FanConfig.cs" />
+    <Compile Include="SoftwareFan\FanConfig.cs" />
     <Compile Include="FanConfigEditor.xaml.cs">
       <DependentUpon>FanConfigEditor.xaml</DependentUpon>
     </Compile>
     <Compile Include="FanCurveKind.cs" />
-    <Compile Include="ISoftwareFanProvider.cs" />
-    <Compile Include="SoftwareFanController.cs" />
+    <Compile Include="HwMonitor.cs" />
+    <Compile Include="SoftwareFan\FanSchedulingMode.cs" />
+    <Compile Include="SoftwareFan\ISoftwareFanProvider.cs" />
+    <Compile Include="SoftwareFan\SoftwareFanController.cs" />
     <Page Include="FanConfigEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
@@ -134,6 +136,9 @@
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
+    <PackageReference Include="LibreHardwareMonitorLibCore">
+      <Version>1.0.3</Version>
+    </PackageReference>
     <PackageReference Include="System.Collections.Immutable">
       <Version>1.5.0</Version>
     </PackageReference>
@@ -150,5 +155,6 @@
   <ItemGroup>
     <Resource Include="Main.ico" />
   </ItemGroup>
+  <ItemGroup />
   <Import Project="$(MSBuildToolsPath)\Microsoft.CSharp.targets" />
 </Project>

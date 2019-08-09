@@ -7,6 +7,6 @@ namespace AeroCtl
 	/// </summary>
 	public interface IGpuController
 	{
-		ValueTask<double> GetTemperatureAsync();
+
 	}
 }

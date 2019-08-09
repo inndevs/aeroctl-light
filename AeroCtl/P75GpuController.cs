@@ -1,18 +1,15 @@
-﻿using System.Runtime.CompilerServices;
-using System.Threading.Tasks;
-using NvAPIWrapper.GPU;
+﻿using System.Threading.Tasks;
 
 namespace AeroCtl
 {
 	/// <summary>
 	/// Controller for the newer Aero models that expose additional GPU settings.
 	/// </summary>
-	public class Aero2019GpuController : NvGpuController
+	public class P75GpuController : NvGpuController
 	{
 		private readonly AeroWmi wmi;
 
-		public Aero2019GpuController(PhysicalGPU gpu, AeroWmi wmi) 
-			: base(gpu)
+		public P75GpuController(AeroWmi wmi) 
 		{
 			this.wmi = wmi;
 		}
@@ -35,6 +32,16 @@ namespace AeroCtl
 		public async Task SetBoostEnabledAsync(bool value)
 		{
 			await this.wmi.InvokeSetAsync<byte>("SetAIBoostStatus", value ? (byte)1 : (byte)0);
+		}
+
+		public async Task<bool> GetThermalTargetEnabledAsync()
+		{
+			return await this.wmi.InvokeGetAsync<byte>("GetNvThermalTarget") != 0;
+		}
+
+		public async Task SetThermalTargetEnabledAsync(bool value)
+		{
+			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", value ? (byte)1 : (byte)0);
 		}
 	}
 }

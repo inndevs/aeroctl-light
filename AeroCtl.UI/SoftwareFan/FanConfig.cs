@@ -5,9 +5,8 @@ using System.Globalization;
 using System.Json;
 using System.Linq;
 using System.Runtime.CompilerServices;
-using System.Windows.Forms.VisualStyles;
 
-namespace AeroCtl.UI
+namespace AeroCtl.UI.SoftwareFan
 {
 	/// <summary>
 	/// Configures the software fan controller.
@@ -110,11 +109,11 @@ namespace AeroCtl.UI
 
 		public FanConfig()
 		{
-			Curve = ImmutableArray.Create(new FanPoint(0.0, 0.0), new FanPoint(100.0, 1.0));
-			Interval = TimeSpan.FromSeconds(1.0 / 3.0);
-			RampUpSpeed = 0.10;
-			RampDownSpeed = 0.03;
-			SchedulingMode = FanSchedulingMode.AboveNormalThread;
+			this.Curve = ImmutableArray.Create(new FanPoint(0.0, 0.0), new FanPoint(100.0, 1.0));
+			this.Interval = TimeSpan.FromSeconds(1.0 / 3.0);
+			this.RampUpSpeed = 0.10;
+			this.RampDownSpeed = 0.03;
+			this.SchedulingMode = FanSchedulingMode.AboveNormalThread;
 		}
 
 		public FanConfig(FanConfig other)

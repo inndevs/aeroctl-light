@@ -52,11 +52,11 @@
   <ItemGroup>
     <Compile Include="Aero.cs" />
     <Compile Include="Aero15Xv8FanController.cs" />
-    <Compile Include="Aero2019GpuController.cs" />
+    <Compile Include="P75GpuController.cs" />
     <Compile Include="AeroWmi.cs" />
     <Compile Include="BatteryController.cs" />
     <Compile Include="ChargePolicy.cs" />
-    <Compile Include="Aero2019FanController.cs" />
+    <Compile Include="P75FanController.cs" />
     <Compile Include="FanCurve.cs" />
     <Compile Include="FanPoint.cs" />
     <Compile Include="FnKey.cs" />
@@ -121,9 +121,6 @@
     <None Include="App.config" />
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="NvAPIWrapper.Net">
-      <Version>0.7.0.57</Version>
-    </PackageReference>
     <PackageReference Include="System.Collections.Immutable">
       <Version>1.5.0</Version>
     </PackageReference>

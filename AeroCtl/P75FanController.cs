@@ -7,7 +7,7 @@ namespace AeroCtl
 	/// <summary>
 	/// Implements the fan controller and thermal management of the notebook.
 	/// </summary>
-	public class Aero2019FanController : IFanController
+	public class P75FanController : IFanController, IDirectFanSpeedController
 	{
 		#region Fields
 
@@ -21,7 +21,7 @@ namespace AeroCtl
 
 		#region Constructors
 
-		public Aero2019FanController(AeroWmi wmi)
+		public P75FanController(AeroWmi wmi)
 		{
 			this.wmi = wmi;
 		}
@@ -93,7 +93,7 @@ namespace AeroCtl
 			await this.wmi.InvokeSetAsync<byte>("SetAutoFanStatus", 0);
 			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 0);
 			await this.wmi.InvokeSetAsync<byte>("SetStepFanStatus", 1);
-			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
+			//await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
 			await this.wmi.InvokeSetAsync<byte>("SetFanAdjustStatus", (byte)relToAbs(fanAdjust));
 		}
 
@@ -102,9 +102,17 @@ namespace AeroCtl
 			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
 			await this.wmi.InvokeSetAsync<byte>("SetAutoFanStatus", 0);
 			await this.wmi.InvokeSetAsync<byte>("SetStepFanStatus", 1);
-			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
+			//await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
 			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 1);
 			await this.wmi.InvokeSetAsync<byte>("SetFixedFanSpeed", (byte)relToAbs(fanSpeed));
+		}
+
+		public void SetFixed(double fanSpeed = 0.25)
+		{
+			this.wmi.InvokeSet<byte>("SetAutoFanStatus", 0);
+			this.wmi.InvokeSet<byte>("SetStepFanStatus", 1);
+			this.wmi.InvokeSet<byte>("SetFixedFanStatus", 1);
+			this.wmi.InvokeSet<byte>("SetFixedFanSpeed", (byte)relToAbs(fanSpeed));
 		}
 
 		public async ValueTask SetCustomAsync()
@@ -113,7 +121,7 @@ namespace AeroCtl
 			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 0);
 			// await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", 0);
 			await this.wmi.InvokeSetAsync<byte>("SetStepFanStatus", 1);
-			await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
+			//await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
 		}
 
 		public FanCurve GetFanCurve()
@@ -162,8 +170,8 @@ namespace AeroCtl
 
 		private sealed class Curve : FanCurve
 		{
-			private readonly Aero2019FanController controller;
-			public Curve(Aero2019FanController controller)
+			private readonly P75FanController controller;
+			public Curve(P75FanController controller)
 			{
 				this.controller = controller;
 			}
@@ -179,5 +187,7 @@ namespace AeroCtl
 		}
 
 		#endregion
+
+
 	}
 }

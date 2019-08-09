@@ -8,6 +8,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using AeroCtl.UI.SoftwareFan;
 using Microsoft.Win32;
 
 namespace AeroCtl.UI
@@ -82,19 +83,40 @@ namespace AeroCtl.UI
 			};
 
 			// To re-apply fan profile after wake up:
+			SystemEvents.SessionSwitch += this.onSessionSwitch;
+			SystemEvents.PowerModeChanged += this.onPowerModeChanged;
+		}
 
-			SystemEvents.PowerModeChanged += (s, e) =>
-			{
-				if (e.Mode == PowerModes.Resume)
-					this.Aero.FanProfileInvalid = true;
-			};
+		private async Task shutdown()
+		{
+			SystemEvents.SessionSwitch -= this.onSessionSwitch;
+			SystemEvents.PowerModeChanged -= this.onPowerModeChanged;
 
-			SystemEvents.SessionSwitch += (s, e) =>
+			if (this.Aero.FanProfile == FanProfile.Software)
 			{
-				if (e.Reason == SessionSwitchReason.SessionUnlock || 
-				    e.Reason == SessionSwitchReason.SessionLock)
-					this.Aero.FanProfileInvalid = true;
-			};
+				await this.aero.Fans.SetNormalAsync();
+			}
+
+			await this.Aero.DisposeAsync();
+			this.aero.Dispose();
+
+			this.trayIcon.Dispose();
+
+			this.shutdownComplete = true;
+			this.Close();
+		}
+
+		private void onSessionSwitch(object sender, SessionSwitchEventArgs e)
+		{
+			if (e.Reason == SessionSwitchReason.SessionUnlock || 
+			    e.Reason == SessionSwitchReason.SessionLock)
+				this.Aero.FanProfileInvalid = true;
+		}
+
+		private void onPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+		{
+			if (e.Mode == PowerModes.Resume)
+				this.Aero.FanProfileInvalid = true;
 		}
 
 		private async Task handleFnKey(FnKeyEventArgs e)
@@ -172,22 +194,6 @@ namespace AeroCtl.UI
 				this.Hide();
 		}
 
-		private async Task shutdown()
-		{
-			if (this.Aero.FanProfile == FanProfile.Software)
-			{
-				await this.aero.Fans.SetNormalAsync();
-			}
-
-			await this.Aero.DisposeAsync();
-			this.aero.Dispose();
-
-			this.trayIcon.Dispose();
-
-			this.shutdownComplete = true;
-			this.Close();
-		}
-		
 		protected override void OnClosing(CancelEventArgs e)
 		{
 			if (!this.shutdownComplete)

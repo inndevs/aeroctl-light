@@ -2,8 +2,6 @@
 using System;
 using System.Collections.Immutable;
 using System.Linq;
-using NvAPIWrapper;
-using NvAPIWrapper.GPU;
 
 namespace AeroCtl
 {
@@ -65,16 +63,13 @@ namespace AeroCtl
 			{
 				if (this.gpu == null)
 				{
-					NVIDIA.Initialize();
-					PhysicalGPU physicalGpu = PhysicalGPU.GetPhysicalGPUs().FirstOrDefault();
-
 					if (this.Sku.StartsWith("P75"))
 					{
-						this.gpu = new Aero2019GpuController(physicalGpu, this.Wmi);
+						this.gpu = new P75GpuController(this.Wmi);
 					}
 					else
 					{
-						this.gpu = new NvGpuController(physicalGpu);
+						this.gpu = new NvGpuController();
 					}
 				}
 
@@ -98,7 +93,7 @@ namespace AeroCtl
 				{
 					if (this.Sku.StartsWith("P75"))
 					{
-						this.fans = new Aero2019FanController(this.Wmi);
+						this.fans = new P75FanController(this.Wmi);
 					}
 					else
 					{

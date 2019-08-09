@@ -4,16 +4,8 @@ using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
 
-namespace AeroCtl.UI
+namespace AeroCtl.UI.SoftwareFan
 {
-	public enum FanSchedulingMode
-	{
-		AsyncTask,
-		NormalThread,
-		AboveNormalThread,
-		HighestThread,
-	}
-
 	public class SoftwareFanController
 	{
 		private readonly FanConfig config;
@@ -94,6 +86,8 @@ namespace AeroCtl.UI
 
 		private async ValueTask update(CancellationToken cancellationToken)
 		{
+			const double epsilon = 0.001;
+
 			cancellationToken.ThrowIfCancellationRequested();
 
 			double secondsPassed = this.watch.Elapsed.TotalSeconds;
@@ -122,27 +116,32 @@ namespace AeroCtl.UI
 				newTarget = this.curve[index].FanSpeed;
 			}
 
-			if (double.IsNaN(currentSpeed))
+			if (double.IsNaN(this.currentSpeed))
 			{
-				currentSpeed = newTarget;
+				this.currentSpeed = newTarget;
 			}
 			else
 			{
-				double diff = newTarget - currentSpeed;
+				double diff = newTarget - this.currentSpeed;
 
-				if (diff > 0.0)
+				if (diff > epsilon)
 				{
 					diff = Math.Min(diff, this.config.RampUpSpeed * secondsPassed);
 				}
-				else if (diff < 0.0)
+				else if (diff < -epsilon)
 				{
 					diff = -Math.Min(-diff, this.config.RampDownSpeed * secondsPassed);
 				}
+				else
+				{
+					// Change too small, don't bother updating the fan.
+					return;
+				}
 
-				currentSpeed += diff;
+				this.currentSpeed += diff;
 			}
 
-			await this.provider.SetSpeedAsync(currentSpeed, cancellationToken);
+			await this.provider.SetSpeedAsync(this.currentSpeed, cancellationToken);
 		}
 
 		private async Task runAsync(CancellationToken cancellationToken)
@@ -161,7 +160,10 @@ namespace AeroCtl.UI
 				while (!cancellationToken.IsCancellationRequested)
 				{
 					Thread.Sleep(this.config.Interval);
-					this.update(cancellationToken).AsTask().Wait(cancellationToken);
+
+					ValueTask t = this.update(cancellationToken);
+					if (!t.IsCompletedSuccessfully)
+						t.AsTask().Wait(cancellationToken);
 				}
 			}
 			catch (OperationCanceledException)

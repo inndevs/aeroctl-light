@@ -1,4 +1,5 @@
 ﻿using System.Windows;
+using AeroCtl.UI.SoftwareFan;
 
 namespace AeroCtl.UI
 {

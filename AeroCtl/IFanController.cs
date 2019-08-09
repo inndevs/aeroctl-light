@@ -15,4 +15,9 @@ namespace AeroCtl
 		ValueTask SetAutoAsync(double fanAdjust = 0.25);
 		ValueTask SetCustomAsync();
 	}
+
+	public interface IDirectFanSpeedController
+	{
+		void SetFixed(double fanSpeed = 0.25);
+	}
 }
