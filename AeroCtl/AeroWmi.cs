@@ -28,7 +28,7 @@ namespace AeroCtl
 		public string BaseBoard { get; }
 		public string SerialNumber { get; }
 		public string Sku { get; }
-		public IReadOnlyList<string> BiosVersions { get; }
+		public ImmutableArray<string> BiosVersions { get; }
 
 		#endregion
 
@@ -57,7 +57,7 @@ namespace AeroCtl
 			if (win32Bios != null)
 			{
 				this.SerialNumber = (string)win32Bios["SerialNumber"];
-				this.BiosVersions = (string[])win32Bios["BIOSVersion"];
+				this.BiosVersions = ((string[])win32Bios["BIOSVersion"]).ToImmutableArray();
 			}
 
 			if (win32ComputerSystem != null)

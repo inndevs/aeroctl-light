@@ -147,7 +147,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.aero.Screen.Brightness = value;
+					this.aero.Display.Brightness = value;
 			}
 		}
 
@@ -542,7 +542,7 @@ namespace AeroCtl.UI
 
 				(this.FanRpm1, this.FanRpm2) = await this.aero.Fans.GetRpmAsync();
 				this.FanPwm = await this.aero.Fans.GetPwmAsync() * 100;
-				this.ScreenBrightness = (int)this.aero.Screen.Brightness;
+				this.ScreenBrightness = (int)this.aero.Display.Brightness;
 
 				this.SmartCharge = await this.aero.Battery.GetSmartChargeAsync();
 				this.ChargeStopEnabled = await this.aero.Battery.GetChargePolicyAsync() == ChargePolicy.CustomStop;

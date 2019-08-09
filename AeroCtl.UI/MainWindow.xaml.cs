@@ -102,11 +102,11 @@ namespace AeroCtl.UI
 			switch(e.Key)
 			{
 				case FnKey.IncreaseBrightness:
-					this.aero.Screen.Brightness = Math.Min(100, this.aero.Screen.Brightness + 10);
+					this.aero.Display.Brightness = Math.Min(100, this.aero.Display.Brightness + 10);
 					break;
 
 				case FnKey.DecreaseBrightness:
-					this.aero.Screen.Brightness = Math.Max(0, this.aero.Screen.Brightness - 10);
+					this.aero.Display.Brightness = Math.Max(0, this.aero.Display.Brightness - 10);
 					break;
 
 				case FnKey.ToggleFan:
@@ -125,7 +125,7 @@ namespace AeroCtl.UI
 					break;
 
 				case FnKey.ToggleScreen:
-					await this.aero.Screen.ToggleScreenAsync();
+					await this.aero.Display.ToggleScreenAsync();
 					break;
 
 				case FnKey.ToggleTouchpad:

@@ -1,6 +1,6 @@
 ﻿using NativeWifi;
 using System;
-using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Linq;
 using NvAPIWrapper;
 using NvAPIWrapper.GPU;
@@ -14,6 +14,14 @@ namespace AeroCtl
 	{
 		#region Fields
 
+		private ICpuController cpu;
+		private IGpuController gpu;
+		private IFanController fans;
+		private KeyboardController keyboard;
+		private BatteryController battery;
+		private DisplayController display;
+		private TouchpadController touchpad;
+
 		#endregion
 
 		#region Properties
@@ -22,16 +30,6 @@ namespace AeroCtl
 		/// Gets the WMI interface.
 		/// </summary>
 		private AeroWmi Wmi { get; }
-
-		/// <summary>
-		/// Gets the CPU controller.
-		/// </summary>
-		public ICpuController Cpu { get; }
-		
-		/// <summary>
-		/// Gets the GPU controller.
-		/// </summary>
-		public IGpuController Gpu { get; }
 
 		/// <summary>
 		/// Gets the base board / notebook model name.
@@ -51,32 +49,81 @@ namespace AeroCtl
 		/// <summary>
 		/// Gets the BIOS version strings.
 		/// </summary>
-		public IReadOnlyList<string> BiosVersions => this.Wmi.BiosVersions;
+		public ImmutableArray<string> BiosVersions => this.Wmi.BiosVersions;
+
+		/// <summary>
+		/// Gets the CPU controller.
+		/// </summary>
+		public ICpuController Cpu => this.cpu ?? (this.cpu = new WmiCpuController(this.Wmi));
+
+		/// <summary>
+		/// Gets the GPU controller.
+		/// </summary>
+		public IGpuController Gpu
+		{
+			get
+			{
+				if (this.gpu == null)
+				{
+					NVIDIA.Initialize();
+					PhysicalGPU physicalGpu = PhysicalGPU.GetPhysicalGPUs().FirstOrDefault();
+
+					if (this.Sku.StartsWith("P75"))
+					{
+						this.gpu = new Aero2019GpuController(physicalGpu, this.Wmi);
+					}
+					else
+					{
+						this.gpu = new NvGpuController(physicalGpu);
+					}
+				}
+
+				return this.gpu;
+			}
+		}
 
 		/// <summary>
 		/// Gets Keyboard Fn key handler.
 		/// </summary>
-		public KeyboardController Keyboard { get; }
+		public KeyboardController Keyboard => this.keyboard ?? (this.keyboard = new KeyboardController());
 
 		/// <summary>
 		/// Gets the fan controller.
 		/// </summary>
-		public IFanController Fans { get; }
+		public IFanController Fans
+		{
+			get
+			{
+				if (this.fans == null)
+				{
+					if (this.Sku.StartsWith("P75"))
+					{
+						this.fans = new Aero2019FanController(this.Wmi);
+					}
+					else
+					{
+						this.fans = new Aero15Xv8FanController(this.Wmi);
+					}
+				}
+
+				return this.fans;
+			}
+		}
 
 		/// <summary>
 		/// Gets the screen controller.
 		/// </summary>
-		public DisplayController Screen { get; }
+		public DisplayController Display => this.display ?? (this.display = new DisplayController(this.Wmi));
 
 		/// <summary>
 		/// Gets the battery stats / controller.
 		/// </summary>
-		public BatteryController Battery { get; }
+		public BatteryController Battery => this.battery ?? (this.battery = new BatteryController(this.Wmi));
 
 		/// <summary>
 		/// Gets the touchpad controller.
 		/// </summary>
-		public TouchpadController Touchpad { get; }
+		public TouchpadController Touchpad => this.touchpad ?? (this.touchpad = new TouchpadController(this.Wmi));
 
 		/// <summary>
 		/// Gets or sets the software wifi enable state.
@@ -128,27 +175,6 @@ namespace AeroCtl
 		public Aero(AeroWmi wmi)
 		{
 			this.Wmi = wmi;
-
-			this.Cpu = new WmiCpuController(wmi);
-
-			NVIDIA.Initialize();
-			PhysicalGPU gpu = PhysicalGPU.GetPhysicalGPUs().FirstOrDefault();
-			
-			if (this.Sku.StartsWith("P75"))
-			{ 
-				this.Fans = new Aero2019FanController(wmi);
-				this.Gpu = new Aero2019GpuController(gpu, wmi);
-			}
-			else
-			{
-				this.Fans = new Aero15Xv8FanController(wmi);
-				this.Gpu = new NvGpuController(gpu);
-			}
-
-			this.Keyboard = new KeyboardController();
-			this.Screen = new DisplayController(wmi);
-			this.Battery = new BatteryController(wmi);
-			this.Touchpad = new TouchpadController(wmi);
 		}
 
 		#endregion

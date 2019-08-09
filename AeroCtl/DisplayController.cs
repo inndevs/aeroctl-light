@@ -33,22 +33,15 @@ namespace AeroCtl
 			}
 		}
 
-		// not functional.
-		//public bool Backlight
-		//{
-		//	get
-		//	{
-		//		ManagementBaseObject inParams = this.wmi.GetClass.GetMethodParameters("GetBirightnessOff"); // sic
-		//		ManagementBaseObject outParams = this.wmi.Get.InvokeMethod("GetBirightnessOff", inParams, null);
-		//		return Convert.ToByte(outParams["Data"]) == 0;
-		//	}
-		//}
-
 		public DisplayController(AeroWmi wmi)
 		{
 			this.wmi = wmi;
 		}
 
+		/// <summary>
+		/// Toggles the screen backlight on/off.
+		/// </summary>
+		/// <returns></returns>
 		public async Task<bool> ToggleScreenAsync()
 		{
 			try
@@ -62,6 +55,20 @@ namespace AeroCtl
 			}
 
 			return false;
+		}
+
+		/// <summary>
+		/// Gets the lid status.
+		/// </summary>
+		/// <returns></returns>
+		public async Task<LidStatus> GetLidStatus()
+		{
+			byte val = await this.wmi.InvokeGetAsync<byte>("GetLid1Status");
+
+			if (val == 0)
+				return LidStatus.Closed;
+
+			return LidStatus.Open;
 		}
 	}
 }
