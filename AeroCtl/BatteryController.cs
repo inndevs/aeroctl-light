@@ -65,7 +65,9 @@ namespace AeroCtl
 		
 		public async Task<int> GetHealthAsync()
 		{
-			return await this.wmi.InvokeGetAsync<byte>("GetBatteryHealth");
+			if (this.wmi.BaseBoard.ToUpper().Contains("15-SA")) // TODO Refactor to only have one baseboard switch in the entire app?
+				return await this.wmi.InvokeGetAsync<byte>("GetBatteryHealth");
+			return 0;
 		}
 
 		public async Task<int> GetCyclesAsync()
