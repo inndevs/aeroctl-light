@@ -285,8 +285,8 @@ namespace AeroCtl.UI
 
 		#region BatteryHealth
 
-		private int batteryHealth;
-		public int BatteryHealth
+		private int? batteryHealth;
+		public int? BatteryHealth
 		{
 			get => this.batteryHealth;
 			private set

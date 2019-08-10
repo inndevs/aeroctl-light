@@ -62,12 +62,17 @@ namespace AeroCtl
 				return (ushort)batt["EstimatedChargeRemaining"];
 			});
 		}
-		
-		public async Task<int> GetHealthAsync()
+
+		public async Task<int?> GetHealthAsync()
 		{
-			if (this.wmi.BaseBoard.ToUpper().Contains("15-SA")) // TODO Refactor to only have one baseboard switch in the entire app?
+			try
+			{
 				return await this.wmi.InvokeGetAsync<byte>("GetBatteryHealth");
-			return 0;
+			}
+			catch (ManagementException ex) when (ex.ErrorCode == ManagementStatus.InvalidMethod)
+			{
+				return null;
+			}
 		}
 
 		public async Task<int> GetCyclesAsync()

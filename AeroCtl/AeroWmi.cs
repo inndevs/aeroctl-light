@@ -102,7 +102,7 @@ namespace AeroCtl
 		public ImmutableDictionary<string, object> Invoke(string methodName, params (string, object)[] parameters)
 		{
 			ManagementObject target = this.get;
-			MethodData m ;
+			MethodData m;
 
 			try
 			{
