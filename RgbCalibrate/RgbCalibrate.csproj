@@ -4,14 +4,14 @@
   <PropertyGroup>
     <Configuration Condition=" '$(Configuration)' == '' ">Debug</Configuration>
     <Platform Condition=" '$(Platform)' == '' ">AnyCPU</Platform>
-    <ProjectGuid>{75C9517D-2BCC-4F67-9DF9-908394B7814E}</ProjectGuid>
+    <ProjectGuid>{484A2AE8-A1E5-41CF-8DCE-81E8FD116E18}</ProjectGuid>
     <OutputType>Exe</OutputType>
-    <RootNamespace>TemperatureMonitor</RootNamespace>
-    <AssemblyName>TemperatureMonitor</AssemblyName>
+    <RootNamespace>RgbCalibrate</RootNamespace>
+    <AssemblyName>RgbCalibrate</AssemblyName>
     <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
-    <TargetFrameworkProfile />
+    <Deterministic>true</Deterministic>
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -32,9 +32,6 @@
     <ErrorReport>prompt</ErrorReport>
     <WarningLevel>4</WarningLevel>
   </PropertyGroup>
-  <PropertyGroup>
-    <ApplicationManifest>app.manifest</ApplicationManifest>
-  </PropertyGroup>
   <ItemGroup>
     <Reference Include="System" />
     <Reference Include="System.Core" />
@@ -50,18 +47,12 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <None Include="app.manifest" />
-  </ItemGroup>
-  <ItemGroup>
-    <ProjectReference Include="..\..\AeroCtl\AeroCtl.csproj">
+    <ProjectReference Include="..\AeroCtl\AeroCtl.csproj">
       <Project>{72af0b9e-75c6-4f98-b586-777df53193c8}</Project>
       <Name>AeroCtl</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="LibreHardwareMonitorLibCore">
-      <Version>1.0.3</Version>
-    </PackageReference>
     <PackageReference Include="System.Threading.Tasks.Extensions">
       <Version>4.5.3</Version>
     </PackageReference>

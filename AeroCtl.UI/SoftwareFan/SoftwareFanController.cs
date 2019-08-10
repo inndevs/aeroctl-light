@@ -86,7 +86,7 @@ namespace AeroCtl.UI.SoftwareFan
 
 		private async ValueTask update(CancellationToken cancellationToken)
 		{
-			const double epsilon = 0.001;
+			const double epsilon = 0.002;
 
 			cancellationToken.ThrowIfCancellationRequested();
 
