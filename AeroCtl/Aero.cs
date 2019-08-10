@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
+using System.Threading.Tasks;
 using AeroCtl.Native;
+using ManagedNativeWifi;
 
 namespace AeroCtl
 {
@@ -121,49 +123,6 @@ namespace AeroCtl
 		/// </summary>
 		public TouchpadController Touchpad => this.touchpad ?? (this.touchpad = new TouchpadController(this.Wmi));
 
-		/// <summary>
-		/// Gets or sets the software wifi enable state.
-		/// </summary>
-		public bool WifiEnabled
-		{
-			get
-			{
-				using (var wl = new WlanClient())
-				{
-					Wlan.Dot11RadioState state = wl.Interfaces.FirstOrDefault()?.RadioState.PhyRadioState.FirstOrDefault().dot11SoftwareRadioState ?? Wlan.Dot11RadioState.Unknown;
-					return state == Wlan.Dot11RadioState.On;
-				}
-			}
-			set
-			{
-				using (var wl = new WlanClient())
-				{
-					Wlan.WlanPhyRadioState newState;
-					if (value)
-					{
-						newState = new Wlan.WlanPhyRadioState
-						{
-							dwPhyIndex = (int)Wlan.Dot11PhyType.Any,
-							dot11SoftwareRadioState = Wlan.Dot11RadioState.On,
-						};
-					}
-					else
-					{
-						newState = new Wlan.WlanPhyRadioState
-						{
-							dwPhyIndex = (int)Wlan.Dot11PhyType.Any,
-							dot11SoftwareRadioState = Wlan.Dot11RadioState.Off,
-						};
-					}
-
-					foreach (var iface in wl.Interfaces)
-					{
-						iface.SetRadioState(newState);
-					}
-				}
-			}
-		}
-
 		#endregion
 
 		#region Constructors
@@ -176,6 +135,38 @@ namespace AeroCtl
 		#endregion
 
 		#region Methods
+
+		public ValueTask<bool?> GetWifiEnabledAsync()
+		{
+			var targetInterface = NativeWifi.EnumerateInterfaces().FirstOrDefault();
+			if (targetInterface == null)
+				return new ValueTask<bool?>((bool?)null);
+
+			var radioSet = NativeWifi.GetInterfaceRadio(targetInterface.Id)?.RadioSets.FirstOrDefault();
+			return new ValueTask<bool?>(radioSet?.SoftwareOn);
+		}
+
+		public async ValueTask SetWifiEnabledAsync(bool enabled)
+		{
+			foreach (var iface in NativeWifi.EnumerateInterfaces())
+			{
+				var radioSet = NativeWifi.GetInterfaceRadio(iface.Id)?.RadioSets.FirstOrDefault();
+				if (radioSet == null)
+					continue;
+
+				if (radioSet.HardwareOn != true)
+					continue;
+
+				if (enabled)
+				{
+					await Task.Run(() => NativeWifi.TurnOnInterfaceRadio(iface.Id));
+				}
+				else
+				{
+					await Task.Run(() => NativeWifi.TurnOffInterfaceRadio(iface.Id));
+				}
+			}
+		}
 
 		public void Dispose()
 		{

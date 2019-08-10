@@ -219,8 +219,8 @@ namespace AeroCtl.UI
 
 		#region WifiEnabled
 
-		private bool wifiEnabled;
-		public bool WifiEnabled
+		private bool? wifiEnabled;
+		public bool? WifiEnabled
 		{
 			get => this.wifiEnabled;
 			set
@@ -228,8 +228,8 @@ namespace AeroCtl.UI
 				this.wifiEnabled = value;
 				this.OnPropertyChanged();
 
-				if (!this.updating.Value)
-					this.aero.WifiEnabled = value;
+				if (!this.updating.Value && value.HasValue)
+					this.updates.Enqueue(async () => await this.aero.SetWifiEnabledAsync(value.Value));
 			}
 		}
 
@@ -683,7 +683,7 @@ namespace AeroCtl.UI
 				this.BatteryHealth = await this.aero.Battery.GetHealthAsync();
 				this.BatteryCharge = await this.aero.Battery.GetRemainingChargeAsync();
 				
-				this.WifiEnabled = this.aero.WifiEnabled;
+				this.WifiEnabled = await this.aero.GetWifiEnabledAsync();
 				this.TouchpadEnabled = await this.aero.Touchpad.GetEnabledAsync();
 			}
 			finally

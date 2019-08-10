@@ -138,10 +138,18 @@ namespace AeroCtl.UI
 					break;
 
 				case FnKey.ToggleWifi:
-					bool wifi = !this.aero.WifiEnabled;
-					this.aero.WifiEnabled = wifi;
+					bool? currentState = await this.aero.GetWifiEnabledAsync();
+					if (currentState == null)
+					{
+						this.trayIcon.ShowBalloonTip(notificationTimeout, this.Title, "Could not determine wifi state.", ToolTipIcon.Warning);
+					}
+					else
+					{
+						bool newState = !currentState.Value;
+						await this.aero.SetWifiEnabledAsync(newState);
+						this.trayIcon.ShowBalloonTip(notificationTimeout, this.Title, $"Wifi {(newState ? "enabled" : "disabled")}.", ToolTipIcon.Info);
+					}
 
-					this.trayIcon.ShowBalloonTip(notificationTimeout, this.Title, $"Wifi {(wifi ? "enabled" : "disabled")}.", ToolTipIcon.Info);
 					break;
 
 				case FnKey.ToggleScreen:
