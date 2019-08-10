@@ -77,7 +77,10 @@ namespace AeroCtl
 
 		public async Task<int> GetCyclesAsync()
 		{
-			return await this.wmi.InvokeGetAsync<ushort>("getBattCyc1");
+			int v1 = await this.wmi.InvokeGetAsync<ushort>("getBattCyc");
+			int v2 = await this.wmi.InvokeGetAsync<ushort>("getBattCyc1");
+
+			return Math.Max(v1, v2);
 		}
 	}
 }
