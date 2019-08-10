@@ -12,6 +12,7 @@ namespace AeroCtl
 	{
 		#region Fields
 
+		private AeroWmi wmi;
 		private ICpuController cpu;
 		private IGpuController gpu;
 		private IFanController fans;
@@ -27,7 +28,7 @@ namespace AeroCtl
 		/// <summary>
 		/// Gets the WMI interface.
 		/// </summary>
-		private AeroWmi Wmi { get; }
+		private AeroWmi Wmi => this.wmi ?? (this.wmi = new AeroWmi());
 
 		/// <summary>
 		/// Gets the base board / notebook model name.
@@ -167,9 +168,9 @@ namespace AeroCtl
 
 		#region Constructors
 
-		public Aero(AeroWmi wmi)
+		public Aero()
 		{
-			this.Wmi = wmi;
+			
 		}
 
 		#endregion

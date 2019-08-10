@@ -25,7 +25,6 @@ namespace AeroCtl.UI
 		private readonly TaskFactory taskFactory;
 		private readonly NotifyIcon trayIcon;
 		private readonly Aero aero;
-		private readonly AeroWmi wmi;
 
 		public AeroController Aero { get; }
 
@@ -34,8 +33,7 @@ namespace AeroCtl.UI
 			TaskScheduler taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
 			this.taskFactory = new TaskFactory(taskScheduler);
 
-			this.wmi = new AeroWmi();
-			this.aero = new Aero(this.wmi);
+			this.aero = new Aero();
 			this.aero.Keyboard.FnKeyPressed += (s, e) =>
 			{
 				this.taskFactory.StartNew(() => this.handleFnKey(e));
@@ -180,8 +178,6 @@ namespace AeroCtl.UI
 			finally
 			{
 				this.aero.Dispose();
-				this.wmi.Dispose();
-
 				this.Close();
 			}
 		}

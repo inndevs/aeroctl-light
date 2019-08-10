@@ -24,22 +24,20 @@ namespace TemperatureMonitor
 				var cpu = pc.Hardware.FirstOrDefault(hw => hw.HardwareType == HardwareType.CPU);
 				var sensors = cpu.Sensors.Where(s => s.SensorType == SensorType.Temperature).ToArray();
 
-				using (AeroWmi wmi = new AeroWmi())
-				using (Aero aero = new Aero(wmi))
+				using (Aero aero = new Aero())
 				{
-					while(run)
+					while (run)
 					{
 						cpu.Update();
 						double wmiTemp = await aero.Cpu.GetTemperatureAsync();
 						double monTemp = sensors.Max(s => s.Value ?? 0.0f);
-						Console.WriteLine($"{wmiTemp:F1}°C | {monTemp:F1}°C");
+						Console.WriteLine($"{wmiTemp:F1}°C \t {monTemp:F1}°C");
 						await Task.Delay(250);
 					}
 				}
 
 				pc.Close();
 			}
-
 		}
 	}
 }

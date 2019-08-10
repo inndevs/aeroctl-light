@@ -59,7 +59,7 @@ namespace AeroCtl
 		public async ValueTask SetImageAsync(int index, ReadOnlyMemory<byte> image)
 		{
 			this.Set(new Packet {B1 = 18, B3 = (byte)index, B4 = 8});
-			await Task.Delay(defaultWait);
+			//await Task.Delay(defaultWait);
 
 			byte[] temp = new byte[65];
 
@@ -72,11 +72,11 @@ namespace AeroCtl
 			}
 		}
 
-		public async ValueTask<Packet> ExecAsync(Packet p, int delay = defaultWait)
+		public ValueTask<Packet> ExecAsync(Packet p)
 		{
 			this.Set(p);
-			await Task.Delay(delay);
-			return this.Get();
+			//await Task.Delay(defaultWait);
+			return new ValueTask<Packet>(this.Get());
 		}
 
 		public void Set(Packet p)

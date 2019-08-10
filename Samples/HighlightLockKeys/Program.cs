@@ -177,8 +177,7 @@ namespace HighlightLockKeys
 			for (;;)
 			{
 				cancellationToken.ThrowIfCancellationRequested();
-				using (AeroWmi wmi = new AeroWmi())
-				using (Aero aero = new Aero(wmi))
+				using (Aero aero = new Aero())
 				{
 					State currentState = 0;
 					bool invalid = true;
