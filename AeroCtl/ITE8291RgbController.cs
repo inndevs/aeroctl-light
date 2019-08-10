@@ -56,7 +56,7 @@ namespace AeroCtl
 			};
 		}
 
-		public async ValueTask SetImageAsync(int index, ReadOnlyMemory<byte> image)
+		public ValueTask SetImageAsync(int index, ReadOnlyMemory<byte> image)
 		{
 			this.Set(new Packet {B1 = 18, B3 = (byte)index, B4 = 8});
 			//await Task.Delay(defaultWait);
@@ -70,6 +70,8 @@ namespace AeroCtl
 				this.device.Stream.Flush();
 				//await Task.Delay(defaultWait);
 			}
+
+			return default;
 		}
 
 		public ValueTask<Packet> ExecAsync(Packet p)

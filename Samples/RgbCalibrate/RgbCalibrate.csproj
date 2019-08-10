@@ -47,7 +47,7 @@
     <Compile Include="Properties\AssemblyInfo.cs" />
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\AeroCtl\AeroCtl.csproj">
+    <ProjectReference Include="..\..\AeroCtl\AeroCtl.csproj">
       <Project>{72af0b9e-75c6-4f98-b586-777df53193c8}</Project>
       <Name>AeroCtl</Name>
     </ProjectReference>
