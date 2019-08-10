@@ -15,7 +15,7 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "TemperatureMonitor", "Sampl
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "Rainbow", "Samples\Rainbow\Rainbow.csproj", "{DDCEBBB7-4245-4096-819D-AA8E7B837F27}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RgbCalibrate", "RgbCalibrate\RgbCalibrate.csproj", "{484A2AE8-A1E5-41CF-8DCE-81E8FD116E18}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "RgbCalibrate", "Samples\RgbCalibrate\RgbCalibrate.csproj", "{484A2AE8-A1E5-41CF-8DCE-81E8FD116E18}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
