@@ -1,0 +1,3 @@
+[submodule "ThirdParty/ManagedNativeWifi"]
+	path = ThirdParty/ManagedNativeWifi
+	url = https://github.com/emoacht/ManagedNativeWifi.git
