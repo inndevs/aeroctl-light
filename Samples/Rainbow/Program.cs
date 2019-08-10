@@ -48,8 +48,10 @@ namespace Rainbow
 			}
 		}
 
-		public static async Task Main(string[] args)
+		public static async Task Main()
 		{
+			Rgb white = new Rgb(60, 255, 90); // white point.
+
 			using (Aero aero = new Aero())
 			{
 				IRgbController rgb = aero.Keyboard.Rgb;
@@ -65,9 +67,9 @@ namespace Rainbow
 						Rgb color = HsvToRgb(h, 1.0, 1.0);
 
 						image[4 * i + 0] = (byte)i;
-						image[4 * i + 1] = (byte)(color.R * 60 / 255);
-						image[4 * i + 2] = color.G;
-						image[4 * i + 3] = (byte)(color.B * 90 / 255);
+						image[4 * i + 1] = (byte)(color.R * white.R / 255);
+						image[4 * i + 2] = (byte)(color.G * white.G / 255);
+						image[4 * i + 3] = (byte)(color.B * white.B / 255);
 
 						h += 1.0;
 					}
