@@ -33,12 +33,16 @@ namespace AeroCtl.Rgb.LockKeys
 
 			SystemEvents.SessionSwitch += onSessionSwitch;
 
-			Timer timer = new Timer();
-			timer.Interval = 5000;
-			timer.Tick += (s, e) => { update(); };
-			timer.Start();
+			using (Timer lidCheckTimer = new Timer())
+			{
+				lidCheckTimer.Interval = 5000;
+				lidCheckTimer.Tick += (s, e) => { update(); };
+				lidCheckTimer.Start();
 
-			Application.Run();
+				Application.Run();
+			}
+
+			SystemEvents.SessionSwitch -= onSessionSwitch;
 
 			UnhookWindowsHookEx(hookID);
 		}

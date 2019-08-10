@@ -31,8 +31,9 @@ namespace TemperatureMonitor
 						cpu.Update();
 						double wmiTemp = await aero.Cpu.GetTemperatureAsync();
 						double monTemp = sensors.Max(s => s.Value ?? 0.0f);
-						Console.WriteLine($"{wmiTemp:F1}°C \t {monTemp:F1}°C");
-						await Task.Delay(250);
+						Console.Write($"{wmiTemp:F1}°C \t {monTemp:F1}°C");
+						Console.CursorLeft = 0;
+						await Task.Delay(50);
 					}
 				}
 

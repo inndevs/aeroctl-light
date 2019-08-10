@@ -210,6 +210,7 @@ namespace AeroCtl
 			{
 				foreach (HidDevice dev in this.usbDevs)
 				{
+					dev.Stream.Dispose();
 					dev.Handle.Close();
 					dev.Handle.Dispose();
 				}
