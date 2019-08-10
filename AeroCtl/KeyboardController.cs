@@ -21,26 +21,27 @@ namespace AeroCtl
 		private static readonly IReadOnlyDictionary<ushort, ushort[]> supportedKeyboards = new Dictionary<ushort, ushort[]>()
 		{
 			{
-				1241, 
+				0x04D9, 
 				new ushort[]
 				{
-					32776
+					0x8008
 				}
 			},
 			{
-				4164,
+				// This is likely the ITE-829x device.
+				0x1044,
 				new ushort[]
 				{
-					31288,
-					31289,
-					31290,
-					31291,
-					31292,
-					31293,
-					31292,
-					31293,
-					31294,
-					31295
+					0x7A38,
+					0x7A39,
+					0x7A3A,
+					0x7A3B,
+					0x7A3C,
+					0x7A3D,
+					0x7A3C,
+					0x7A3D,
+					0x7A3E,
+					0x7A3F
 				}
 			}
 		};

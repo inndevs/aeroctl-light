@@ -70,7 +70,7 @@ namespace AeroCtl.Rgb.Rainbow
 						image[4 * i + 2] = (byte)(color.G * white.G / 255);
 						image[4 * i + 3] = (byte)(color.B * white.B / 255);
 
-						h += 1.0;
+						h += 2.0;
 					}
 
 					await rgb.SetEffectAsync(new RgbEffect {Type = RgbEffectType.Custom0, Brightness = 51});
