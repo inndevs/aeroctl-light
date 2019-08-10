@@ -21,50 +21,56 @@ namespace AeroCtl
 		private readonly ManagementObject get;
 		private readonly ManagementObject set;
 
+		private bool initialized;
+		
 		#endregion
 
 		#region Properties
+		
+		private string baseBoard;
+		public string BaseBoard
+		{
+			get
+			{
+				this.ensureInitialized();
+				return this.baseBoard;
+			}
+		}
 
-		public string BaseBoard { get; }
-		public string SerialNumber { get; }
-		public string Sku { get; }
-		public ImmutableArray<string> BiosVersions { get; }
+		private string serialNumber;
+		public string SerialNumber
+		{
+			get
+			{
+				this.ensureInitialized();
+				return this.serialNumber;
+			}
+		}
+	
+		private string sku;
+		public string Sku
+		{
+			get
+			{
+				this.ensureInitialized();
+				return this.sku;
+			}
+		}
+
+		private ImmutableArray<string> biosVersions;
+		public ImmutableArray<string> BiosVersions
+		{
+			get
+			{
+				this.ensureInitialized();
+				return this.biosVersions;
+			}
+		}
 
 		#endregion
 
 		public AeroWmi()
 		{
-			ManagementObject win32BaseBoard = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BaseBoard")
-				.Get()
-				.OfType<ManagementObject>()
-				.FirstOrDefault();
-
-			ManagementObject win32Bios = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BIOS")
-				.Get()
-				.OfType<ManagementObject>()
-				.FirstOrDefault();
-
-			ManagementObject win32ComputerSystem = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_ComputerSystem")
-				.Get()
-				.OfType<ManagementObject>()
-				.FirstOrDefault();
-
-			if (win32BaseBoard != null)
-			{
-				this.BaseBoard = (string)win32BaseBoard["Product"];
-			}
-
-			if (win32Bios != null)
-			{
-				this.SerialNumber = (string)win32Bios["SerialNumber"];
-				this.BiosVersions = ((string[])win32Bios["BIOSVersion"]).ToImmutableArray();
-			}
-
-			if (win32ComputerSystem != null)
-			{
-				this.Sku = (string)win32ComputerSystem["SystemSKUNumber"];
-			}
-
 			ManagementScope scope = new ManagementScope("root\\WMI", new ConnectionOptions
 			{
 				EnablePrivileges = true,
@@ -92,7 +98,46 @@ namespace AeroCtl
 			if (this.set == null)
 				throw new InvalidOperationException("Failed to find instance for GB_WMIACPI_Set. Your device is probably not supported.");
 		}
-		
+
+		private void ensureInitialized()
+		{
+			if (this.initialized)
+				return;
+
+			this.initialized = true;
+
+			ManagementObject win32BaseBoard = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BaseBoard")
+				.Get()
+				.OfType<ManagementObject>()
+				.FirstOrDefault();
+
+			ManagementObject win32Bios = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_BIOS")
+				.Get()
+				.OfType<ManagementObject>()
+				.FirstOrDefault();
+
+			ManagementObject win32ComputerSystem = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_ComputerSystem")
+				.Get()
+				.OfType<ManagementObject>()
+				.FirstOrDefault();
+
+			if (win32BaseBoard != null)
+			{
+				this.baseBoard = (string)win32BaseBoard["Product"];
+			}
+
+			if (win32Bios != null)
+			{
+				this.serialNumber = (string)win32Bios["SerialNumber"];
+				this.biosVersions = ((string[])win32Bios["BIOSVersion"]).ToImmutableArray();
+			}
+
+			if (win32ComputerSystem != null)
+			{
+				this.sku = (string)win32ComputerSystem["SystemSKUNumber"];
+			}
+		}
+
 		/// <summary>
 		/// Invokes a WMI method.
 		/// </summary>

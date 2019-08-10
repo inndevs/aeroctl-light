@@ -1,8 +1,7 @@
 ﻿using System;
 using System.Threading.Tasks;
-using AeroCtl;
 
-namespace Rainbow
+namespace AeroCtl.Rgb.Rainbow
 {
 	public static class Program
 	{
@@ -48,13 +47,13 @@ namespace Rainbow
 			}
 		}
 
+		private static readonly Rgb white = new Rgb(60, 255, 90); // white point.
+
 		public static async Task Main()
 		{
-			Rgb white = new Rgb(60, 255, 90); // white point.
-
 			using (Aero aero = new Aero())
 			{
-				IRgbController rgb = aero.Keyboard.Rgb;
+				Ite829XRgbController rgb = (Ite829XRgbController)aero.Keyboard.Rgb;
 
 				byte[] image = new byte[512];
 

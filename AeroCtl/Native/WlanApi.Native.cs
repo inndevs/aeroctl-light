@@ -1,13 +1,13 @@
 #pragma warning disable 1573
 #pragma warning disable 1574
 using System;
-using System.Runtime.InteropServices;
-using System.Net.NetworkInformation;
-using System.Text;
-using System.Diagnostics;
 using System.ComponentModel;
+using System.Diagnostics;
+using System.Net.NetworkInformation;
+using System.Runtime.InteropServices;
+using System.Text;
 
-namespace NativeWifi
+namespace AeroCtl.Native
 {
 	// TODO: Separate the functions and the structs/enums. Many of the structs/enums should remain public
 	//       (since they're reused in the OOP interfaces) -- the rest (including all P/Invoke function mappings)
@@ -275,8 +275,8 @@ namespace NativeWifi
 			{
 				get
 				{
-					Dot11PhyType[] ret = new Dot11PhyType[numberOfPhyTypes];
-					Array.Copy(dot11PhyTypes, ret, numberOfPhyTypes);
+					Dot11PhyType[] ret = new Dot11PhyType[this.numberOfPhyTypes];
+					Array.Copy(this.dot11PhyTypes, ret, this.numberOfPhyTypes);
 					return ret;
 				}
 			}
@@ -522,14 +522,14 @@ namespace NativeWifi
 			{
 				get
 				{
-					switch (notificationSource)
+					switch (this.notificationSource)
 					{
 						case WlanNotificationSource.MSM:
-							return (WlanNotificationCodeMsm)notificationCode;
+							return (WlanNotificationCodeMsm)this.notificationCode;
 						case WlanNotificationSource.ACM:
-							return (WlanNotificationCodeAcm)notificationCode;
+							return (WlanNotificationCodeAcm)this.notificationCode;
 						default:
-							return notificationCode;
+							return this.notificationCode;
 					}
 				}
 			}
@@ -781,8 +781,8 @@ namespace NativeWifi
 			{
 				get
 				{
-					ushort[] rates = new ushort[rateSetLength / sizeof(ushort)];
-					Array.Copy(rateSet, rates, rates.Length);
+					ushort[] rates = new ushort[this.rateSetLength / sizeof(ushort)];
+					Array.Copy(this.rateSet, rates, rates.Length);
 					return rates;
 				}
 			}
@@ -798,7 +798,7 @@ namespace NativeWifi
 				if (rateIndex < 0 || rateIndex > this.rateSet.Length)
 					throw new ArgumentOutOfRangeException("rateIndex");
 
-				return (rateSet[rateIndex] & 0x7FFF) * 0.5;
+				return (this.rateSet[rateIndex] & 0x7FFF) * 0.5;
 			}
 		} 
 
@@ -820,7 +820,7 @@ namespace NativeWifi
 			/// <value>The WLAN reason code.</value>
 			public WlanReasonCode ReasonCode
 			{
-				get { return reasonCode; }
+				get { return this.reasonCode; }
 			}
 
 			/// <summary>
@@ -834,7 +834,7 @@ namespace NativeWifi
 				{
 					StringBuilder sb = new StringBuilder(1024);
 					return
-						WlanReasonCodeToString(reasonCode, sb.Capacity, sb, IntPtr.Zero) == 0 ?
+						WlanReasonCodeToString(this.reasonCode, sb.Capacity, sb, IntPtr.Zero) == 0 ?
 							sb.ToString() :
 							string.Empty;
 				}
@@ -1318,7 +1318,7 @@ namespace NativeWifi
 			/// <value>The BSSID.</value>
 			public PhysicalAddress Dot11Bssid
 			{
-				get { return new PhysicalAddress(dot11Bssid); }
+				get { return new PhysicalAddress(this.dot11Bssid); }
 			}
 		}
 
@@ -1645,8 +1645,8 @@ namespace NativeWifi
 			{
 				get
 				{
-					WlanPhyRadioState[] ret = new WlanPhyRadioState[numberofItems];
-					Array.Copy(phyRadioState, ret, numberofItems);
+					WlanPhyRadioState[] ret = new WlanPhyRadioState[this.numberofItems];
+					Array.Copy(this.phyRadioState, ret, this.numberofItems);
 					return ret;
 				}
 			}

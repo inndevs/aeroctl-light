@@ -67,7 +67,7 @@
     <Compile Include="IGpuController.cs" />
     <Compile Include="IRgbController.cs" />
     <Compile Include="KeyboardController.cs" />
-    <Compile Include="ITE8291RgbController.cs" />
+    <Compile Include="Ite829XRgbController.cs" />
     <Compile Include="LidStatus.cs" />
     <Compile Include="NvGpuController.cs" />
     <Compile Include="RgbEffect.cs" />

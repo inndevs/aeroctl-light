@@ -25,11 +25,19 @@ namespace AeroCtl
 		ValueTask<RgbEffect> GetEffectAsync();
 
 		/// <summary>
-		/// Sets the image for custom effects.
+		/// Sets the image for a custom effect.
 		/// </summary>
 		/// <param name="index">The custom effect index, corresponds to the "Custom" entries in <see cref="RgbEffectType"/>.</param>
 		/// <param name="image">The RGB values (4 bytes per pixel/key).</param>
 		/// <returns></returns>
 		ValueTask SetImageAsync(int index, ReadOnlyMemory<byte> image);
+
+		/// <summary>
+		/// Gets the image for a custom effect.
+		/// </summary>
+		/// <param name="index"></param>
+		/// <param name="image"></param>
+		/// <returns></returns>
+		ValueTask GetImageAsync(int index, Memory<byte> image);
 	}
 }

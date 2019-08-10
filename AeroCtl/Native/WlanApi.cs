@@ -1,12 +1,12 @@
 using System;
 using System.Collections.Generic;
 using System.ComponentModel;
-using System.Runtime.InteropServices;
 using System.Net.NetworkInformation;
-using System.Threading;
+using System.Runtime.InteropServices;
 using System.Text;
+using System.Threading;
 
-namespace NativeWifi
+namespace AeroCtl.Native
 {
 	/// <summary>
 	/// Represents a client to the Zeroconf (Native Wifi) service.
@@ -98,7 +98,7 @@ namespace NativeWifi
 				try
 				{
 					Wlan.ThrowIfError(
-						Wlan.WlanSetInterface(client.clientHandle, info.interfaceGuid, opCode, sizeof(int), valuePtr, IntPtr.Zero));
+						Wlan.WlanSetInterface(this.client.clientHandle, this.info.interfaceGuid, opCode, sizeof(int), valuePtr, IntPtr.Zero));
 				}
 				finally
 				{
@@ -117,7 +117,7 @@ namespace NativeWifi
 				int valueSize;
 				Wlan.WlanOpcodeValueType opcodeValueType;
 				Wlan.ThrowIfError(
-					Wlan.WlanQueryInterface(client.clientHandle, info.interfaceGuid, opCode, IntPtr.Zero, out valueSize, out valuePtr, out opcodeValueType));
+					Wlan.WlanQueryInterface(this.client.clientHandle, this.info.interfaceGuid, opCode, IntPtr.Zero, out valueSize, out valuePtr, out opcodeValueType));
 				try
 				{
 					return Marshal.ReadInt32(valuePtr);
@@ -136,11 +136,11 @@ namespace NativeWifi
 			{
 				get
 				{
-					return GetInterfaceInt(Wlan.WlanIntfOpcode.AutoconfEnabled) != 0;
+					return this.GetInterfaceInt(Wlan.WlanIntfOpcode.AutoconfEnabled) != 0;
 				}
 				set
 				{
-					SetInterfaceInt(Wlan.WlanIntfOpcode.AutoconfEnabled, value ? 1 : 0);
+					this.SetInterfaceInt(Wlan.WlanIntfOpcode.AutoconfEnabled, value ? 1 : 0);
 				}
 			}
 
@@ -152,11 +152,11 @@ namespace NativeWifi
 			{
 				get
 				{
-					return (Wlan.Dot11BssType) GetInterfaceInt(Wlan.WlanIntfOpcode.BssType);
+					return (Wlan.Dot11BssType) this.GetInterfaceInt(Wlan.WlanIntfOpcode.BssType);
 				}
 				set
 				{
-					SetInterfaceInt(Wlan.WlanIntfOpcode.BssType, (int)value);
+					this.SetInterfaceInt(Wlan.WlanIntfOpcode.BssType, (int)value);
 				}
 			}
 
@@ -168,7 +168,7 @@ namespace NativeWifi
 			{
 				get
 				{
-					return (Wlan.WlanInterfaceState)GetInterfaceInt(Wlan.WlanIntfOpcode.InterfaceState);
+					return (Wlan.WlanInterfaceState)this.GetInterfaceInt(Wlan.WlanIntfOpcode.InterfaceState);
 				}
 			}
 
@@ -181,7 +181,7 @@ namespace NativeWifi
 			{
 				get
 				{
-					return GetInterfaceInt(Wlan.WlanIntfOpcode.ChannelNumber);
+					return this.GetInterfaceInt(Wlan.WlanIntfOpcode.ChannelNumber);
 				}				
 			}
 
@@ -194,7 +194,7 @@ namespace NativeWifi
 			{
 				get
 				{
-					return GetInterfaceInt(Wlan.WlanIntfOpcode.RSSI);
+					return this.GetInterfaceInt(Wlan.WlanIntfOpcode.RSSI);
 				}
 			}
 
@@ -211,7 +211,7 @@ namespace NativeWifi
 					IntPtr valuePtr;
 					Wlan.WlanOpcodeValueType opcodeValueType;
 					Wlan.ThrowIfError(
-						Wlan.WlanQueryInterface(client.clientHandle, info.interfaceGuid, Wlan.WlanIntfOpcode.RadioState, IntPtr.Zero, out valueSize, out valuePtr, out opcodeValueType));
+						Wlan.WlanQueryInterface(this.client.clientHandle, this.info.interfaceGuid, Wlan.WlanIntfOpcode.RadioState, IntPtr.Zero, out valueSize, out valuePtr, out opcodeValueType));
 					try
 					{
 						return (Wlan.WlanRadioState)Marshal.PtrToStructure(valuePtr, typeof(Wlan.WlanRadioState));
@@ -232,7 +232,7 @@ namespace NativeWifi
 			{
 				get
 				{
-					return (Wlan.Dot11OperationMode) GetInterfaceInt(Wlan.WlanIntfOpcode.CurrentOperationMode);
+					return (Wlan.Dot11OperationMode) this.GetInterfaceInt(Wlan.WlanIntfOpcode.CurrentOperationMode);
 				}
 			}
 
@@ -249,7 +249,7 @@ namespace NativeWifi
 					IntPtr valuePtr;
 					Wlan.WlanOpcodeValueType opcodeValueType;
 					Wlan.ThrowIfError(
-						Wlan.WlanQueryInterface(client.clientHandle, info.interfaceGuid, Wlan.WlanIntfOpcode.CurrentConnection, IntPtr.Zero, out valueSize, out valuePtr, out opcodeValueType));
+						Wlan.WlanQueryInterface(this.client.clientHandle, this.info.interfaceGuid, Wlan.WlanIntfOpcode.CurrentConnection, IntPtr.Zero, out valueSize, out valuePtr, out opcodeValueType));
 					try
 					{
 							return (Wlan.WlanConnectionAttributes)Marshal.PtrToStructure(valuePtr, typeof(Wlan.WlanConnectionAttributes));
@@ -270,7 +270,7 @@ namespace NativeWifi
 			public void Scan()
 			{
 				Wlan.ThrowIfError(
-					Wlan.WlanScan(client.clientHandle, info.interfaceGuid, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero));
+					Wlan.WlanScan(this.client.clientHandle, this.info.interfaceGuid, IntPtr.Zero, IntPtr.Zero, IntPtr.Zero));
 			}
 
 			/// <summary>
@@ -300,7 +300,7 @@ namespace NativeWifi
 			{
 				IntPtr availNetListPtr;
 				Wlan.ThrowIfError(
-					Wlan.WlanGetAvailableNetworkList(client.clientHandle, info.interfaceGuid, flags, IntPtr.Zero, out availNetListPtr));
+					Wlan.WlanGetAvailableNetworkList(this.client.clientHandle, this.info.interfaceGuid, flags, IntPtr.Zero, out availNetListPtr));
 				try
 				{
 					return ConvertAvailableNetworkListPtr(availNetListPtr);
@@ -336,7 +336,7 @@ namespace NativeWifi
 			{
 				IntPtr bssListPtr;
 				Wlan.ThrowIfError(
-					Wlan.WlanGetNetworkBssList(client.clientHandle, info.interfaceGuid, IntPtr.Zero, Wlan.Dot11BssType.Any, false, IntPtr.Zero, out bssListPtr));
+					Wlan.WlanGetNetworkBssList(this.client.clientHandle, this.info.interfaceGuid, IntPtr.Zero, Wlan.Dot11BssType.Any, false, IntPtr.Zero, out bssListPtr));
 				try
 				{
 					return ConvertBssListPtr(bssListPtr);
@@ -361,7 +361,7 @@ namespace NativeWifi
 				{
 					IntPtr bssListPtr;
 					Wlan.ThrowIfError(
-						Wlan.WlanGetNetworkBssList(client.clientHandle, info.interfaceGuid, ssidPtr, bssType, securityEnabled, IntPtr.Zero, out bssListPtr));
+						Wlan.WlanGetNetworkBssList(this.client.clientHandle, this.info.interfaceGuid, ssidPtr, bssType, securityEnabled, IntPtr.Zero, out bssListPtr));
 					try
 					{
 						return ConvertBssListPtr(bssListPtr);
@@ -384,7 +384,7 @@ namespace NativeWifi
 			protected void Connect(Wlan.WlanConnectionParameters connectionParams)
 			{
 				Wlan.ThrowIfError(
-					Wlan.WlanConnect(client.clientHandle, info.interfaceGuid, ref connectionParams, IntPtr.Zero));
+					Wlan.WlanConnect(this.client.clientHandle, this.info.interfaceGuid, ref connectionParams, IntPtr.Zero));
 			}
 
 			/// <summary>
@@ -400,7 +400,7 @@ namespace NativeWifi
 				connectionParams.profile = profile;
 				connectionParams.dot11BssType = bssType;
 				connectionParams.flags = 0;
-				Connect(connectionParams);
+				this.Connect(connectionParams);
 			}
 			
 			/// <summary>
@@ -414,17 +414,17 @@ namespace NativeWifi
 			/// <returns></returns>
 			public bool ConnectSynchronously(Wlan.WlanConnectionMode connectionMode, Wlan.Dot11BssType bssType, string profile, int connectTimeout)
 			{
-				queueEvents = true;
+				this.queueEvents = true;
 				try
 				{
-					Connect(connectionMode, bssType, profile);
-					while (queueEvents && eventQueueFilled.WaitOne(connectTimeout, true))
+					this.Connect(connectionMode, bssType, profile);
+					while (this.queueEvents && this.eventQueueFilled.WaitOne(connectTimeout, true))
 					{
-						lock (eventQueue)
+						lock (this.eventQueue)
 						{
-							while (eventQueue.Count != 0)
+							while (this.eventQueue.Count != 0)
 							{
-								object e = eventQueue.Dequeue();
+								object e = this.eventQueue.Dequeue();
 								if (e is WlanConnectionNotificationEventData)
 								{
 									WlanConnectionNotificationEventData wlanConnectionData = (WlanConnectionNotificationEventData)e;
@@ -447,8 +447,8 @@ namespace NativeWifi
 				}
 				finally
 				{
-					queueEvents = false;
-					eventQueue.Clear();
+					this.queueEvents = false;
+					this.eventQueue.Clear();
 				}
 				return false; // timeout expired and no "connection complete"
 			}
@@ -467,7 +467,7 @@ namespace NativeWifi
 				Marshal.StructureToPtr(ssid, connectionParams.dot11SsidPtr, false);
 				connectionParams.dot11BssType = bssType;
 				connectionParams.flags = flags;
-				Connect(connectionParams);
+				this.Connect(connectionParams);
 				Marshal.DestroyStructure(connectionParams.dot11SsidPtr, ssid.GetType());
 				Marshal.FreeHGlobal(connectionParams.dot11SsidPtr);
 			}
@@ -482,7 +482,7 @@ namespace NativeWifi
 			public void DeleteProfile(string profileName)
 			{
 				Wlan.ThrowIfError(
-					Wlan.WlanDeleteProfile(client.clientHandle, info.interfaceGuid, profileName, IntPtr.Zero));
+					Wlan.WlanDeleteProfile(this.client.clientHandle, this.info.interfaceGuid, profileName, IntPtr.Zero));
 			}
 
 			/// <summary>
@@ -496,7 +496,7 @@ namespace NativeWifi
 			{
 				Wlan.WlanReasonCode reasonCode;
 				Wlan.ThrowIfError(
-						Wlan.WlanSetProfile(client.clientHandle, info.interfaceGuid, flags, profileXml, null, overwrite, IntPtr.Zero, out reasonCode));
+						Wlan.WlanSetProfile(this.client.clientHandle, this.info.interfaceGuid, flags, profileXml, null, overwrite, IntPtr.Zero, out reasonCode));
 				return reasonCode;
 			}
 
@@ -511,7 +511,7 @@ namespace NativeWifi
 				Wlan.WlanProfileFlags flags;
 				Wlan.WlanAccess access;
 				Wlan.ThrowIfError(
-					Wlan.WlanGetProfile(client.clientHandle, info.interfaceGuid, profileName, IntPtr.Zero, out profileXmlPtr, out flags,
+					Wlan.WlanGetProfile(this.client.clientHandle, this.info.interfaceGuid, profileName, IntPtr.Zero, out profileXmlPtr, out flags,
 								   out access));
 				try
 				{
@@ -531,7 +531,7 @@ namespace NativeWifi
 			{
 				IntPtr profileListPtr;
 				Wlan.ThrowIfError(
-					Wlan.WlanGetProfileList(client.clientHandle, info.interfaceGuid, IntPtr.Zero, out profileListPtr));
+					Wlan.WlanGetProfileList(this.client.clientHandle, this.info.interfaceGuid, IntPtr.Zero, out profileListPtr));
 				try
 				{
 					Wlan.WlanProfileInfoListHeader header = (Wlan.WlanProfileInfoListHeader) Marshal.PtrToStructure(profileListPtr, typeof(Wlan.WlanProfileInfoListHeader));
@@ -553,35 +553,35 @@ namespace NativeWifi
 
 			internal void OnWlanConnection(Wlan.WlanNotificationData notifyData, Wlan.WlanConnectionNotificationData connNotifyData)
 			{
-				if (WlanConnectionNotification != null)
-					WlanConnectionNotification(notifyData, connNotifyData);
+				if (this.WlanConnectionNotification != null)
+					this.WlanConnectionNotification(notifyData, connNotifyData);
 
-				if (queueEvents)
+				if (this.queueEvents)
 				{
 					WlanConnectionNotificationEventData queuedEvent = new WlanConnectionNotificationEventData();
 					queuedEvent.notifyData = notifyData;
 					queuedEvent.connNotifyData = connNotifyData;
-					EnqueueEvent(queuedEvent);
+					this.EnqueueEvent(queuedEvent);
 				}
 			}
 
 			internal void OnWlanReason(Wlan.WlanNotificationData notifyData, Wlan.WlanReasonCode reasonCode)
 			{
-				if (WlanReasonNotification != null)
-					WlanReasonNotification(notifyData, reasonCode);
-				if (queueEvents)
+				if (this.WlanReasonNotification != null)
+					this.WlanReasonNotification(notifyData, reasonCode);
+				if (this.queueEvents)
 				{
 					WlanReasonNotificationData queuedEvent = new WlanReasonNotificationData();
 					queuedEvent.notifyData = notifyData;
 					queuedEvent.reasonCode = reasonCode;
-					EnqueueEvent(queuedEvent);
+					this.EnqueueEvent(queuedEvent);
 				}
 			}
 
 			internal void OnWlanNotification(Wlan.WlanNotificationData notifyData)
 			{
-				if (WlanNotification != null)
-					WlanNotification(notifyData);
+				if (this.WlanNotification != null)
+					this.WlanNotification(notifyData);
 			}
 
 			/// <summary>
@@ -589,9 +589,9 @@ namespace NativeWifi
 			/// </summary>
 			private void EnqueueEvent(object queuedEvent)
 			{
-				lock (eventQueue)
-					eventQueue.Enqueue(queuedEvent);
-				eventQueueFilled.Set();
+				lock (this.eventQueue)
+					this.eventQueue.Enqueue(queuedEvent);
+				this.eventQueueFilled.Set();
 			}
 
 			/// <summary>
@@ -609,7 +609,7 @@ namespace NativeWifi
 					foreach (NetworkInterface netIface in NetworkInterface.GetAllNetworkInterfaces())
 					{
 						Guid netIfaceGuid = new Guid(netIface.Id);
-						if (netIfaceGuid.Equals(info.interfaceGuid))
+						if (netIfaceGuid.Equals(this.info.interfaceGuid))
 						{
 							return netIface;
 						}
@@ -623,7 +623,7 @@ namespace NativeWifi
 			/// </summary>
 			public Guid InterfaceGuid
 			{
-				get { return info.interfaceGuid; }
+				get { return this.info.interfaceGuid; }
 			}
 
 			/// <summary>
@@ -632,7 +632,7 @@ namespace NativeWifi
 			/// </summary>
 			public string InterfaceDescription
 			{
-				get { return info.interfaceDescription; }
+				get { return this.info.interfaceDescription; }
 			}
 
 			/// <summary>
@@ -640,7 +640,7 @@ namespace NativeWifi
 			/// </summary>
 			public string InterfaceName
 			{
-				get { return NetworkInterface.Name; }
+				get { return this.NetworkInterface.Name; }
 			}
 
 			public void SetRadioState(Wlan.WlanPhyRadioState state)
@@ -651,7 +651,7 @@ namespace NativeWifi
 				try
 				{
 					Wlan.ThrowIfError(Wlan.WlanSetInterface(
-									   client.clientHandle, info.interfaceGuid,
+									   this.client.clientHandle, this.info.interfaceGuid,
 									   Wlan.WlanIntfOpcode.RadioState,
 									   (uint)size,
 									   pointer,
@@ -675,17 +675,17 @@ namespace NativeWifi
 		public WlanClient()
 		{
 			Wlan.ThrowIfError(
-				Wlan.WlanOpenHandle(Wlan.WLAN_CLIENT_VERSION_XP_SP2, IntPtr.Zero, out negotiatedVersion, out clientHandle));
+				Wlan.WlanOpenHandle(Wlan.WLAN_CLIENT_VERSION_XP_SP2, IntPtr.Zero, out this.negotiatedVersion, out this.clientHandle));
 			try
 			{
 				Wlan.WlanNotificationSource prevSrc;
-				wlanNotificationCallback = OnWlanNotification;
+				this.wlanNotificationCallback = this.OnWlanNotification;
 				Wlan.ThrowIfError(
-					Wlan.WlanRegisterNotification(clientHandle, Wlan.WlanNotificationSource.All, false, wlanNotificationCallback, IntPtr.Zero, IntPtr.Zero, out prevSrc));
+					Wlan.WlanRegisterNotification(this.clientHandle, Wlan.WlanNotificationSource.All, false, this.wlanNotificationCallback, IntPtr.Zero, IntPtr.Zero, out prevSrc));
 			}
 			catch
 			{
-				Close();
+				this.Close();
 				throw;
 			}
 		}
@@ -693,12 +693,12 @@ namespace NativeWifi
 		void IDisposable.Dispose()
 		{
 			GC.SuppressFinalize(this);
-			Close();
+			this.Close();
 		}
 
 		~WlanClient()
 		{
-			Close();
+			this.Close();
 		}
 
 		/// <summary>
@@ -706,10 +706,10 @@ namespace NativeWifi
 		/// </summary>
 		private void Close()
 		{
-			if (clientHandle != IntPtr.Zero)
+			if (this.clientHandle != IntPtr.Zero)
 			{
-				Wlan.WlanCloseHandle(clientHandle, IntPtr.Zero);
-				clientHandle = IntPtr.Zero;
+				Wlan.WlanCloseHandle(this.clientHandle, IntPtr.Zero);
+				this.clientHandle = IntPtr.Zero;
 			}
 		}
 
@@ -736,7 +736,7 @@ namespace NativeWifi
 		private void OnWlanNotification(ref Wlan.WlanNotificationData notifyData, IntPtr context)
 		{
 			WlanInterface wlanIface;
-			ifaces.TryGetValue(notifyData.interfaceGuid, out wlanIface);
+			this.ifaces.TryGetValue(notifyData.interfaceGuid, out wlanIface);
 
 			switch(notifyData.notificationSource)
 			{
@@ -803,7 +803,7 @@ namespace NativeWifi
 			{
 				IntPtr ifaceList;
 				Wlan.ThrowIfError(
-					Wlan.WlanEnumInterfaces(clientHandle, IntPtr.Zero, out ifaceList));
+					Wlan.WlanEnumInterfaces(this.clientHandle, IntPtr.Zero, out ifaceList));
 				try
 				{
 					Wlan.WlanInterfaceInfoListHeader header =
@@ -819,10 +819,10 @@ namespace NativeWifi
 						currentIfaceGuids.Add(info.interfaceGuid);
 
 						WlanInterface wlanIface;
-						if (!ifaces.TryGetValue(info.interfaceGuid, out wlanIface))
+						if (!this.ifaces.TryGetValue(info.interfaceGuid, out wlanIface))
 						{
 							wlanIface = new WlanInterface(this, info);
-							ifaces[info.interfaceGuid] = wlanIface;
+							this.ifaces[info.interfaceGuid] = wlanIface;
 						}
 
 						interfaces[i] = wlanIface;
@@ -830,7 +830,7 @@ namespace NativeWifi
 
 					// Remove stale interfaces
 					Queue<Guid> deadIfacesGuids = new Queue<Guid>();
-					foreach (Guid ifaceGuid in ifaces.Keys)
+					foreach (Guid ifaceGuid in this.ifaces.Keys)
 					{
 						if (!currentIfaceGuids.Contains(ifaceGuid))
 							deadIfacesGuids.Enqueue(ifaceGuid);
@@ -838,7 +838,7 @@ namespace NativeWifi
 					while(deadIfacesGuids.Count != 0)
 					{
 						Guid deadIfaceGuid = deadIfacesGuids.Dequeue();
-						ifaces.Remove(deadIfaceGuid);
+						this.ifaces.Remove(deadIfaceGuid);
 					}
 
 					return interfaces;

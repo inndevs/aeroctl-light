@@ -1,7 +1,7 @@
-﻿using NativeWifi;
-using System;
+﻿using System;
 using System.Collections.Immutable;
 using System.Linq;
+using AeroCtl.Native;
 
 namespace AeroCtl
 {

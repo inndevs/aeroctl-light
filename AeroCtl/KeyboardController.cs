@@ -122,7 +122,7 @@ namespace AeroCtl
 						// Find RGB controller.
 						if (caps.UsagePage == 0xFF01 && caps.Usage == 1 && caps.FeatureReportByteLength == 9)
 						{
-							this.Rgb = new Ite8291RgbController(dev);
+							this.Rgb = new Ite829XRgbController(dev);
 						}
 					}
 				}
