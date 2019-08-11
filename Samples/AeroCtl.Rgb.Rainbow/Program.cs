@@ -64,18 +64,14 @@ namespace AeroCtl.Rgb.Rainbow
 					for (int i = 0; i < 128; ++i)
 					{
 						Rgb color = HsvToRgb(h, 1.0, 1.0);
-
 						image[4 * i + 0] = (byte)i;
 						image[4 * i + 1] = (byte)(color.R * white.R / 255);
 						image[4 * i + 2] = (byte)(color.G * white.G / 255);
 						image[4 * i + 3] = (byte)(color.B * white.B / 255);
-
 						h += 2.0;
 					}
 
-					await rgb.SetEffectAsync(new RgbEffect {Type = RgbEffectType.Custom0, Brightness = 51});
 					await rgb.SetImageAsync(0, image);
-					await Task.Delay(1);
 					hStart += 5.0;
 				}
 			}
