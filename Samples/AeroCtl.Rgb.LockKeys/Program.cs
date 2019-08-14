@@ -4,6 +4,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Runtime.InteropServices;
+using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Forms;
 using Microsoft.Win32;
@@ -24,10 +25,11 @@ namespace AeroCtl.Rgb.LockKeys
 		private static readonly LowLevelKeyboardProc proc = hookCallback;
 
 		private static IntPtr hookID = IntPtr.Zero;
+		private static SynchronizationContext syncContext;
 
 		public static async Task Main()
 		{
-			await Effect.Update();
+			await Effect.UpdateAsync();
 			
 			hookID = setHook(proc);
 
@@ -49,13 +51,13 @@ namespace AeroCtl.Rgb.LockKeys
 
 		private static void update()
 		{
-			Effect.Update().ContinueWith(t =>
+			syncContext = SynchronizationContext.Current ?? syncContext;
+			Effect.UpdateAsync().ContinueWith(t =>
 			{
-				if (t.IsFaulted)
+				syncContext?.Post(_ =>
 				{
-					Console.Error.WriteLine(t.Exception);
-					Application.Exit();
-				}
+					t.Wait();
+				}, null);
 			});
 		}
 
@@ -136,56 +138,60 @@ namespace AeroCtl.Rgb.LockKeys
 		/// Update state and apply.
 		/// </summary>
 		/// <returns></returns>
-		public static async Task<bool> Update()
+		public static async Task<bool> UpdateAsync()
 		{
 			await Task.Delay(5); // Small delay so Control.IsKeyLocked returns the correct value.
 
-			using (Aero aero = new Aero())
+			// Sometimes the keyboard controller seems to get disconnected (e.g. after wake up from sleep), so we try a couple of times.
+			for (int i = 9; i >= 0; --i)
 			{
-				// Read current keyboard state.
-				EffectState state = 0;
+				using (Aero aero = new Aero())
+				{
+					// Read current keyboard state.
+					EffectState state = 0;
 
-				if (Control.IsKeyLocked(Keys.CapsLock))
-					state |= EffectState.Caps;
-				else
-					state &= ~EffectState.Caps;
+					if (Control.IsKeyLocked(Keys.CapsLock))
+						state |= EffectState.Caps;
+					else
+						state &= ~EffectState.Caps;
 
-				if (Control.IsKeyLocked(Keys.NumLock))
-					state |= EffectState.Num;
-				else
-					state &= ~EffectState.Num;
+					if (Control.IsKeyLocked(Keys.NumLock))
+						state |= EffectState.Num;
+					else
+						state &= ~EffectState.Num;
 
-				if (Control.IsKeyLocked(Keys.Scroll))
-					state |= EffectState.Scroll;
-				else
-					state &= ~EffectState.Scroll;
+					if (Control.IsKeyLocked(Keys.Scroll))
+						state |= EffectState.Scroll;
+					else
+						state &= ~EffectState.Scroll;
 
-				if (await aero.Display.GetLidStatus() == LidStatus.Closed)
-					state |= EffectState.LidClosed;
-				else
-					state &= ~EffectState.LidClosed;
+					if (await aero.Display.GetLidStatus() == LidStatus.Closed)
+						state |= EffectState.LidClosed;
+					else
+						state &= ~EffectState.LidClosed;
 
-				Console.WriteLine(state);
+					//Console.WriteLine(state);
 
-				// Try to apply the effect.
-				if (await apply(aero.Keyboard.Rgb, state))
-					return true;
+					// Try to apply the effect.
+					if (await applyAsync(aero.Keyboard.Rgb, state, i > 0))
+						return true;
+				}
 
-				// Sometimes the keyboard controller seems to get disconnected, so we try a second time.
-				await Task.Delay(500); 
-				return await apply(aero.Keyboard.Rgb, state);
-				
+				await Task.Delay(1000);
 			}
+
+			return false;
 		}
 
 		/// <summary>
 		/// Apply the effect.
 		/// </summary>
-		/// <param name="rgb"></param>
-		/// <param name="state"></param>
-		/// <returns></returns>
-		private static async Task<bool> apply(IRgbController rgb, EffectState state)
+		private static async Task<bool> applyAsync(IRgbController rgb, EffectState state, bool suppressException)
 		{
+			// Check if the RGB controller even exists.
+			if (rgb == null)
+				return false;
+
 			if ((state & EffectState.LidClosed) != 0)
 			{
 				// Turn off when lid is closed.
@@ -201,11 +207,11 @@ namespace AeroCtl.Rgb.LockKeys
 
 					return true;
 				}
-				catch (Win32Exception)
+				catch (Win32Exception) when (suppressException)
 				{
 					return false;
 				}
-				catch (IOException)
+				catch (IOException) when (suppressException)
 				{
 					return false;
 				}
@@ -249,11 +255,11 @@ namespace AeroCtl.Rgb.LockKeys
 
 				return true;
 			}
-			catch (Win32Exception)
+			catch (Win32Exception) when (suppressException)
 			{
 				return false;
 			}
-			catch (IOException)
+			catch (IOException) when (suppressException)
 			{
 				return false;
 			}

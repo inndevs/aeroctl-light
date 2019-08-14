@@ -72,7 +72,7 @@ namespace AeroCtl.Rgb.Rainbow
 					}
 
 					await rgb.SetImageAsync(0, image);
-					hStart += 5.0;
+					hStart += 20.0;
 				}
 			}
 		}
