@@ -134,11 +134,12 @@
       <Project>{72af0b9e-75c6-4f98-b586-777df53193c8}</Project>
       <Name>AeroCtl</Name>
     </ProjectReference>
+    <ProjectReference Include="..\ThirdParty\LibreHardwareMonitor\OpenHardwareMonitorLib.csproj">
+      <Project>{80630332-e5cc-40f1-a5eb-d21e60a985ea}</Project>
+      <Name>OpenHardwareMonitorLib</Name>
+    </ProjectReference>
   </ItemGroup>
   <ItemGroup>
-    <PackageReference Include="LibreHardwareMonitorLibCore">
-      <Version>1.0.3</Version>
-    </PackageReference>
     <PackageReference Include="System.Collections.Immutable">
       <Version>1.5.0</Version>
     </PackageReference>

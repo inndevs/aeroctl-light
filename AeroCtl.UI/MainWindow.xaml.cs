@@ -235,7 +235,7 @@ namespace AeroCtl.UI
 			editor.ShowDialog();
 		}
 
-		private void onEditSwconfigClicked(object sender, RoutedEventArgs e)
+		private void onEditSwConfigClicked(object sender, RoutedEventArgs e)
 		{
 			FanConfig cfg = new FanConfig(this.Aero.SoftwareFanConfig);
 			FanConfigEditor editor = new FanConfigEditor(cfg);

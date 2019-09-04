@@ -1,3 +1,6 @@
 [submodule "ThirdParty/ManagedNativeWifi"]
 	path = ThirdParty/ManagedNativeWifi
 	url = https://github.com/emoacht/ManagedNativeWifi.git
+[submodule "ThirdParty/LibreHardwareMonitor"]
+	path = ThirdParty/LibreHardwareMonitor
+	url = https://github.com/MachinaCore/LibreHardwareMonitor

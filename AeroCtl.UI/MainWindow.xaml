@@ -237,7 +237,7 @@
 						<RadioButton Grid.Row="4" Grid.Column="0" IsChecked="{Binding Path=Aero.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Software}}" DockPanel.Dock="Left" Name="fanProfileSoftware">Software</RadioButton>
 						<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" IsEnabled="{Binding ElementName=fanProfileSoftware, Path=IsChecked}">
 							<Button Width="90" Height="23" HorizontalAlignment="Left" Click="onEditSwCurveClicked" Margin="0 0 2 0">Edit Curve</Button>
-							<Button Width="90" Height="23" Click="onEditSwconfigClicked">Config</Button>
+							<Button Width="90" Height="23" Click="onEditSwConfigClicked">Config</Button>
 						</StackPanel>
 					</Grid>
 				</StackPanel>

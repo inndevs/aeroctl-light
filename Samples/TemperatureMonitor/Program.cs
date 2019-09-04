@@ -2,6 +2,7 @@ using System;
 using System.Linq;
 using System.Threading.Tasks;
 using AeroCtl;
+using AeroCtl.UI;
 using OpenHardwareMonitor.Hardware;
 
 namespace TemperatureMonitor
@@ -17,27 +18,43 @@ namespace TemperatureMonitor
 				run = false;
 			};
 
-			var pc = new Computer {CPUEnabled = true};
-
+			var computer = new Computer
 			{
-				pc.Open();
-				var cpu = pc.Hardware.FirstOrDefault(hw => hw.HardwareType == HardwareType.CPU);
-				var sensors = cpu.Sensors.Where(s => s.SensorType == SensorType.Temperature).ToArray();
+				CPUEnabled = true,
+				GPUEnabled = true
+			};
 
-				using (Aero aero = new Aero())
+			computer.Open();
+
+			var cpu = computer.Hardware.First(hw => hw.HardwareType == HardwareType.CPU);
+			cpu.Update();
+
+			foreach (var sens in cpu.Sensors.Where(s => s.SensorType == SensorType.Temperature))
+			{
+				Console.WriteLine($"{sens.Name} = {sens.Value}");
+			}
+
+			computer.Close();
+
+
+
+			using (HwMonitor hw = new HwMonitor())
+			using (Aero aero = new Aero())
+			{
+				//Random rng = new Random();
+				//IDirectFanSpeedController fans = (IDirectFanSpeedController)aero.Fans;
+
+				while (run)
 				{
-					while (run)
-					{
-						cpu.Update();
-						double wmiTemp = await aero.Cpu.GetTemperatureAsync();
-						double monTemp = sensors.Max(s => s.Value ?? 0.0f);
-						Console.Write($"{wmiTemp:F1}°C \t {monTemp:F1}°C");
-						Console.CursorLeft = 0;
-						await Task.Delay(50);
-					}
+					hw.Update();
+					double wmiCpuTemp = await aero.Cpu.GetTemperatureAsync();
+					double monCpuTemp = hw.CpuTemperature;
+					double monGpuTemp = hw.GpuTemperature;
+					Console.Write($"CPU {wmiCpuTemp:F1}°C \t {monCpuTemp:F1}°C \t GPU {monGpuTemp:F1}°C   ");
+					Console.CursorLeft = 0;
+					//fans.SetFixed(0.0 + rng.NextDouble() * 0.3);
+					await Task.Delay(500);
 				}
-
-				pc.Close();
 			}
 		}
 	}

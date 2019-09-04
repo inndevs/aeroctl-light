@@ -30,7 +30,7 @@ namespace AeroCtl.Rgb.LockKeys
 		public static async Task Main()
 		{
 			await Effect.UpdateAsync();
-			
+
 			hookID = setHook(proc);
 
 			SystemEvents.SessionSwitch += onSessionSwitch;

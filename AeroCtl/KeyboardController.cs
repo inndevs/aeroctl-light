@@ -153,7 +153,7 @@ namespace AeroCtl
 			}
 			remove => this.fnKeyPressed -= value;
 		}
-
+		
 		private void onRawInput(object sender, RAWINPUT e)
 		{
 			if(e.header.dwType == RAWINPUTHEADER.RIM_TYPEHID && e.data.keyboard.MakeCode == 4)
@@ -270,7 +270,6 @@ namespace AeroCtl
 					dwFlags = RAWINPUTDEVICE.RIDEV_INPUTSINK | RAWINPUTDEVICE.RIDEV_DEVNOTIFY,
 					hwndTarget = this.Handle
 				});
-
 				pRawInputDevice.Add(new RAWINPUTDEVICE
 				{
 					usUsagePage = 0xFF02,

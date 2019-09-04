@@ -54,7 +54,6 @@ namespace AeroCtl.Rgb.Rainbow
 			using (Aero aero = new Aero())
 			{
 				Ite829XRgbController rgb = (Ite829XRgbController)aero.Keyboard.Rgb;
-
 				byte[] image = new byte[512];
 
 				double hStart = 0.0;

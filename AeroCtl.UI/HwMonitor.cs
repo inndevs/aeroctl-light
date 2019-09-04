@@ -9,13 +9,13 @@ namespace AeroCtl.UI
 	/// </summary>
 	public class HwMonitor : IDisposable
 	{
-		private readonly Computer computer;
-		private readonly IHardware cpu;
-		private readonly IHardware gpu;
+		private Computer computer;
+		private IHardware cpu;
+		private IHardware gpu;
 
-		public double CpuTemperature => this.cpu.Sensors.Where(s => s.SensorType == SensorType.Temperature).Max(s => s.Value ?? 0);
+		public double CpuTemperature => this.cpu?.Sensors.FirstOrDefault(s => string.Equals(s.Name, "cpu package", StringComparison.OrdinalIgnoreCase))?.Value ?? 0.0;
 
-		public double GpuTemperature => this.gpu.Sensors.Where(s => s.SensorType == SensorType.Temperature).Max(s => s.Value ?? 0);
+		public double GpuTemperature => this.gpu?.Sensors.Where(s => s.SensorType == SensorType.Temperature).Max(s => s.Value ?? 0) ?? 0.0;
 		
 		public HwMonitor()
 		{
@@ -33,13 +33,16 @@ namespace AeroCtl.UI
 
 		public void Update()
 		{
-			this.cpu.Update();
-			this.gpu.Update();
+			this.cpu?.Update();
+			this.gpu?.Update();
 		}
 
 		public void Dispose()
 		{
-			this.computer.Close();
+			this.computer?.Close();
+			this.computer = null;
+			this.cpu = null;
+			this.gpu = null;
 		}
 	}
 }
