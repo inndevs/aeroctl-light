@@ -22,8 +22,20 @@
             <Button Name="addButton" Width="100" Click="addButton_OnClick" Margin="5" IsEnabled="{Binding IsCurveEditable}" Focusable="false">Add Point</Button>
             <Button Name="deleteButton" Width="100" Click="deleteButton_OnClick" Margin="5" IsEnabled="{Binding IsCurveEditable}" Focusable="false">Delete Point</Button>
         </StackPanel>
-        <Canvas Name="canvas" Margin="25" Background="#EEEEEE">
+        <DockPanel Margin="0 25 25 0">
+            <TextBlock DockPanel.Dock="Bottom" Height="25" TextAlignment="Center">Temperature in °C</TextBlock>
+            <Grid DockPanel.Dock="Left" Width="25">
+                <TextBlock TextAlignment="Center" HorizontalAlignment="Right">
+                    <TextBlock.LayoutTransform>
+                        <RotateTransform Angle="-90"></RotateTransform>
+                    </TextBlock.LayoutTransform>
+                    Fan speed
+                </TextBlock>
+            </Grid>
 
-        </Canvas>
+            <Canvas Name="canvas" Background="#EEEEEE">
+
+            </Canvas>
+        </DockPanel>
     </DockPanel>
 </Window>
