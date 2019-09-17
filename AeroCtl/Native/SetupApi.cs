@@ -3,7 +3,7 @@ using System.Runtime.InteropServices;
 
 namespace AeroCtl.Native
 {
-	public class SetupApi
+	public static class SetupApi
 	{
 		private const string lib = "setupapi.dll";
 

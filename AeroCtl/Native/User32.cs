@@ -3,21 +3,74 @@ using System.Runtime.InteropServices;
 
 namespace AeroCtl.Native
 {
-	public class User32
+	[StructLayout(LayoutKind.Sequential)]
+	public struct HARDWAREINPUT
+	{
+		public int uMsg;
+		public short wParamL;
+		public short wParamH;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct KEYBDINPUT
+	{
+		public ushort wVk;
+		public ushort wScan;
+		public uint dwFlags;
+		public int time;
+		public UIntPtr dwExtraInfo;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct MOUSEINPUT
+	{
+		public int dx;
+		public int dy;
+		public int mouseData;
+		public uint dwFlags;
+		public uint time;
+		public UIntPtr dwExtraInfo;
+	}
+
+	[StructLayout(LayoutKind.Sequential)]
+	public struct INPUT
+	{
+		[StructLayout(LayoutKind.Explicit)]
+		public struct InputUnion
+		{
+			[FieldOffset(0)] public MOUSEINPUT mouse;
+			[FieldOffset(0)] public KEYBDINPUT keyboard;
+			[FieldOffset(0)] public HARDWAREINPUT hardware;
+		}
+		
+		public uint type;
+		public InputUnion U;
+
+		public static int Size => Marshal.SizeOf(typeof(INPUT));
+	}
+
+	public static class User32
 	{
 		private const string lib = "user32.dll";
 		
 		public const uint RID_INPUT = 0x10000003;
 		public const uint RID_HEADER = 0x10000005;
 
+		public const ushort VK_VOLUME_MUTE = 0xAD;
+
+		public const uint INPUT_MOUSE = 0;
+		public const uint INPUT_KEYBOARD = 1;
+
+		public const uint KEYEVENTF_KEYUP = 2;
+
 		[DllImport(lib, SetLastError = true)]
-		internal static extern bool RegisterRawInputDevices(
+		public static extern bool RegisterRawInputDevices(
 			RAWINPUTDEVICE[] pRawInputDevice,
 			uint numberDevices,
 			uint size);
 
 		[DllImport(lib, SetLastError = true)]
-		internal static extern int GetRawInputData(
+		public static extern int GetRawInputData(
 			IntPtr hRawInput,
 			uint command,
 			out RAWINPUT pData,
@@ -25,7 +78,7 @@ namespace AeroCtl.Native
 			int cbSizeHeader);
 
 		[DllImport(lib, SetLastError = true)]
-		internal static extern int GetRawInputData(
+		public static extern int GetRawInputData(
 			IntPtr hRawInput,
 			uint command,
 			IntPtr pData,
@@ -33,9 +86,23 @@ namespace AeroCtl.Native
 			int cbSizeHeader);
 
 		[DllImport(lib, SetLastError = true)]
+		public static extern uint SendInput(uint nInputs, [MarshalAs(UnmanagedType.LPArray), In] INPUT[] pInputs, int cbSize);
+
+		[DllImport(lib, SetLastError = true)]
 		public static extern IntPtr RegisterPowerSettingNotification(
 		  IntPtr hRecipient,
 		  ref Guid PowerSettingGuid,
 		  uint Flags);
+
+		[DllImport(lib, SetLastError = true)]
+		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
+
+		[return: MarshalAs(UnmanagedType.Bool)]
+		[DllImport(lib, SetLastError = true)]
+		public static extern bool PostMessage(IntPtr hWnd, uint Msg, IntPtr wParam, IntPtr lParam);
+
+		[DllImport(lib, SetLastError = true)]
+		public static extern uint RegisterWindowMessage(string lpString);
+
 	}
 }

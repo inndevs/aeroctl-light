@@ -35,9 +35,7 @@ namespace TemperatureMonitor
 			}
 
 			computer.Close();
-
-
-
+			
 			using (HwMonitor hw = new HwMonitor())
 			using (Aero aero = new Aero())
 			{

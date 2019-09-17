@@ -123,10 +123,12 @@ namespace AeroCtl.UI
 			{
 				case FnKey.IncreaseBrightness:
 					this.aero.Display.Brightness = Math.Min(100, this.aero.Display.Brightness + 10);
+					await WindowsOsd.ShowBrightnessAsync();
 					break;
 
 				case FnKey.DecreaseBrightness:
 					this.aero.Display.Brightness = Math.Max(0, this.aero.Display.Brightness - 10);
+					await WindowsOsd.ShowBrightnessAsync();
 					break;
 
 				case FnKey.ToggleFan:

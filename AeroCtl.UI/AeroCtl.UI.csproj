@@ -75,6 +75,7 @@
     <Compile Include="SoftwareFan\FanSchedulingMode.cs" />
     <Compile Include="SoftwareFan\ISoftwareFanProvider.cs" />
     <Compile Include="SoftwareFan\SoftwareFanController.cs" />
+    <Compile Include="WindowsOsd.cs" />
     <Page Include="FanConfigEditor.xaml">
       <SubType>Designer</SubType>
       <Generator>MSBuild:Compile</Generator>
