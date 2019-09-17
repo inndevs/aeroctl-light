@@ -143,13 +143,13 @@ namespace AeroCtl.UI
 					bool? currentState = await this.aero.GetWifiEnabledAsync();
 					if (currentState == null)
 					{
-						this.trayIcon.ShowBalloonTip(notificationTimeout, this.Title, "Could not determine wifi state.", ToolTipIcon.Warning);
+						this.trayIcon.ShowBalloonTip(notificationTimeout, this.Title, "Could not determine Wi-Fi state.", ToolTipIcon.Warning);
 					}
 					else
 					{
 						bool newState = !currentState.Value;
 						await this.aero.SetWifiEnabledAsync(newState);
-						this.trayIcon.ShowBalloonTip(notificationTimeout, this.Title, $"Wifi {(newState ? "enabled" : "disabled")}.", ToolTipIcon.Info);
+						this.trayIcon.ShowBalloonTip(notificationTimeout, this.Title, $"Wi-Fi {(newState ? "enabled" : "disabled")}.", ToolTipIcon.Info);
 					}
 
 					break;
