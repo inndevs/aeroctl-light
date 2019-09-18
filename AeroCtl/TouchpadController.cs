@@ -14,12 +14,12 @@ namespace AeroCtl
 
 		public async Task<bool> GetEnabledAsync()
 		{
-			return await this.wmi.InvokeGetAsync<byte>("GetTouchPad") != 0;
+			return await this.wmi.InvokeGetAsync<byte>("GetTouchPad") == 0;
 		}
 
 		public async Task SetEnabledAsync(bool enabled)
 		{
-			await this.wmi.InvokeSetAsync("SetTouchPad", enabled ? (byte)1 : (byte)0);
+			await this.wmi.InvokeSetAsync("SetTouchPad", enabled ? (byte)0 : (byte)1);
 		}
 	}
 }

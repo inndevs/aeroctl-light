@@ -65,7 +65,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
-    <Compile Include="EnumExtension.cs" />
+    <Compile Include="EnumerationExtension.cs" />
     <Compile Include="SoftwareFan\FanConfig.cs" />
     <Compile Include="FanConfigEditor.xaml.cs">
       <DependentUpon>FanConfigEditor.xaml</DependentUpon>

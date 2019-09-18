@@ -5,12 +5,12 @@ using System.Windows;
 // General Information about an assembly is controlled through the following
 // set of attributes. Change these attribute values to modify the information
 // associated with an assembly.
-[assembly: AssemblyTitle("AeroCtl.UI")]
-[assembly: AssemblyDescription("")]
+[assembly: AssemblyTitle("AeroCtl")]
+[assembly: AssemblyDescription("Open-source AERO control panel")]
 [assembly: AssemblyConfiguration("")]
 [assembly: AssemblyCompany("")]
-[assembly: AssemblyProduct("AeroCtl.UI")]
-[assembly: AssemblyCopyright("Copyright ©  2019")]
+[assembly: AssemblyProduct("AeroCtl")]
+[assembly: AssemblyCopyright("Copyright © WTWRP 2019")]
 [assembly: AssemblyTrademark("")]
 [assembly: AssemblyCulture("")]
 
