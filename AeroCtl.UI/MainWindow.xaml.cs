@@ -10,6 +10,7 @@ using System.Windows;
 using System.Windows.Forms;
 using AeroCtl.UI.SoftwareFan;
 using Microsoft.Win32;
+using MessageBox = System.Windows.MessageBox;
 
 namespace AeroCtl.UI
 {
@@ -246,6 +247,11 @@ namespace AeroCtl.UI
 			{
 				this.Aero.SoftwareFanConfig = cfg;
 			}
+		}
+
+		private async void onResetKeyboardClicked(object sender, RoutedEventArgs e)
+		{
+			await this.Aero.ResetKeyboard();
 		}
 	}
 }

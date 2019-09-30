@@ -4,9 +4,11 @@ using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.Json;
+using System.Linq;
 using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
+using System.Windows.Controls;
 using AeroCtl.UI.Properties;
 using AeroCtl.UI.SoftwareFan;
 
@@ -707,6 +709,12 @@ namespace AeroCtl.UI
 			}
 
 			this.hwMonitor?.Dispose();
+		}
+
+		public async ValueTask<bool> ResetKeyboard()
+		{
+			await this.aero.Keyboard.Rgb.ResetAsync();
+			return true;
 		}
 
 		#endregion

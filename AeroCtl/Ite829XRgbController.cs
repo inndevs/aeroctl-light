@@ -165,6 +165,11 @@ namespace AeroCtl
 			}
 		}
 
+		public async ValueTask ResetAsync()
+		{
+			await this.ExecAsync(new Packet {B1 = Command.Reset, B2 = 0xFF});
+		}
+
 		public ValueTask<Packet> ExecAsync(Packet p)
 		{
 			this.Set(p);
@@ -222,7 +227,7 @@ namespace AeroCtl
 			SetMacroContent = 0x11,
 			GetMacroContent = 0x91,
 
-			SetRecoveryData = 0x13,
+			Reset = 0x13,
 
 			SetImage = 0x12,
 			GetImage = 0x92,

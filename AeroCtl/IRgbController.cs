@@ -39,5 +39,11 @@ namespace AeroCtl
 		/// <param name="image"></param>
 		/// <returns></returns>
 		ValueTask GetImageAsync(int index, Memory<byte> image);
+
+		/// <summary>
+		/// Performs a factory reset.
+		/// </summary>
+		/// <returns></returns>
+		ValueTask ResetAsync();
 	}
 }
