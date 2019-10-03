@@ -255,6 +255,24 @@ namespace AeroCtl.UI
 
 		#endregion
 
+		#region BluetoothEnabled
+
+		private bool bluetoothEnabled;
+
+		public bool BluetoothEnabled
+		{
+			get => this.bluetoothEnabled;
+			set
+			{
+				this.bluetoothEnabled = value;
+				this.OnPropertyChanged();
+
+				if (!this.updating.Value)
+					this.updates.Enqueue(() => this.aero.Bluetooth.SetEnabledAsync(value));
+			}
+		}
+		#endregion
+
 		#region BatteryCycles
 
 		private int batteryCycles;

@@ -22,6 +22,7 @@ namespace AeroCtl
 		private BatteryController battery;
 		private DisplayController display;
 		private TouchpadController touchpad;
+		private BluetoothController bluetooth;
 
 		#endregion
 
@@ -122,6 +123,11 @@ namespace AeroCtl
 		/// Gets the touchpad controller.
 		/// </summary>
 		public TouchpadController Touchpad => this.touchpad ?? (this.touchpad = new TouchpadController(this.Wmi));
+
+		/// <summary>
+		/// Gets the Bluetooth controller.
+		/// </summary>
+		public BluetoothController Bluetooth => this.bluetooth ?? (this.bluetooth = new BluetoothController(this.Wmi));
 
 		#endregion
 

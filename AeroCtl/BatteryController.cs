@@ -8,6 +8,7 @@ namespace AeroCtl
 	public class BatteryController
 	{
 		private readonly AeroWmi wmi;
+		private bool healthSupported = true;
 
 		public BatteryController(AeroWmi wmi)
 		{
@@ -65,12 +66,16 @@ namespace AeroCtl
 
 		public async Task<int?> GetHealthAsync()
 		{
+			if (!this.healthSupported)
+				return null;
+
 			try
 			{
 				return await this.wmi.InvokeGetAsync<byte>("GetBatteryHealth");
 			}
 			catch (ManagementException ex) when (ex.ErrorCode == ManagementStatus.InvalidMethod)
 			{
+				this.healthSupported = false;
 				return null;
 			}
 		}
