@@ -99,6 +99,9 @@
 								<CheckBox IsChecked="{Binding Aero.GpuThermalTarget}">GPU thermal target (?)</CheckBox>
 								<CheckBox IsChecked="{Binding Aero.GpuPowerConfig}">GPU power config (?)</CheckBox>
 							</StackPanel>
+							<StackPanel>
+								<CheckBox IsChecked="{Binding Aero.BluetoothEnabled}">Bluetooth enabled</CheckBox>
+							</StackPanel>
 						</StackPanel>
 					</StackPanel>
 				</Grid>
