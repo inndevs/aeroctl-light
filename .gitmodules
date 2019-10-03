@@ -3,4 +3,4 @@
 	url = https://github.com/emoacht/ManagedNativeWifi.git
 [submodule "ThirdParty/LibreHardwareMonitor"]
 	path = ThirdParty/LibreHardwareMonitor
-	url = https://github.com/MachinaCore/LibreHardwareMonitor
+	url = https://gitlab.com/wtwrp/librehardwaremonitor
