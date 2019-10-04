@@ -21,12 +21,17 @@ namespace AeroCtl.UI
 	{
 		#region Fields
 
-		private readonly Aero aero;
 		private readonly HwMonitor hwMonitor;
 		private SoftwareFanController swFanController;
 		private readonly AsyncLocal<bool> updating;
 		private bool loading;
 		private readonly ConcurrentQueue<Func<Task>> updates;
+
+		#endregion
+
+		#region Aero
+
+		public Aero Aero { get; }
 
 		#endregion
 
@@ -213,7 +218,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.aero.Display.Brightness = value;
+					this.Aero.Display.Brightness = value;
 			}
 		}
 
@@ -231,7 +236,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value && value.HasValue)
-					this.updates.Enqueue(async () => await this.aero.SetWifiEnabledAsync(value.Value));
+					this.updates.Enqueue(async () => await this.Aero.SetWifiEnabledAsync(value.Value));
 			}
 		}
 
@@ -249,7 +254,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => this.aero.Touchpad.SetEnabledAsync(value));
+					this.updates.Enqueue(() => this.Aero.Touchpad.SetEnabledAsync(value));
 			}
 		}
 
@@ -268,7 +273,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => this.aero.Bluetooth.SetEnabledAsync(value));
+					this.updates.Enqueue(() => this.Aero.Bluetooth.SetEnabledAsync(value));
 			}
 		}
 		#endregion
@@ -330,7 +335,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => this.aero.Battery.SetSmargeChargeAsync(value));
+					this.updates.Enqueue(() => this.Aero.Battery.SetSmargeChargeAsync(value));
 			}
 		}
 
@@ -348,7 +353,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => this.aero.Battery.SetChargePolicyAsync(value ? ChargePolicy.CustomStop : ChargePolicy.Full));
+					this.updates.Enqueue(() => this.Aero.Battery.SetChargePolicyAsync(value ? ChargePolicy.CustomStop : ChargePolicy.Full));
 			}
 		}
 
@@ -366,7 +371,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => this.aero.Battery.SetChargeStopAsync(value));
+					this.updates.Enqueue(() => this.Aero.Battery.SetChargeStopAsync(value));
 			}
 		}
 
@@ -527,7 +532,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => ((P75GpuController)this.aero.Gpu).SetBoostEnabledAsync(value));
+					this.updates.Enqueue(() => ((P75GpuController)this.Aero.Gpu).SetBoostEnabledAsync(value));
 			}
 		}
 
@@ -545,7 +550,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => ((P75GpuController)this.aero.Gpu).SetPowerConfigAsync(value));
+					this.updates.Enqueue(() => ((P75GpuController)this.Aero.Gpu).SetPowerConfigAsync(value));
 			}
 		}
 
@@ -563,7 +568,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => ((P75GpuController)this.aero.Gpu).SetThermalTargetEnabledAsync(value));
+					this.updates.Enqueue(() => ((P75GpuController)this.Aero.Gpu).SetThermalTargetEnabledAsync(value));
 			}
 		}
 
@@ -573,7 +578,7 @@ namespace AeroCtl.UI
 
 		public AeroController(Aero aero)
 		{
-			this.aero = aero;
+			this.Aero = aero;
 			this.updating = new AsyncLocal<bool>();
 			this.updates = new ConcurrentQueue<Func<Task>>();
 			this.hwMonitor = new HwMonitor();
@@ -623,25 +628,25 @@ namespace AeroCtl.UI
 			switch (newProfile)
 			{
 				case FanProfile.Quiet:
-					await this.aero.Fans.SetQuietAsync();
+					await this.Aero.Fans.SetQuietAsync();
 					break;
 				case FanProfile.Normal:
-					await this.aero.Fans.SetNormalAsync();
+					await this.Aero.Fans.SetNormalAsync();
 					break;
 				case FanProfile.Gaming:
-					await this.aero.Fans.SetGamingAsync();
+					await this.Aero.Fans.SetGamingAsync();
 					break;
 				case FanProfile.Fixed:
-					await this.aero.Fans.SetFixedAsync(this.fixedFanSpeed);
+					await this.Aero.Fans.SetFixedAsync(this.fixedFanSpeed);
 					break;
 				case FanProfile.Auto:
-					await this.aero.Fans.SetAutoAsync(this.autoFanAdjust);
+					await this.Aero.Fans.SetAutoAsync(this.autoFanAdjust);
 					break;
 				case FanProfile.Custom:
-					await this.aero.Fans.SetCustomAsync();
+					await this.Aero.Fans.SetCustomAsync();
 					break;
 				case FanProfile.Software:
-					this.swFanController = new SoftwareFanController(this.SoftwareFanConfig, new AeroFanProvider(this.aero, this.hwMonitor));
+					this.swFanController = new SoftwareFanController(this.SoftwareFanConfig, new AeroFanProvider(this.Aero, this.hwMonitor));
 					break;
 				default:
 					throw new InvalidEnumArgumentException(nameof(this.FanProfile), (int)newProfile, typeof(FanProfile));
@@ -660,14 +665,14 @@ namespace AeroCtl.UI
 			{
 				if (full)
 				{
-					this.BaseBoard = this.aero.BaseBoard;
-					this.Sku = this.aero.Sku;
-					this.SerialNumber = this.aero.SerialNumber;
-					this.BiosVersion = string.Join("; ", this.aero.BiosVersions);
+					this.BaseBoard = this.Aero.BaseBoard;
+					this.Sku = this.Aero.Sku;
+					this.SerialNumber = this.Aero.SerialNumber;
+					this.BiosVersion = string.Join("; ", this.Aero.BiosVersions);
 
-					if (this.aero.Keyboard.Rgb != null)
+					if (this.Aero.Keyboard.Rgb != null)
 					{
-						this.KeyboardFWVersion = await this.aero.Keyboard.Rgb.GetFirmwareVersionAsync();
+						this.KeyboardFWVersion = await this.Aero.Keyboard.Rgb.GetFirmwareVersionAsync();
 					}
 				}
 
@@ -684,7 +689,7 @@ namespace AeroCtl.UI
 					this.GpuTemperature = this.hwMonitor.GpuTemperature;
 				}
 
-				if (this.aero.Gpu is P75GpuController newGpu)
+				if (this.Aero.Gpu is P75GpuController newGpu)
 				{
 					this.GpuConfigAvailable = true;
 					this.GpuBoost = await newGpu.GetBoostEnabledAsync();
@@ -692,19 +697,19 @@ namespace AeroCtl.UI
 					this.GpuThermalTarget = await newGpu.GetThermalTargetEnabledAsync();
 				}
 
-				(this.FanRpm1, this.FanRpm2) = await this.aero.Fans.GetRpmAsync();
-				this.FanPwm = await this.aero.Fans.GetPwmAsync() * 100;
-				this.DisplayBrightness = (int)this.aero.Display.Brightness;
+				(this.FanRpm1, this.FanRpm2) = await this.Aero.Fans.GetRpmAsync();
+				this.FanPwm = await this.Aero.Fans.GetPwmAsync() * 100;
+				this.DisplayBrightness = (int)this.Aero.Display.Brightness;
 
-				this.SmartCharge = await this.aero.Battery.GetSmartChargeAsync();
-				this.ChargeStopEnabled = await this.aero.Battery.GetChargePolicyAsync() == ChargePolicy.CustomStop;
-				this.ChargeStop = await this.aero.Battery.GetChargeStopAsync();
-				this.BatteryCycles = await this.aero.Battery.GetCyclesAsync();
-				this.BatteryHealth = await this.aero.Battery.GetHealthAsync();
-				this.BatteryCharge = await this.aero.Battery.GetRemainingChargeAsync();
+				this.SmartCharge = await this.Aero.Battery.GetSmartChargeAsync();
+				this.ChargeStopEnabled = await this.Aero.Battery.GetChargePolicyAsync() == ChargePolicy.CustomStop;
+				this.ChargeStop = await this.Aero.Battery.GetChargeStopAsync();
+				this.BatteryCycles = await this.Aero.Battery.GetCyclesAsync();
+				this.BatteryHealth = await this.Aero.Battery.GetHealthAsync();
+				this.BatteryCharge = await this.Aero.Battery.GetRemainingChargeAsync();
 				
-				this.WifiEnabled = await this.aero.GetWifiEnabledAsync();
-				this.TouchpadEnabled = await this.aero.Touchpad.GetEnabledAsync();
+				this.WifiEnabled = await this.Aero.GetWifiEnabledAsync();
+				this.TouchpadEnabled = await this.Aero.Touchpad.GetEnabledAsync();
 			}
 			finally
 			{
@@ -731,7 +736,7 @@ namespace AeroCtl.UI
 
 		public async ValueTask<bool> ResetKeyboard()
 		{
-			await this.aero.Keyboard.Rgb.ResetAsync();
+			await this.Aero.Keyboard.Rgb.ResetAsync();
 			return true;
 		}
 

@@ -24,7 +24,7 @@ namespace AeroCtl.UI
 				return hWnd;
 
 			// The OSD window doesn't exist when it was never used or explorer.exe isn't running,
-			// so we emulate mute/unmute keypress here to force it to show up. It'll be overridden by
+			// so we emulate mute/unmute keypress here to force it to show up. The OSD be overridden by
 			// whatever event follows so it should only be visible for 1 frame or so.
 
 			INPUT[] inputs = new INPUT[2];

@@ -1,4 +1,13 @@
-﻿using System.Windows;
+﻿using System;
+using System.Diagnostics;
+using System.IO;
+using System.Reflection;
+using System.Threading;
+using System.Threading.Tasks;
+using System.Windows;
+using System.Windows.Forms;
+using Microsoft.Win32;
+using Application = System.Windows.Application;
 
 namespace AeroCtl.UI
 {
@@ -7,6 +16,223 @@ namespace AeroCtl.UI
 	/// </summary>
 	public partial class App : Application
 	{
-		
+		private const int notificationTimeout = 3000;
+
+		private readonly string title;
+		private readonly CancellationTokenSource cancellationTokenSource;
+		private TaskFactory taskFactory;
+		private NotifyIcon trayIcon;
+		private Aero aero;
+		private AeroController controller;
+		private Task updateTask;
+
+		private readonly object windowLock;
+		private MainWindow window;
+
+		public App()
+		{
+			this.title = typeof(App).Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? typeof(App).Assembly.GetName().Name;
+			this.cancellationTokenSource = new CancellationTokenSource();
+			this.windowLock = new object();
+		}
+
+		private async Task handleFnKey(FnKeyEventArgs e)
+		{
+			switch(e.Key)
+			{
+				case FnKey.IncreaseBrightness:
+					this.aero.Display.Brightness = Math.Min(100, this.aero.Display.Brightness + 10);
+					await WindowsOsd.ShowBrightnessAsync();
+					break;
+
+				case FnKey.DecreaseBrightness:
+					this.aero.Display.Brightness = Math.Max(0, this.aero.Display.Brightness - 10);
+					await WindowsOsd.ShowBrightnessAsync();
+					break;
+
+				case FnKey.ToggleFan:
+					FanProfile fanProfile = this.controller.FanProfileAlt;
+					this.controller.FanProfileAlt = this.controller.FanProfile;
+					this.controller.FanProfile = fanProfile;
+				
+					this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Fan profile switched to \"{fanProfile}\".", ToolTipIcon.Info);
+					break;
+
+				case FnKey.ToggleWifi:
+					bool? currentState = await this.aero.GetWifiEnabledAsync();
+					if (currentState == null)
+					{
+						this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, "Could not determine Wi-Fi state.", ToolTipIcon.Warning);
+					}
+					else
+					{
+						bool newState = !currentState.Value;
+						await this.aero.SetWifiEnabledAsync(newState);
+						this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Wi-Fi {(newState ? "enabled" : "disabled")}.", ToolTipIcon.Info);
+					}
+
+					break;
+
+				case FnKey.ToggleScreen:
+					await this.aero.Display.ToggleScreenAsync();
+					break;
+
+				case FnKey.ToggleTouchpad:
+					bool touchPad = !await this.aero.Touchpad.GetEnabledAsync();
+					await this.aero.Touchpad.SetEnabledAsync(touchPad);
+
+					this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Touchpad {(touchPad ? "enabled" : "disabled")}.", ToolTipIcon.Info);
+					break;
+			}
+		}
+
+
+		protected override void OnStartup(StartupEventArgs e)
+		{
+			base.OnStartup(e);
+
+			// Create task scheduler bound to WPF main thread.
+			TaskScheduler taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
+			this.taskFactory = new TaskFactory(taskScheduler);
+			
+			// Create aero and controller.
+			this.aero = new Aero();
+			this.controller = new AeroController(this.aero);
+			this.controller.Load();
+
+			// Create background update task.
+			this.updateTask = this.updateLoop(this.cancellationTokenSource.Token);
+
+			// Create tray icon.
+			this.trayIcon = new NotifyIcon
+			{
+				Icon = UI.Properties.Resources.Main,
+				Text = this.title,
+				Visible = true,
+			};
+
+			this.trayIcon.DoubleClick += (s, e2) => { this.showWindow(); };
+			
+			// Handle Fn key events.
+			this.aero.Keyboard.FnKeyPressed += (s, e2) => { this.taskFactory.StartNew(() => this.handleFnKey(e2)); };
+
+			// To re-apply fan profile after wake up:
+			SystemEvents.SessionSwitch += this.onSessionSwitch;
+			SystemEvents.PowerModeChanged += this.onPowerModeChanged;
+			
+			if (!this.controller.StartMinimized || Debugger.IsAttached)
+			{
+				// Show window if 'start minimized' isn't active.
+				this.showWindow();
+			}
+		}
+
+		private void showWindow()
+		{
+			lock (this.windowLock)
+			{
+				if (this.window == null)
+				{
+					// Create window if it doesn't exist.
+					this.window = new MainWindow(this.controller);
+
+					// Register close handler to set window back to null.
+					this.window.Closed += (s, e) =>
+					{
+						lock (this.windowLock)
+						{
+							this.window = null;
+						}
+					};
+				}
+
+				// Show window and restore if minimized.
+				this.window.Show();
+				this.window.WindowState = WindowState.Normal;
+			}
+		}
+
+		protected override async void OnExit(ExitEventArgs e)
+		{
+			base.OnExit(e);
+
+			// Cancel.
+			this.cancellationTokenSource.Cancel();
+
+			// Wait for aero update task to stop.
+			try
+			{
+				await this.updateTask;
+			}
+			catch (OperationCanceledException)
+			{
+
+			}
+			finally
+			{
+				this.window?.Close();
+
+				// Remove tray icon.
+				this.trayIcon.Dispose();
+
+				// Reset fan profile to normal so the laptop doesn't melt.
+				if (this.controller.FanProfile == FanProfile.Software)
+				{
+					await this.controller.Aero.Fans.SetNormalAsync();
+				}
+
+				// Unregister events (probably not necessary but whatever).
+				SystemEvents.SessionSwitch -= this.onSessionSwitch;
+				SystemEvents.PowerModeChanged -= this.onPowerModeChanged;
+
+				// Close controller.
+				await this.controller.DisposeAsync();
+
+				// Close aero.
+				this.aero.Dispose();
+			}
+		}
+
+		private async Task updateLoop(CancellationToken token)
+		{
+			bool first = true;
+
+			await Task.Yield();
+			try
+			{
+				for (;;)
+				{
+					// Only update when necessary.
+					if (first || this.controller.FanProfileInvalid || 
+					    (this.window != null && this.window.WindowState != WindowState.Minimized))
+					{
+						await this.controller.UpdateAsync(first);
+						first = false;
+					}
+
+					await Task.Delay(750, token);
+				}
+			}
+			finally
+			{
+				this.Shutdown();
+			}
+		}
+
+		private void onSessionSwitch(object sender, SessionSwitchEventArgs e)
+		{
+			// Re-apply fan profile after someone logs in or out (when the laptop comes 
+			// back from sleep) because it will default to 'Normal' otherwise.
+			if (e.Reason == SessionSwitchReason.SessionUnlock || 
+			    e.Reason == SessionSwitchReason.SessionLock)
+				this.controller.FanProfileInvalid = true;
+		}
+
+		private void onPowerModeChanged(object sender, PowerModeChangedEventArgs e)
+		{
+			// Re-apply fan-profile after hibernation resume.
+			if (e.Mode == PowerModes.Resume)
+				this.controller.FanProfileInvalid = true;
+		}
 	}
 }
