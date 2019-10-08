@@ -242,24 +242,6 @@ namespace AeroCtl.UI
 
 		#endregion
 
-		#region TouchpadEnabled
-
-		private bool touchpadEnabled;
-		public bool TouchpadEnabled
-		{
-			get => this.touchpadEnabled;
-			set
-			{
-				this.touchpadEnabled = value;
-				this.OnPropertyChanged();
-
-				if (!this.updating.Value)
-					this.updates.Enqueue(() => this.Aero.Touchpad.SetEnabledAsync(value).AsTask());
-			}
-		}
-
-		#endregion
-
 		#region BluetoothEnabled
 
 		private bool bluetoothEnabled;
@@ -707,7 +689,6 @@ namespace AeroCtl.UI
 				
 				this.WifiEnabled = await this.Aero.GetWifiEnabledAsync();
 				this.BluetoothEnabled = await this.Aero.Bluetooth.GetEnabledAsync();
-				this.TouchpadEnabled = await this.Aero.Touchpad.GetEnabledAsync();
 			}
 			finally
 			{

@@ -47,13 +47,6 @@ namespace AeroCtl
 			return new ValueTask<bool>(state);
 		}
 
-		public ValueTask SetEnabledAsync(bool enabled)
-		{
-			// WMI method has no actual effect. Handled natively since Windows 8.1 from Ctrl+Win+F24 keystroke.
-			// Registry.CurrentUser.SetValue("Enabled", enabled ? 1 : 0, RegistryValueKind.DWord);
-			return default;
-		}
-
 		public void Dispose()
 		{
 			this.keyWatcher.Stop();
