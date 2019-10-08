@@ -254,7 +254,7 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => this.Aero.Touchpad.SetEnabledAsync(value));
+					this.updates.Enqueue(() => this.Aero.Touchpad.SetEnabledAsync(value).AsTask());
 			}
 		}
 
@@ -709,6 +709,7 @@ namespace AeroCtl.UI
 				this.BatteryCharge = await this.Aero.Battery.GetRemainingChargeAsync();
 				
 				this.WifiEnabled = await this.Aero.GetWifiEnabledAsync();
+				this.BluetoothEnabled = await this.Aero.Bluetooth.GetEnabledAsync();
 				this.TouchpadEnabled = await this.Aero.Touchpad.GetEnabledAsync();
 			}
 			finally

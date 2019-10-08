@@ -122,7 +122,7 @@ namespace AeroCtl
 		/// <summary>
 		/// Gets the touchpad controller.
 		/// </summary>
-		public TouchpadController Touchpad => this.touchpad ?? (this.touchpad = new TouchpadController(this.Wmi));
+		public TouchpadController Touchpad => this.touchpad ?? (this.touchpad = new TouchpadController());
 
 		/// <summary>
 		/// Gets the Bluetooth controller.
@@ -178,6 +178,7 @@ namespace AeroCtl
 		{
 			this.Wmi?.Dispose();
 			this.Keyboard?.Dispose();
+			this.Touchpad?.Dispose();
 		}
 
 		#endregion

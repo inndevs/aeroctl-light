@@ -128,8 +128,8 @@ namespace AeroCtl.UI
 
 				ellipse.SetBinding(Canvas.LeftProperty, $"Points[{i}].EllipseX");
 				ellipse.SetBinding(Canvas.TopProperty, $"Points[{i}].EllipseY");
-				ellipse.SetBinding(Ellipse.WidthProperty, $"Points[{i}].EllipseW");
-				ellipse.SetBinding(Ellipse.HeightProperty, $"Points[{i}].EllipseH");
+				ellipse.SetBinding(WidthProperty, $"Points[{i}].EllipseW");
+				ellipse.SetBinding(HeightProperty, $"Points[{i}].EllipseH");
 
 				if (i < this.Points.Length - 1)
 				{
@@ -177,15 +177,22 @@ namespace AeroCtl.UI
 
 				this.graphElements.Add(ellipse);
 
+				void updateLabel()
+				{
+					this.infoLabel.Text = $"Point {j}: {this.Points[j].Point.FanSpeed * 100.0:F1}% at {this.Points[j].Point.Temperature:F1}°C";
+				}
+
 				ellipse.MouseDown += (s, e) =>
 				{
 					ellipse.Focus();
 					ellipse.CaptureMouse();
+					updateLabel();
 				};
 
 				ellipse.MouseUp += (s, e) =>
 				{
 					ellipse.ReleaseMouseCapture();
+					this.infoLabel.Text = "";
 				};
 
 				ellipse.MouseMove += (s, e) =>
@@ -220,15 +227,21 @@ namespace AeroCtl.UI
 						//	p.Y = p2.Y;
 					}
 
+					if ((Keyboard.Modifiers & ModifierKeys.Shift) != 0)
+					{
+						p.FanSpeed = Math.Round(p.FanSpeed, 2);
+						p.Temperature = Math.Round(p.Temperature);
+					}
+
 					this.Points[j].Point = p;
+					updateLabel();
 				};
 			}
 
 			foreach (UIElement el in this.graphElements)
 				this.canvas.Children.Add(el);
 
-			if (focusedEllipse != null)
-				focusedEllipse.Focus();
+			focusedEllipse?.Focus();
 		}
 
 		protected override void OnRenderSizeChanged(SizeChangedInfo sizeInfo)
@@ -354,10 +367,10 @@ namespace AeroCtl.UI
 				{
 					this.set(value);
 					this.OnPropertyChanged();
-					this.OnPropertyChanged(nameof(X));
-					this.OnPropertyChanged(nameof(EllipseX));
-					this.OnPropertyChanged(nameof(Y));
-					this.OnPropertyChanged(nameof(EllipseY));
+					this.OnPropertyChanged(nameof(this.X));
+					this.OnPropertyChanged(nameof(this.EllipseX));
+					this.OnPropertyChanged(nameof(this.Y));
+					this.OnPropertyChanged(nameof(this.EllipseY));
 				}
 			}
 
@@ -395,16 +408,16 @@ namespace AeroCtl.UI
 
 			public void Invalidate()
 			{
-				this.OnPropertyChanged(nameof(X));
-				this.OnPropertyChanged(nameof(Y));
-				this.OnPropertyChanged(nameof(EllipseX));
-				this.OnPropertyChanged(nameof(EllipseY));
+				this.OnPropertyChanged(nameof(this.X));
+				this.OnPropertyChanged(nameof(this.Y));
+				this.OnPropertyChanged(nameof(this.EllipseX));
+				this.OnPropertyChanged(nameof(this.EllipseY));
 			}
 
 			public event PropertyChangedEventHandler PropertyChanged;
 			protected virtual void OnPropertyChanged(string propertyName = null)
 			{
-				PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+				this.PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
 			}
 		}
 

@@ -185,7 +185,7 @@ namespace AeroCtl
 						return;
 				}
 			}
-			Debug.WriteLine($"Unhandled raw input: dwType={e.header.dwType} MakeCode={e.data.keyboard.MakeCode} Flags={e.data.keyboard.Flags} VKey={e.data.keyboard.VKey} Message={e.data.keyboard.Message:X8} Extra={e.data.keyboard.ExtraInformation}");
+			Debug.WriteLine($"Unhandled raw input: dwType={e.header.dwType} MakeCode={e.data.keyboard.MakeCode} Flags={e.data.keyboard.Flags:X4} VKey={e.data.keyboard.VKey:X2} Message={e.data.keyboard.Message:X8} Extra={e.data.keyboard.ExtraInformation}");
 		}
 
 		#endregion
@@ -239,6 +239,7 @@ namespace AeroCtl
 
 				List<RAWINPUTDEVICE> pRawInputDevice = new List<RAWINPUTDEVICE>();
 
+				// Keyboard
 				//pRawInputDevice.Add(new RAWINPUTDEVICE
 				//{
 				//	usUsagePage = 1,
@@ -247,6 +248,7 @@ namespace AeroCtl
 				//	hwndTarget = this.Handle
 				//});
 
+				// Mouse
 				//pRawInputDevice.Add(new RAWINPUTDEVICE
 				//{
 				//	usUsagePage = 1,
@@ -270,6 +272,7 @@ namespace AeroCtl
 					dwFlags = RAWINPUTDEVICE.RIDEV_INPUTSINK | RAWINPUTDEVICE.RIDEV_DEVNOTIFY,
 					hwndTarget = this.Handle
 				});
+
 				pRawInputDevice.Add(new RAWINPUTDEVICE
 				{
 					usUsagePage = 0xFF02,

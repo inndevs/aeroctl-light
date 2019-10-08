@@ -6,6 +6,7 @@ using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
 using System.Windows.Forms;
+using System.Windows.Threading;
 using Microsoft.Win32;
 using Application = System.Windows.Application;
 
@@ -20,7 +21,6 @@ namespace AeroCtl.UI
 
 		private readonly string title;
 		private readonly CancellationTokenSource cancellationTokenSource;
-		private TaskFactory taskFactory;
 		private NotifyIcon trayIcon;
 		private Aero aero;
 		private AeroController controller;
@@ -34,6 +34,43 @@ namespace AeroCtl.UI
 			this.title = typeof(App).Assembly.GetCustomAttribute<AssemblyTitleAttribute>()?.Title ?? typeof(App).Assembly.GetName().Name;
 			this.cancellationTokenSource = new CancellationTokenSource();
 			this.windowLock = new object();
+		}
+
+		protected override void OnStartup(StartupEventArgs e)
+		{
+			base.OnStartup(e);
+
+			// Create aero and controller.
+			this.aero = new Aero();
+			this.controller = new AeroController(this.aero);
+			this.controller.Load();
+
+			// Create background update task.
+			this.updateTask = this.Dispatcher.InvokeAsync(() => this.updateLoop(this.cancellationTokenSource.Token), DispatcherPriority.Background).Task;
+			
+			// Create tray icon.
+			this.trayIcon = new NotifyIcon
+			{
+				Icon = UI.Properties.Resources.Main,
+				Text = this.title,
+				Visible = true,
+			};
+
+			this.trayIcon.DoubleClick += (s, e2) => { this.showWindow(); };
+			
+			// Handle Fn key events.
+			this.aero.Keyboard.FnKeyPressed += (s, e2) => { this.Dispatcher.InvokeAsync(() => this.handleFnKey(e2)); };
+			this.aero.Touchpad.EnabledChanged += (s, e2) => { this.Dispatcher.InvokeAsync(() => this.onTouchpadEnabledChanged().AsTask()); };
+
+			// To re-apply fan profile after wake up:
+			SystemEvents.SessionSwitch += this.onSessionSwitch;
+			SystemEvents.PowerModeChanged += this.onPowerModeChanged;
+			
+			if (!this.controller.StartMinimized || Debugger.IsAttached)
+			{
+				// Show window if 'start minimized' isn't active.
+				this.showWindow();
+			}
 		}
 
 		private async Task handleFnKey(FnKeyEventArgs e)
@@ -77,54 +114,18 @@ namespace AeroCtl.UI
 					await this.aero.Display.ToggleScreenAsync();
 					break;
 
-				case FnKey.ToggleTouchpad:
-					bool touchPad = !await this.aero.Touchpad.GetEnabledAsync();
-					await this.aero.Touchpad.SetEnabledAsync(touchPad);
-
-					this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Touchpad {(touchPad ? "enabled" : "disabled")}.", ToolTipIcon.Info);
-					break;
+				//case FnKey.ToggleTouchpad:
+				//	bool touchPad = !await this.aero.Touchpad.GetEnabledAsync();
+				//	await this.aero.Touchpad.SetEnabledAsync(touchPad);
+				//	this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Touchpad {(touchPad ? "enabled" : "disabled")}.", ToolTipIcon.Info);
+				//	break;
 			}
 		}
 
-
-		protected override void OnStartup(StartupEventArgs e)
-		{
-			base.OnStartup(e);
-
-			// Create task scheduler bound to WPF main thread.
-			TaskScheduler taskScheduler = TaskScheduler.FromCurrentSynchronizationContext();
-			this.taskFactory = new TaskFactory(taskScheduler);
-			
-			// Create aero and controller.
-			this.aero = new Aero();
-			this.controller = new AeroController(this.aero);
-			this.controller.Load();
-
-			// Create background update task.
-			this.updateTask = this.updateLoop(this.cancellationTokenSource.Token);
-
-			// Create tray icon.
-			this.trayIcon = new NotifyIcon
-			{
-				Icon = UI.Properties.Resources.Main,
-				Text = this.title,
-				Visible = true,
-			};
-
-			this.trayIcon.DoubleClick += (s, e2) => { this.showWindow(); };
-			
-			// Handle Fn key events.
-			this.aero.Keyboard.FnKeyPressed += (s, e2) => { this.taskFactory.StartNew(() => this.handleFnKey(e2)); };
-
-			// To re-apply fan profile after wake up:
-			SystemEvents.SessionSwitch += this.onSessionSwitch;
-			SystemEvents.PowerModeChanged += this.onPowerModeChanged;
-			
-			if (!this.controller.StartMinimized || Debugger.IsAttached)
-			{
-				// Show window if 'start minimized' isn't active.
-				this.showWindow();
-			}
+		private async ValueTask onTouchpadEnabledChanged()
+		{ 
+			bool touchPad = await this.aero.Touchpad.GetEnabledAsync();
+			this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Touchpad {(touchPad ? "enabled" : "disabled")}.", ToolTipIcon.Info);
 		}
 
 		private void showWindow()
@@ -149,13 +150,12 @@ namespace AeroCtl.UI
 				// Show window and restore if minimized.
 				this.window.Show();
 				this.window.WindowState = WindowState.Normal;
+				this.window.Focus();
 			}
 		}
 
 		protected override async void OnExit(ExitEventArgs e)
 		{
-			base.OnExit(e);
-
 			// Cancel.
 			this.cancellationTokenSource.Cancel();
 
@@ -170,7 +170,10 @@ namespace AeroCtl.UI
 			}
 			finally
 			{
-				this.window?.Close();
+				lock (this.windowLock)
+				{
+					this.window?.Close();
+				}
 
 				// Remove tray icon.
 				this.trayIcon.Dispose();
@@ -190,6 +193,8 @@ namespace AeroCtl.UI
 
 				// Close aero.
 				this.aero.Dispose();
+
+				base.OnExit(e);
 			}
 		}
 

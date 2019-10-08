@@ -1,25 +1,64 @@
 ﻿using System;
+using System.Management;
+using System.Security.Principal;
 using System.Threading.Tasks;
+using Microsoft.Win32;
 
 namespace AeroCtl
 {
-	public class TouchpadController
+	public class TouchpadController : IDisposable
 	{
-		private readonly AeroWmi wmi;
+		private readonly RegistryKey key;
+		private readonly ManagementEventWatcher keyWatcher;
 
-		public TouchpadController(AeroWmi wmi)
+		private static string escape(string str)
 		{
-			this.wmi = wmi;
+			str = str.Replace("'", "\\'");
+			str = str.Replace("\"", "\\\"");
+			str = str.Replace("\\", "\\\\");
+			return str;
 		}
 
-		public async Task<bool> GetEnabledAsync()
+		public TouchpadController()
 		{
-			return await this.wmi.InvokeGetAsync<byte>("GetTouchPad") == 0;
+			const string path = @"Software\Microsoft\Windows\CurrentVersion\PrecisionTouchPad\Status";
+			this.key = Registry.CurrentUser.OpenSubKey(path);
+
+			WindowsIdentity currentUser = WindowsIdentity.GetCurrent();
+			WqlEventQuery query = new WqlEventQuery($"SELECT * FROM RegistryValueChangeEvent WHERE Hive='HKEY_USERS' AND KeyPath='{escape(currentUser.User.Value)}\\\\{escape(path)}' AND ValueName='Enabled'");
+			this.keyWatcher = new ManagementEventWatcher(query);
+			this.keyWatcher.EventArrived += (s, e) => { this.onEnabledChanged(); };
+			this.keyWatcher.Start();
 		}
 
-		public async Task SetEnabledAsync(bool enabled)
+		public event EventHandler EnabledChanged;
+
+		private void onEnabledChanged()
 		{
-			await this.wmi.InvokeSetAsync("SetTouchPad", enabled ? (byte)0 : (byte)1);
+			this.EnabledChanged?.Invoke(this, EventArgs.Empty);
+		}
+
+		public ValueTask<bool> GetEnabledAsync()
+		{
+			object value = this.key.GetValue("Enabled", 0);
+			bool state = false;
+			if (value is int i)
+				state = i != 0;
+			return new ValueTask<bool>(state);
+		}
+
+		public ValueTask SetEnabledAsync(bool enabled)
+		{
+			// has no effect:
+			// Registry.CurrentUser.SetValue("Enabled", enabled ? 1 : 0, RegistryValueKind.DWord);
+			return default;
+		}
+
+		public void Dispose()
+		{
+			this.keyWatcher.Stop();
+			this.keyWatcher.Dispose();
+			this.key?.Dispose();
 		}
 	}
 }

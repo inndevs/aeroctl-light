@@ -86,7 +86,8 @@ namespace AeroCtl.UI
 
 		private async void onResetKeyboardClicked(object sender, RoutedEventArgs e)
 		{
-			await this.Controller.ResetKeyboard();
+			if (MessageBox.Show("This will reset all keyboard settings (e.g. RGB LED colors). Are you sure?", "Reset keyboard", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+				await this.Controller.ResetKeyboard();
 		}
 	}
 }

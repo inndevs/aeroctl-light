@@ -9,6 +9,9 @@
 		Title="AERO Controls" MinWidth="450" Width="400" SizeToContent="Height">
 	<Window.Resources>
 		<local:EnumBooleanConverter x:Key="EnumConv" />
+        <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="ToolTipService.ShowOnDisabled" Value="true"/>
+        </Style>
 	</Window.Resources>
 	<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
 		<StackPanel>
@@ -90,17 +93,17 @@
 						<Separator />
 						<StackPanel Orientation="Horizontal">
 							<StackPanel Margin="0 0 16 0">
-								<CheckBox IsChecked="{Binding Controller.WifiEnabled}">Wifi enabled</CheckBox>
-								<CheckBox IsChecked="{Binding Controller.BluetoothEnabled}">Bluetooth enabled</CheckBox>
-								<CheckBox IsChecked="{Binding Controller.TouchpadEnabled}">Touchpad enabled</CheckBox>
+								<CheckBox IsChecked="{Binding Controller.WifiEnabled}" ToolTip="Hardware rfkill.">Wifi enabled</CheckBox>
+								<CheckBox IsChecked="{Binding Controller.BluetoothEnabled}" ToolTip="Hardware rfkill.">Bluetooth enabled</CheckBox>
+								<CheckBox IsChecked="{Binding Controller.TouchpadEnabled}" IsEnabled="false" ToolTip="Can't be toggled programmatically as Windows doesn't expose an API. The Fn key works, though. Go to Windows Settings if you want to change it.">Touchpad enabled</CheckBox>
 							</StackPanel>
 							<StackPanel Margin="0 0 16 0" IsEnabled="{Binding Controller.GpuConfigAvailable}">
-								<CheckBox IsChecked="{Binding Controller.GpuBoost}">GPU boost / OC</CheckBox>
-								<CheckBox IsChecked="{Binding Controller.GpuThermalTarget}">GPU thermal target</CheckBox>
-								<CheckBox IsChecked="{Binding Controller.GpuPowerConfig}">GPU power config</CheckBox>
+								<CheckBox IsChecked="{Binding Controller.GpuBoost}" ToolTip="Seems to overclock the GPU a little.">GPU boost / OC</CheckBox>
+								<CheckBox IsChecked="{Binding Controller.GpuThermalTarget}" ToolTip="No idea what exactly this does. Turns the fans off for a second.">GPU thermal target</CheckBox>
+								<CheckBox IsChecked="{Binding Controller.GpuPowerConfig}" ToolTip="No idea what this does.">GPU power config</CheckBox>
 							</StackPanel>
 							<StackPanel>
-								<CheckBox IsChecked="{Binding Controller.StartMinimized}">Start minimized</CheckBox>
+								<CheckBox IsChecked="{Binding Controller.StartMinimized}" ToolTip="Whether the app will start minimized to tray.">Start minimized</CheckBox>
 							</StackPanel>
 						</StackPanel>
 					</StackPanel>
@@ -149,8 +152,8 @@
 					<Separator />
 
 					<StackPanel Orientation="Horizontal">
-						<CheckBox IsChecked="{Binding Path=Controller.SmartCharge}" Margin="0 0 16 0">"Smart Charge" enabled</CheckBox>
-						<CheckBox IsChecked="{Binding Path=Controller.ChargeStopEnabled}">Charge stop enabled</CheckBox>
+						<CheckBox IsChecked="{Binding Path=Controller.SmartCharge}" ToolTip="No idea what 'smart' means in this context or what difference this makes." Margin="0 0 16 0">"Smart Charge" enabled</CheckBox>
+						<CheckBox IsChecked="{Binding Path=Controller.ChargeStopEnabled}" ToolTip="Tells to battery controller to stop charging at a specific percentage.">Charge stop enabled</CheckBox>
 					</StackPanel>
 
 					<Label Target="{Binding ElementName=chargeStop}">
@@ -173,20 +176,20 @@
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 						
-						<StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center">
+						<StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" ToolTip="PWM percentage as reported by the hardware.">
 							<TextBlock Margin="0 0 5 0">PWM:</TextBlock>
 							<TextBlock Text="{Binding Path=Controller.FanPwm, Mode=OneWay, StringFormat=F1}" />
 							<TextBlock Margin="2 0 0 0">%</TextBlock>
 						</StackPanel>
 
-						<StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center">
+						<StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center" ToolTip="RPM as reported by the hardware.">
 							<TextBlock Margin="0 0 5 0">RPM:</TextBlock>
 							<TextBlock Text="{Binding Path=Controller.FanRpm1, Mode=OneWay}" />
 							<TextBlock Margin="5 0 5 0">/</TextBlock>
 							<TextBlock Text="{Binding Path=Controller.FanRpm2, Mode=OneWay}" />
 						</StackPanel>
 
-						<StackPanel Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Center">
+						<StackPanel Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Center" ToolTip="Alternate profile that is activated when you press the fan Fn key.">
 							<TextBlock Margin="0 0 5 0" VerticalAlignment="Center">Alt. profile</TextBlock>
 							<ComboBox ItemsSource="{Binding Source={local:Enumeration {x:Type local:FanProfile}}}" DisplayMemberPath="Description" SelectedValue="{Binding Controller.FanProfileAlt}" SelectedValuePath="Value" />
 						</StackPanel>

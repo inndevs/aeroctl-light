@@ -21,6 +21,7 @@
             <Button Name="applyButton" Width="100" Click="applyButton_OnClick" Margin="5">Apply</Button>
             <Button Name="addButton" Width="100" Click="addButton_OnClick" Margin="5" IsEnabled="{Binding IsCurveEditable}" Focusable="false">Add Point</Button>
             <Button Name="deleteButton" Width="100" Click="deleteButton_OnClick" Margin="5" IsEnabled="{Binding IsCurveEditable}" Focusable="false">Delete Point</Button>
+            <TextBlock Name="infoLabel" VerticalAlignment="Center" />
         </StackPanel>
         <DockPanel Margin="0 25 25 0">
             <TextBlock DockPanel.Dock="Bottom" Height="25" TextAlignment="Center">Temperature in °C</TextBlock>
