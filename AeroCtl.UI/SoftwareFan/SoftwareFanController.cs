@@ -25,7 +25,7 @@ namespace AeroCtl.UI.SoftwareFan
 				throw new ArgumentNullException(nameof(config));
 
 			if (!config.IsValid)
-				throw new ArgumentException("Invalid fan config.", nameof(config));
+				throw new ArgumentException(@"Invalid fan config.", nameof(config));
 
 			this.config = new FanConfig(config);
 			this.curve = config.Curve;
@@ -101,9 +101,7 @@ namespace AeroCtl.UI.SoftwareFan
 			for (int i = 0; i < this.curve.Length; ++i)
 			{
 				if (this.curve[i].Temperature < temperature)
-				{
 					index = i;
-				}
 			}
 
 			if (index < this.curve.Length - 1)
@@ -125,18 +123,11 @@ namespace AeroCtl.UI.SoftwareFan
 				double diff = newTarget - this.currentSpeed;
 
 				if (diff > epsilon)
-				{
 					diff = Math.Min(diff, this.config.RampUpSpeed * secondsPassed);
-				}
 				else if (diff < -epsilon)
-				{
 					diff = -Math.Min(-diff, this.config.RampDownSpeed * secondsPassed);
-				}
 				else
-				{
-					// Change too small, don't bother updating the fan.
-					return;
-				}
+					return; // Change too small, don't bother updating the fan.
 
 				this.currentSpeed += diff;
 			}

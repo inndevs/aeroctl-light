@@ -164,13 +164,9 @@ namespace AeroCtl
 					continue;
 
 				if (enabled)
-				{
 					await Task.Run(() => NativeWifi.TurnOnInterfaceRadio(iface.Id));
-				}
 				else
-				{
 					await Task.Run(() => NativeWifi.TurnOffInterfaceRadio(iface.Id));
-				}
 			}
 		}
 

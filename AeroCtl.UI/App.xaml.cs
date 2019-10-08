@@ -165,15 +165,11 @@ namespace AeroCtl.UI
 				await this.updateTask;
 			}
 			catch (OperationCanceledException)
-			{
-
-			}
+			{ }
 			finally
 			{
 				lock (this.windowLock)
-				{
 					this.window?.Close();
-				}
 
 				// Remove tray icon.
 				this.trayIcon.Dispose();

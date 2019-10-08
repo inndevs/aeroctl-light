@@ -49,7 +49,7 @@ namespace AeroCtl
 
 		public ValueTask SetEnabledAsync(bool enabled)
 		{
-			// has no effect:
+			// WMI method has no actual effect. Handled natively since Windows 8.1 from Ctrl+Win+F24 keystroke.
 			// Registry.CurrentUser.SetValue("Enabled", enabled ? 1 : 0, RegistryValueKind.DWord);
 			return default;
 		}
