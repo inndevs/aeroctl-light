@@ -47,13 +47,6 @@ namespace AeroCtl
 			return new ValueTask<bool>(state);
 		}
 
-		public ValueTask SetEnabledAsync(bool enabled)
-		{
-			// has no effect:
-			// Registry.CurrentUser.SetValue("Enabled", enabled ? 1 : 0, RegistryValueKind.DWord);
-			return default;
-		}
-
 		public void Dispose()
 		{
 			this.keyWatcher.Stop();

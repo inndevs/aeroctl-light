@@ -9,9 +9,9 @@
 		Title="AERO Controls" MinWidth="450" Width="400" SizeToContent="Height">
 	<Window.Resources>
 		<local:EnumBooleanConverter x:Key="EnumConv" />
-        <Style TargetType="{x:Type CheckBox}">
-            <Setter Property="ToolTipService.ShowOnDisabled" Value="true"/>
-        </Style>
+		<Style TargetType="{x:Type CheckBox}">
+			<Setter Property="ToolTipService.ShowOnDisabled" Value="true"/>
+		</Style>
 	</Window.Resources>
 	<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
 		<StackPanel>
@@ -95,15 +95,12 @@
 							<StackPanel Margin="0 0 16 0">
 								<CheckBox IsChecked="{Binding Controller.WifiEnabled}" ToolTip="Hardware rfkill.">Wifi enabled</CheckBox>
 								<CheckBox IsChecked="{Binding Controller.BluetoothEnabled}" ToolTip="Hardware rfkill.">Bluetooth enabled</CheckBox>
-								<CheckBox IsChecked="{Binding Controller.TouchpadEnabled}" IsEnabled="false" ToolTip="Can't be toggled programmatically as Windows doesn't expose an API. The Fn key works, though. Go to Windows Settings if you want to change it.">Touchpad enabled</CheckBox>
+								<CheckBox IsChecked="{Binding Controller.StartMinimized}" ToolTip="Whether the app will start minimized to tray.">Start minimized</CheckBox>
 							</StackPanel>
 							<StackPanel Margin="0 0 16 0" IsEnabled="{Binding Controller.GpuConfigAvailable}">
 								<CheckBox IsChecked="{Binding Controller.GpuBoost}" ToolTip="Seems to overclock the GPU a little.">GPU boost / OC</CheckBox>
 								<CheckBox IsChecked="{Binding Controller.GpuThermalTarget}" ToolTip="No idea what exactly this does. Turns the fans off for a second.">GPU thermal target</CheckBox>
 								<CheckBox IsChecked="{Binding Controller.GpuPowerConfig}" ToolTip="No idea what this does.">GPU power config</CheckBox>
-							</StackPanel>
-							<StackPanel>
-								<CheckBox IsChecked="{Binding Controller.StartMinimized}" ToolTip="Whether the app will start minimized to tray.">Start minimized</CheckBox>
 							</StackPanel>
 						</StackPanel>
 					</StackPanel>
