@@ -154,7 +154,7 @@ namespace AeroCtl.UI
 			}
 		}
 
-		protected override async void OnExit(ExitEventArgs e)
+		private async Task shutdownAsync()
 		{
 			// Cancel.
 			this.cancellationTokenSource.Cancel();
@@ -178,11 +178,7 @@ namespace AeroCtl.UI
 				// Remove tray icon.
 				this.trayIcon.Dispose();
 
-				// Reset fan profile to normal so the laptop doesn't melt.
-				if (this.controller.FanProfile == FanProfile.Software)
-				{
-					await this.controller.Aero.Fans.SetNormalAsync();
-				}
+				bool resetFans = this.controller.FanProfile == FanProfile.Software;
 
 				// Unregister events (probably not necessary but whatever).
 				SystemEvents.SessionSwitch -= this.onSessionSwitch;
@@ -191,11 +187,21 @@ namespace AeroCtl.UI
 				// Close controller.
 				await this.controller.DisposeAsync();
 
+				// Reset fan profile to normal so the laptop doesn't melt.
+				if (resetFans)
+					await this.aero.Fans.SetNormalAsync();
+
 				// Close aero.
 				this.aero.Dispose();
 
-				base.OnExit(e);
 			}
+		}
+
+		protected override void OnExit(ExitEventArgs e)
+		{
+			SynchronizationContext.SetSynchronizationContext(null);
+			this.shutdownAsync().Wait();
+			base.OnExit(e);
 		}
 
 		private async Task updateLoop(CancellationToken token)
