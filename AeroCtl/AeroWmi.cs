@@ -209,9 +209,7 @@ namespace AeroCtl
 
 			T res = default;
 			if (outParams != null)
-			{
 				res = (T)outParams["DataOut"];
-			}
 
 			Debug.WriteLine($"{methodName}({value}) = {res}");
 			return res;

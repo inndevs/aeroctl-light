@@ -603,7 +603,6 @@ namespace AeroCtl.UI
 				this.SoftwareFanConfig = new FanConfig();
 				if (s.SoftwareFanConfig != null && s.SoftwareFanConfig.Count > 0)
 					this.SoftwareFanConfig = FanConfig.FromJson((JsonObject)JsonValue.Parse(s.SoftwareFanConfig[0]));
-
 			}
 			finally
 			{
@@ -655,8 +654,8 @@ namespace AeroCtl.UI
 
 		public async Task UpdateAsync(bool full = false)
 		{
-			while (this.updates.TryDequeue(out var f))
-				await f();
+			while (this.updates.TryDequeue(out var updateFunc))
+				await updateFunc();
 
 			Debug.Assert(!this.updating.Value);
 
@@ -671,9 +670,7 @@ namespace AeroCtl.UI
 					this.BiosVersion = string.Join("; ", this.Aero.BiosVersions);
 
 					if (this.Aero.Keyboard.Rgb != null)
-					{
 						this.KeyboardFWVersion = await this.Aero.Keyboard.Rgb.GetFirmwareVersionAsync();
-					}
 				}
 
 				if (this.FanProfileInvalid)
@@ -699,7 +696,7 @@ namespace AeroCtl.UI
 
 				(this.FanRpm1, this.FanRpm2) = await this.Aero.Fans.GetRpmAsync();
 				this.FanPwm = await this.Aero.Fans.GetPwmAsync() * 100;
-				this.DisplayBrightness = (int)this.Aero.Display.Brightness;
+				this.DisplayBrightness = this.Aero.Display.Brightness;
 
 				this.SmartCharge = await this.Aero.Battery.GetSmartChargeAsync();
 				this.ChargeStopEnabled = await this.Aero.Battery.GetChargePolicyAsync() == ChargePolicy.CustomStop;

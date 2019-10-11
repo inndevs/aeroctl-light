@@ -50,8 +50,11 @@ namespace AeroCtl
 
 		private static int relToAbs(double fanSpeed)
 		{
-			if (fanSpeed <= 0.0) return minFanSpeed;
-			if (fanSpeed >= 1.0) return maxFanSpeed;
+			if (fanSpeed <= 0.0)
+				return minFanSpeed;
+			if (fanSpeed >= 1.0)
+				return maxFanSpeed;
+
 			return (int) (minFanSpeed + fanSpeed * (maxFanSpeed - minFanSpeed));
 		}
 

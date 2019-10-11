@@ -79,14 +79,17 @@ namespace AeroCtl.UI
 			FanConfigEditor editor = new FanConfigEditor(cfg);
 
 			if (editor.ShowDialog() == true)
-			{
 				this.Controller.SoftwareFanConfig = cfg;
-			}
 		}
 
 		private async void onResetKeyboardClicked(object sender, RoutedEventArgs e)
 		{
-			if (MessageBox.Show("This will reset all keyboard settings (e.g. RGB LED colors). Are you sure?", "Reset keyboard", MessageBoxButton.YesNo, MessageBoxImage.Question) == MessageBoxResult.Yes)
+			var messageBoxResult = MessageBox.Show(
+				"This will reset all keyboard settings (e.g. RGB LED colors). Are you sure?",
+				"Reset keyboard",
+				MessageBoxButton.YesNo,
+				MessageBoxImage.Question);
+			if (messageBoxResult == MessageBoxResult.Yes)
 				await this.Controller.ResetKeyboard();
 		}
 	}

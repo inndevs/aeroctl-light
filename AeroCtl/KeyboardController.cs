@@ -205,13 +205,9 @@ namespace AeroCtl
 		public void Dispose()
 		{
 			if (this.form.InvokeRequired)
-			{
 				this.form.BeginInvoke(new Action(() => { this.form?.Dispose(); }));
-			}
 			else
-			{
 				this.form?.Dispose();
-			}
 
 			if (this.usbDevs != null)
 			{
