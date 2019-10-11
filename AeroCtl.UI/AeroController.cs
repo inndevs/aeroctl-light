@@ -242,6 +242,24 @@ namespace AeroCtl.UI
 
 		#endregion
 
+		#region CameraEnabled
+
+		private bool? cameraEnabled;
+		public bool? CameraEnabled
+		{
+			get => this.cameraEnabled;
+			set
+			{
+				this.cameraEnabled = value;
+				this.OnPropertyChanged();
+
+				if (!this.updating.Value && value.HasValue)
+					this.updates.Enqueue(async () => await this.Aero.SetCameraEnabledAsync(value.Value));
+			}
+		}
+
+		#endregion
+
 		#region BluetoothEnabled
 
 		private bool bluetoothEnabled;
@@ -692,6 +710,7 @@ namespace AeroCtl.UI
 				
 				this.WifiEnabled = await this.Aero.GetWifiEnabledAsync();
 				this.BluetoothEnabled = await this.Aero.Bluetooth.GetEnabledAsync();
+				this.CameraEnabled = await this.Aero.GetCameraEnabledAsync();
 			}
 			finally
 			{

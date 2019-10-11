@@ -174,6 +174,16 @@ namespace AeroCtl
 			}
 		}
 
+		public async ValueTask<bool> GetCameraEnabledAsync()
+		{
+			return await this.wmi.InvokeGetAsync<byte>("GetCamera") != 0;
+		}
+
+		public async ValueTask SetCameraEnabledAsync(bool enabled)
+		{
+			await this.wmi.InvokeSetAsync("SetCamera", enabled ? (byte)1 : (byte)0);
+		}
+
 		public void Dispose()
 		{
 			this.Wmi?.Dispose();
