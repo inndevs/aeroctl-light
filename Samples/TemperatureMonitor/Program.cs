@@ -3,7 +3,7 @@ using System.Linq;
 using System.Threading.Tasks;
 using AeroCtl;
 using AeroCtl.UI;
-using OpenHardwareMonitor.Hardware;
+using LibreHardwareMonitor.Hardware;
 
 namespace TemperatureMonitor
 {
@@ -20,13 +20,13 @@ namespace TemperatureMonitor
 
 			var computer = new Computer
 			{
-				CPUEnabled = true,
-				GPUEnabled = true
+				IsCpuEnabled = true,
+				IsGpuEnabled = true
 			};
 
 			computer.Open();
 
-			var cpu = computer.Hardware.First(hw => hw.HardwareType == HardwareType.CPU);
+			var cpu = computer.Hardware.First(hw => hw.HardwareType == HardwareType.Cpu);
 			cpu.Update();
 
 			foreach (var sens in cpu.Sensors.Where(s => s.SensorType == SensorType.Temperature))

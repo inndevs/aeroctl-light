@@ -8,10 +8,11 @@
     <OutputType>Library</OutputType>
     <RootNamespace>AeroCtl</RootNamespace>
     <AssemblyName>AeroCtl</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -105,6 +106,7 @@
     <Compile Include="Properties\Resources.Designer.cs">
       <AutoGen>True</AutoGen>
       <DependentUpon>Resources.resx</DependentUpon>
+      <DesignTime>True</DesignTime>
     </Compile>
     <None Include="Properties\Settings.settings">
       <Generator>SettingsSingleFileGenerator</Generator>
@@ -137,7 +139,7 @@
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
-    <ProjectReference Include="..\ThirdParty\ManagedNativeWifi\ManagedNativeWifi\ManagedNativeWifi.csproj">
+    <ProjectReference Include="..\ThirdParty\ManagedNativeWifi\Source\ManagedNativeWifi\ManagedNativeWifi.csproj">
       <Project>{ebff4686-23e6-42bf-97ca-cf82641bcfa7}</Project>
       <Name>ManagedNativeWifi</Name>
     </ProjectReference>

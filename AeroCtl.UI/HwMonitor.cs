@@ -1,6 +1,6 @@
 ﻿using System;
 using System.Linq;
-using OpenHardwareMonitor.Hardware;
+using LibreHardwareMonitor.Hardware;
 
 namespace AeroCtl.UI
 {
@@ -21,13 +21,13 @@ namespace AeroCtl.UI
 		{
 			this.computer = new Computer
 			{
-				CPUEnabled = true,
-				GPUEnabled = true
+				IsCpuEnabled = true,
+				IsGpuEnabled = true
 			};
 
 			this.computer.Open();
 
-			this.cpu = this.computer.Hardware.FirstOrDefault(hw => hw.HardwareType == HardwareType.CPU);
+			this.cpu = this.computer.Hardware.FirstOrDefault(hw => hw.HardwareType == HardwareType.Cpu);
 			this.gpu = this.computer.Hardware.FirstOrDefault(hw => hw.HardwareType == HardwareType.GpuNvidia);
 		}
 

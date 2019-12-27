@@ -8,12 +8,13 @@
     <OutputType>WinExe</OutputType>
     <RootNamespace>AeroCtl.UI</RootNamespace>
     <AssemblyName>AeroCtl.UI</AssemblyName>
-    <TargetFrameworkVersion>v4.7.2</TargetFrameworkVersion>
+    <TargetFrameworkVersion>v4.8</TargetFrameworkVersion>
     <FileAlignment>512</FileAlignment>
     <ProjectTypeGuids>{60dc8134-eba5-43b8-bcc9-bb4bc16c2548};{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}</ProjectTypeGuids>
     <WarningLevel>4</WarningLevel>
     <AutoGenerateBindingRedirects>true</AutoGenerateBindingRedirects>
     <Deterministic>true</Deterministic>
+    <TargetFrameworkProfile />
   </PropertyGroup>
   <PropertyGroup Condition=" '$(Configuration)|$(Platform)' == 'Debug|AnyCPU' ">
     <PlatformTarget>AnyCPU</PlatformTarget>
@@ -135,9 +136,9 @@
       <Project>{72af0b9e-75c6-4f98-b586-777df53193c8}</Project>
       <Name>AeroCtl</Name>
     </ProjectReference>
-    <ProjectReference Include="..\ThirdParty\LibreHardwareMonitor\OpenHardwareMonitorLib.csproj">
-      <Project>{80630332-e5cc-40f1-a5eb-d21e60a985ea}</Project>
-      <Name>OpenHardwareMonitorLib</Name>
+    <ProjectReference Include="..\ThirdParty\LibreHardwareMonitor\LibreHardwareMonitorLib\LibreHardwareMonitorLib.csproj">
+      <Project>{ea57d11b-b322-43ce-bbf6-6e7de76a5834}</Project>
+      <Name>LibreHardwareMonitorLib</Name>
     </ProjectReference>
   </ItemGroup>
   <ItemGroup>

@@ -19,9 +19,9 @@ Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "AeroCtl.Rgb.Rainbow", "Samp
 EndProject
 Project("{2150E333-8FDC-42A3-9474-1A3956D46DE8}") = "ThirdParty", "ThirdParty", "{7BB26CDF-0D4C-4F06-A762-2FFF39965E9D}"
 EndProject
-Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedNativeWifi", "ThirdParty\ManagedNativeWifi\ManagedNativeWifi\ManagedNativeWifi.csproj", "{EBFF4686-23E6-42BF-97CA-CF82641BCFA7}"
+Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreHardwareMonitorLib", "ThirdParty\LibreHardwareMonitor\LibreHardwareMonitorLib\LibreHardwareMonitorLib.csproj", "{EA57D11B-B322-43CE-BBF6-6E7DE76A5834}"
 EndProject
-Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "OpenHardwareMonitorLib", "ThirdParty\LibreHardwareMonitor\OpenHardwareMonitorLib.csproj", "{80630332-E5CC-40F1-A5EB-D21E60A985EA}"
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedNativeWifi", "ThirdParty\ManagedNativeWifi\Source\ManagedNativeWifi\ManagedNativeWifi.csproj", "{EBFF4686-23E6-42BF-97CA-CF82641BCFA7}"
 EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
@@ -53,14 +53,14 @@ Global
 		{DDCEBBB7-4245-4096-819D-AA8E7B837F27}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{DDCEBBB7-4245-4096-819D-AA8E7B837F27}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{DDCEBBB7-4245-4096-819D-AA8E7B837F27}.Release|Any CPU.Build.0 = Release|Any CPU
+		{EA57D11B-B322-43CE-BBF6-6E7DE76A5834}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{EA57D11B-B322-43CE-BBF6-6E7DE76A5834}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{EA57D11B-B322-43CE-BBF6-6E7DE76A5834}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{EA57D11B-B322-43CE-BBF6-6E7DE76A5834}.Release|Any CPU.Build.0 = Release|Any CPU
 		{EBFF4686-23E6-42BF-97CA-CF82641BCFA7}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
 		{EBFF4686-23E6-42BF-97CA-CF82641BCFA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBFF4686-23E6-42BF-97CA-CF82641BCFA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBFF4686-23E6-42BF-97CA-CF82641BCFA7}.Release|Any CPU.Build.0 = Release|Any CPU
-		{80630332-E5CC-40F1-A5EB-D21E60A985EA}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
-		{80630332-E5CC-40F1-A5EB-D21E60A985EA}.Debug|Any CPU.Build.0 = Debug|Any CPU
-		{80630332-E5CC-40F1-A5EB-D21E60A985EA}.Release|Any CPU.ActiveCfg = Release|Any CPU
-		{80630332-E5CC-40F1-A5EB-D21E60A985EA}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -70,8 +70,8 @@ Global
 		{484A2AE8-A1E5-41CF-8DCE-81E8FD116E18} = {CB49CA9B-17CD-4513-9506-334458FD0D94}
 		{B64DD80F-1418-4A8A-AAC7-5153FC756573} = {CB49CA9B-17CD-4513-9506-334458FD0D94}
 		{DDCEBBB7-4245-4096-819D-AA8E7B837F27} = {CB49CA9B-17CD-4513-9506-334458FD0D94}
+		{EA57D11B-B322-43CE-BBF6-6E7DE76A5834} = {7BB26CDF-0D4C-4F06-A762-2FFF39965E9D}
 		{EBFF4686-23E6-42BF-97CA-CF82641BCFA7} = {7BB26CDF-0D4C-4F06-A762-2FFF39965E9D}
-		{80630332-E5CC-40F1-A5EB-D21E60A985EA} = {7BB26CDF-0D4C-4F06-A762-2FFF39965E9D}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A1BB3A2-A00F-4948-864C-048197D4E4DA}
