@@ -1,7 +1,9 @@
 ﻿using System;
+using System.CodeDom;
 using System.Linq;
 using System.Management;
 using System.Threading.Tasks;
+using AeroCtl.Native;
 
 namespace AeroCtl
 {
@@ -9,6 +11,15 @@ namespace AeroCtl
 	{
 		private readonly AeroWmi wmi;
 		private bool healthSupported = true;
+
+		public PowerLineStatus PowerLineStatus
+		{
+			get
+			{
+				Kernel32.GetSystemPowerStatus(out SYSTEM_POWER_STATUS status);
+				return status.ACLineStatus;
+			}
+		}
 
 		public BatteryController(AeroWmi wmi)
 		{

@@ -52,7 +52,7 @@ namespace AeroCtl.Native
 	public static class User32
 	{
 		private const string lib = "user32.dll";
-		
+
 		public const uint RID_INPUT = 0x10000003;
 		public const uint RID_HEADER = 0x10000005;
 
@@ -62,6 +62,16 @@ namespace AeroCtl.Native
 		public const uint INPUT_KEYBOARD = 1;
 
 		public const uint KEYEVENTF_KEYUP = 2;
+
+		public const int ENUM_CURRENT_SETTINGS = -1;
+
+		public const int DISP_CHANGE_SUCCESSFUL = 0;
+		public const int DISP_CHANGE_RESTART = 1;
+		public const int DISP_CHANGE_FAILED = -1;
+		public const int DISP_CHANGE_BADMODE = -2;
+		public const int DISP_CHANGE_NOTUPDATED = -3;
+		public const int DISP_CHANGE_BADFLAGS = -4;
+		public const int DISP_CHANGE_BADPARAM = -5;
 
 		[DllImport(lib, SetLastError = true)]
 		public static extern bool RegisterRawInputDevices(
@@ -90,9 +100,9 @@ namespace AeroCtl.Native
 
 		[DllImport(lib, SetLastError = true)]
 		public static extern IntPtr RegisterPowerSettingNotification(
-		  IntPtr hRecipient,
-		  ref Guid PowerSettingGuid,
-		  uint Flags);
+			IntPtr hRecipient,
+			ref Guid PowerSettingGuid,
+			uint Flags);
 
 		[DllImport(lib, SetLastError = true)]
 		public static extern IntPtr FindWindow(string lpClassName, string lpWindowName);
@@ -104,5 +114,20 @@ namespace AeroCtl.Native
 		[DllImport(lib, SetLastError = true)]
 		public static extern uint RegisterWindowMessage(string lpString);
 
+		[DllImport(lib, SetLastError = true, CharSet = CharSet.Auto)]
+		[return: MarshalAs(UnmanagedType.Bool)]
+		public static extern bool EnumDisplaySettings(
+			[param: MarshalAs(UnmanagedType.LPTStr)]
+			string lpszDeviceName,
+			int iModeNum,
+			[In, Out] ref DEVMODE lpDevMode);
+
+		[DllImport(lib, SetLastError = true, CharSet = CharSet.Auto)]
+		[return: MarshalAs(UnmanagedType.I4)]
+		public static extern int ChangeDisplaySettings([In, Out] ref DEVMODE lpDevMode,
+			[param: MarshalAs(UnmanagedType.U4)] uint dwflags);
+
+		[DllImport(lib, SetLastError = true, CharSet = CharSet.Auto)]
+		public static extern bool EnumDisplayDevices(string lpDevice, uint iDevNum, [In, Out] ref DISPLAY_DEVICE lpDisplayDevice, uint dwFlags);
 	}
 }

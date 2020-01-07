@@ -1,6 +1,10 @@
 ﻿using AeroCtl.Native;
 using System;
+using System.Collections;
+using System.Collections.Generic;
 using System.Management;
+using System.Net;
+using System.Runtime.InteropServices;
 using System.Threading.Tasks;
 
 namespace AeroCtl
@@ -69,6 +73,80 @@ namespace AeroCtl
 				return LidStatus.Closed;
 
 			return LidStatus.Open;
+		}
+
+		/// <summary>
+		/// Returns the name of the integrated display, if it is connected.
+		/// </summary>
+		/// <returns>The device name of the integrated display, or null if not connected.</returns>
+		public string GetIntegratedDisplayName()
+		{
+			for (uint i = 0;; ++i)
+			{
+				DISPLAY_DEVICE dev = default;
+				dev.cb = Marshal.SizeOf<DISPLAY_DEVICE>();
+
+				if (!User32.EnumDisplayDevices(null, i, ref dev, 0))
+					break;
+
+				if ((dev.StateFlags & DisplayDeviceStateFlags.AttachedToDesktop) == 0)
+					continue;
+
+				if ((dev.StateFlags & DisplayDeviceStateFlags.Remote) != 0)
+					continue;
+
+				if ((dev.StateFlags & DisplayDeviceStateFlags.PrimaryDevice) == 0)
+					continue;
+
+				return dev.DeviceName;
+			}
+
+			return null;
+		}
+
+		public IEnumerable<uint> GetIntegratedDisplayFrequencies()
+		{
+			string devName = this.GetIntegratedDisplayName();
+			if (devName == null)
+				yield break;
+
+			DEVMODE current = default;
+			current.dmSize = (ushort)Marshal.SizeOf<DEVMODE>();
+			if (!User32.EnumDisplaySettings(devName, User32.ENUM_CURRENT_SETTINGS, ref current))
+				yield break;
+
+			HashSet<uint> returnedHz = new HashSet<uint>();
+
+			for (int j = 0;; ++j)
+			{
+				DEVMODE mode = default;
+				mode.dmSize = (ushort)Marshal.SizeOf<DEVMODE>();
+				if (!User32.EnumDisplaySettings(devName, j, ref mode))
+					break;
+
+				if (mode.dmPelsWidth == current.dmPelsWidth && mode.dmPelsHeight == current.dmPelsHeight)
+				{
+					if (returnedHz.Add(mode.dmDisplayFrequency))
+						yield return mode.dmDisplayFrequency;
+				}
+			}
+		}
+
+		public bool SetIntegratedDisplayFrequency(uint newFreq)
+		{
+			string devName = this.GetIntegratedDisplayName();
+			if (devName == null)
+				return false;
+
+			DEVMODE current = default;
+			current.dmSize = (ushort)Marshal.SizeOf<DEVMODE>();
+			if (!User32.EnumDisplaySettings(devName, User32.ENUM_CURRENT_SETTINGS, ref current))
+				return false;
+
+			current.dmDisplayFrequency = newFreq;
+			User32.ChangeDisplaySettings(ref current, 0);
+
+			return true;
 		}
 	}
 }

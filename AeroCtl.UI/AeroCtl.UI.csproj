@@ -66,7 +66,9 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="DisplayFrequencyConverter.cs" />
     <Compile Include="EnumerationExtension.cs" />
+    <Compile Include="PowerLineStatusConverter.cs" />
     <Compile Include="SoftwareFan\FanConfig.cs" />
     <Compile Include="FanConfigEditor.xaml.cs">
       <DependentUpon>FanConfigEditor.xaml</DependentUpon>
@@ -76,6 +78,7 @@
     <Compile Include="SoftwareFan\FanSchedulingMode.cs" />
     <Compile Include="SoftwareFan\ISoftwareFanProvider.cs" />
     <Compile Include="SoftwareFan\SoftwareFanController.cs" />
+    <Compile Include="UpdateMode.cs" />
     <Compile Include="WindowsOsd.cs" />
     <Page Include="FanConfigEditor.xaml">
       <SubType>Designer</SubType>

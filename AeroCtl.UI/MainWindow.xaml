@@ -9,6 +9,8 @@
 		Title="AERO Controls" MinWidth="450" Width="400" SizeToContent="Height">
 	<Window.Resources>
 		<local:EnumBooleanConverter x:Key="EnumConv" />
+		<local:DisplayFrequencyConverter x:Key="DispFreqConv" />
+		<local:PowerLineStatusConverter x:Key="PowerLineConv" />
 		<Style TargetType="{x:Type CheckBox}">
 			<Setter Property="ToolTipService.ShowOnDisabled" Value="true"/>
 		</Style>
@@ -95,16 +97,16 @@
 							<StackPanel Margin="0 0 16 0">
 								<CheckBox IsChecked="{Binding Controller.WifiEnabled}" ToolTip="Hardware rfkill.">Wifi enabled</CheckBox>
 								<CheckBox IsChecked="{Binding Controller.BluetoothEnabled}" ToolTip="Hardware rfkill.">Bluetooth enabled</CheckBox>
-                                <CheckBox IsChecked="{Binding Controller.CameraEnabled}" ToolTip="Built-in webcam toggle.">Camera enabled</CheckBox>
+								<CheckBox IsChecked="{Binding Controller.CameraEnabled}" ToolTip="Built-in webcam toggle.">Camera enabled</CheckBox>
 							</StackPanel>
 							<StackPanel Margin="0 0 16 0" IsEnabled="{Binding Controller.GpuConfigAvailable}">
 								<CheckBox IsChecked="{Binding Controller.GpuBoost}" ToolTip="Seems to overclock the GPU a little.">GPU boost / OC</CheckBox>
 								<CheckBox IsChecked="{Binding Controller.GpuThermalTarget}" ToolTip="No idea what exactly this does. Turns the fans off for a second.">GPU thermal target</CheckBox>
 								<CheckBox IsChecked="{Binding Controller.GpuPowerConfig}" ToolTip="No idea what this does.">GPU power config</CheckBox>
 							</StackPanel>
-                            <StackPanel Margin="0 0 16 0">
-                                <CheckBox IsChecked="{Binding Controller.StartMinimized}" ToolTip="Whether the app will start minimized to tray.">Start minimized</CheckBox>
-                            </StackPanel>
+							<StackPanel Margin="0 0 16 0">
+								<CheckBox IsChecked="{Binding Controller.StartMinimized}" ToolTip="Whether the app will start minimized to tray.">Start minimized</CheckBox>
+							</StackPanel>
 						</StackPanel>
 					</StackPanel>
 				</Grid>
@@ -120,6 +122,32 @@
 						</StackPanel>
 					</Label>
 					<Slider Name="screenBrightness" Minimum="0" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding Path=Controller.DisplayBrightness}" />
+					<Grid>
+						<Grid.ColumnDefinitions>
+							<ColumnDefinition Width="Auto" />
+							<ColumnDefinition Width="100" />
+						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition Height="Auto"></RowDefinition>
+							<RowDefinition Height="Auto"></RowDefinition>
+						</Grid.RowDefinitions>
+						<Label Grid.Row="0" Grid.Column="0" Target="{Binding ElementName=displayFreqDc}">Battery display frequency:</Label>
+						<ComboBox Grid.Row="0" Grid.Column="1" Name="displayFreqDc" ItemsSource="{Binding Path=Controller.DisplayFrequencyChoices}" SelectedItem="{Binding Path=Controller.DisplayFrequencyDc}">
+							<ComboBox.ItemTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Converter={StaticResource DispFreqConv}}"/>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+						<Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=displayFreqAc}">AC display frequency:</Label>
+						<ComboBox Grid.Row="1" Grid.Column="1" Name="displayFreqAc" ItemsSource="{Binding Path=Controller.DisplayFrequencyChoices}" SelectedItem="{Binding Path=Controller.DisplayFrequencyAc}">
+							<ComboBox.ItemTemplate>
+								<DataTemplate>
+									<TextBlock Text="{Binding Converter={StaticResource DispFreqConv}}"/>
+								</DataTemplate>
+							</ComboBox.ItemTemplate>
+						</ComboBox>
+					</Grid>
 				</StackPanel>
 			</GroupBox>
 
@@ -127,9 +155,10 @@
 				<StackPanel>
 					<Grid>
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="100" />
-							<ColumnDefinition Width="100" />
-							<ColumnDefinition Width="100" />
+							<ColumnDefinition Width="90" />
+							<ColumnDefinition Width="90" />
+							<ColumnDefinition Width="90" />
+							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
 						
 						<StackPanel Orientation="Horizontal" Grid.Column="0">
@@ -146,6 +175,11 @@
 						<StackPanel Orientation="Horizontal" Grid.Column="2">
 							<TextBlock Margin="0 0 5 0">Health:</TextBlock>
 							<TextBlock Text="{Binding Path=Controller.BatteryHealth, Mode=OneWay}" />
+						</StackPanel>
+
+						<StackPanel Orientation="Horizontal" Grid.Column="3">
+							<TextBlock Margin="0 0 5 0">Status:</TextBlock>
+							<TextBlock Text="{Binding Path=Controller.PowerLineStatus, Mode=OneWay, Converter={StaticResource PowerLineConv}}" />
 						</StackPanel>
 					</Grid>
 

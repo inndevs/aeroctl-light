@@ -54,6 +54,10 @@
     <Compile Include="Aero.cs" />
     <Compile Include="Aero15Xv8FanController.cs" />
     <Compile Include="HidDevice.cs" />
+    <Compile Include="Native\DEVMODE.cs" />
+    <Compile Include="Native\DisplayDeviceStateFlags.cs" />
+    <Compile Include="Native\DISPLAY_DEVICE.cs" />
+    <Compile Include="Native\POINTL.cs" />
     <Compile Include="P75GpuController.cs" />
     <Compile Include="AeroWmi.cs" />
     <Compile Include="BatteryController.cs" />

@@ -93,5 +93,29 @@ namespace AeroCtl.UI.Properties {
                 this["SoftwareFanConfig"] = value;
             }
         }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public uint DisplayFrequencyAc {
+            get {
+                return ((uint)(this["DisplayFrequencyAc"]));
+            }
+            set {
+                this["DisplayFrequencyAc"] = value;
+            }
+        }
+        
+        [global::System.Configuration.UserScopedSettingAttribute()]
+        [global::System.Diagnostics.DebuggerNonUserCodeAttribute()]
+        [global::System.Configuration.DefaultSettingValueAttribute("0")]
+        public uint DisplayFrequencyDc {
+            get {
+                return ((uint)(this["DisplayFrequencyDc"]));
+            }
+            set {
+                this["DisplayFrequencyDc"] = value;
+            }
+        }
     }
 }

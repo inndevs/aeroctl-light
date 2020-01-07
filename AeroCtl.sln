@@ -23,6 +23,8 @@ Project("{9A19103F-16F7-4668-BE54-9A1E7A4F7556}") = "LibreHardwareMonitorLib", "
 EndProject
 Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "ManagedNativeWifi", "ThirdParty\ManagedNativeWifi\Source\ManagedNativeWifi\ManagedNativeWifi.csproj", "{EBFF4686-23E6-42BF-97CA-CF82641BCFA7}"
 EndProject
+Project("{FAE04EC0-301F-11D3-BF4B-00C04F79EFBC}") = "DisplayModes", "Samples\DisplayModes\DisplayModes.csproj", "{C2057D8A-5568-4802-80F3-35E1BC449AAD}"
+EndProject
 Global
 	GlobalSection(SolutionConfigurationPlatforms) = preSolution
 		Debug|Any CPU = Debug|Any CPU
@@ -61,6 +63,10 @@ Global
 		{EBFF4686-23E6-42BF-97CA-CF82641BCFA7}.Debug|Any CPU.Build.0 = Debug|Any CPU
 		{EBFF4686-23E6-42BF-97CA-CF82641BCFA7}.Release|Any CPU.ActiveCfg = Release|Any CPU
 		{EBFF4686-23E6-42BF-97CA-CF82641BCFA7}.Release|Any CPU.Build.0 = Release|Any CPU
+		{C2057D8A-5568-4802-80F3-35E1BC449AAD}.Debug|Any CPU.ActiveCfg = Debug|Any CPU
+		{C2057D8A-5568-4802-80F3-35E1BC449AAD}.Debug|Any CPU.Build.0 = Debug|Any CPU
+		{C2057D8A-5568-4802-80F3-35E1BC449AAD}.Release|Any CPU.ActiveCfg = Release|Any CPU
+		{C2057D8A-5568-4802-80F3-35E1BC449AAD}.Release|Any CPU.Build.0 = Release|Any CPU
 	EndGlobalSection
 	GlobalSection(SolutionProperties) = preSolution
 		HideSolutionNode = FALSE
@@ -72,6 +78,7 @@ Global
 		{DDCEBBB7-4245-4096-819D-AA8E7B837F27} = {CB49CA9B-17CD-4513-9506-334458FD0D94}
 		{EA57D11B-B322-43CE-BBF6-6E7DE76A5834} = {7BB26CDF-0D4C-4F06-A762-2FFF39965E9D}
 		{EBFF4686-23E6-42BF-97CA-CF82641BCFA7} = {7BB26CDF-0D4C-4F06-A762-2FFF39965E9D}
+		{C2057D8A-5568-4802-80F3-35E1BC449AAD} = {CB49CA9B-17CD-4513-9506-334458FD0D94}
 	EndGlobalSection
 	GlobalSection(ExtensibilityGlobals) = postSolution
 		SolutionGuid = {0A1BB3A2-A00F-4948-864C-048197D4E4DA}

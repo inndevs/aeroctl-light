@@ -209,14 +209,19 @@ namespace AeroCtl.UI
 			{
 				for (;;)
 				{
-					// Only update when necessary.
-					if (first || this.controller.FanProfileInvalid || 
-					    (this.window != null && this.window.WindowState != WindowState.Minimized))
+					UpdateMode mode = UpdateMode.Light;
+
+					if (first)
 					{
-						await this.controller.UpdateAsync(first);
+						mode = UpdateMode.Full;
 						first = false;
 					}
+					else if (this.controller.FanProfileInvalid || (this.window != null && this.window.WindowState != WindowState.Minimized))
+					{
+						mode = UpdateMode.Normal;
+					}
 
+					await this.controller.UpdateAsync(mode);
 					await Task.Delay(750, token);
 				}
 			}

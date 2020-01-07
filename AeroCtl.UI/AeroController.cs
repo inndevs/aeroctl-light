@@ -1,5 +1,7 @@
 ﻿using System;
 using System.Collections.Concurrent;
+using System.Collections.Generic;
+using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
@@ -9,8 +11,11 @@ using System.Runtime.CompilerServices;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
+using System.Windows.Documents;
+using AeroCtl.Native;
 using AeroCtl.UI.Properties;
 using AeroCtl.UI.SoftwareFan;
+using LibreHardwareMonitor.Hardware;
 
 namespace AeroCtl.UI
 {
@@ -276,6 +281,22 @@ namespace AeroCtl.UI
 					this.updates.Enqueue(() => this.Aero.Bluetooth.SetEnabledAsync(value));
 			}
 		}
+		#endregion
+
+		#region PowerLineStatus
+
+		private PowerLineStatus powerLineStatus;
+
+		public PowerLineStatus PowerLineStatus
+		{
+			get => this.powerLineStatus;
+			private set
+			{
+				this.powerLineStatus = value;
+				this.OnPropertyChanged();
+			}
+		}
+
 		#endregion
 
 		#region BatteryCycles
@@ -574,6 +595,87 @@ namespace AeroCtl.UI
 
 		#endregion
 
+		#region DisplayFrequencies
+
+		private IReadOnlyList<uint> displayFrequencies;
+
+		public IReadOnlyList<uint> DisplayFrequencies
+		{
+			get => this.displayFrequencies;
+			private set
+			{
+				this.displayFrequencies = value;
+				this.OnPropertyChanged();
+				this.OnPropertyChanged(nameof(this.DisplayFrequencyChoices));
+			}
+		}
+
+		public IReadOnlyList<uint> DisplayFrequencyChoices
+		{
+			get
+			{
+				List<uint> frequencies = new List<uint>((this.DisplayFrequencies?.Count ?? 0) + 1);
+
+				frequencies.Add(0);
+
+				if (this.DisplayFrequencies != null)
+				{
+					foreach (uint freq in this.DisplayFrequencies)
+					{
+						frequencies.Add(freq);
+					}
+				}
+
+				return frequencies;
+			}
+		}
+
+		#endregion
+
+		#region DisplayFrequencyAc
+
+		private uint displayFrequencyAc;
+
+		public uint DisplayFrequencyAc
+		{
+			get => this.displayFrequencyAc;
+			set
+			{
+				this.displayFrequencyAc = value;
+				this.OnPropertyChanged();
+
+				if (!this.loading)
+				{
+					Settings.Default.DisplayFrequencyAc = value;
+					Settings.Default.Save();
+				}
+			}
+		}
+
+		#endregion
+
+		#region DisplayFrequencyDc
+
+		private uint displayFrequencyDc;
+
+		public uint DisplayFrequencyDc
+		{
+			get => this.displayFrequencyDc;
+			set
+			{
+				this.displayFrequencyDc = value;
+				this.OnPropertyChanged();
+
+				if (!this.loading)
+				{
+					Settings.Default.DisplayFrequencyDc = value;
+					Settings.Default.Save();
+				}
+			}
+		}
+
+		#endregion
+
 		#region Constructors
 
 		public AeroController(Aero aero)
@@ -599,6 +701,8 @@ namespace AeroCtl.UI
 				this.FanProfileAlt = (FanProfile)s.FanProfileAlt;
 				this.FixedFanSpeed = s.FixedFanSpeed;
 				this.AutoFanAdjust = s.AutoFanAdjust;
+				this.DisplayFrequencyAc = s.DisplayFrequencyAc;
+				this.DisplayFrequencyDc = s.DisplayFrequencyDc;
 
 				this.SoftwareFanConfig = new FanConfig();
 				if (s.SoftwareFanConfig != null && s.SoftwareFanConfig.Count > 0)
@@ -652,62 +756,86 @@ namespace AeroCtl.UI
 			}
 		}
 
-		public async Task UpdateAsync(bool full = false)
+		public async Task UpdateAsync(UpdateMode mode)
 		{
 			while (this.updates.TryDequeue(out var updateFunc))
 				await updateFunc();
 
 			Debug.Assert(!this.updating.Value);
 
+
 			this.updating.Value = true;
 			try
 			{
-				if (full)
+				if (mode >= UpdateMode.Full)
 				{
 					this.BaseBoard = this.Aero.BaseBoard;
 					this.Sku = this.Aero.Sku;
 					this.SerialNumber = this.Aero.SerialNumber;
 					this.BiosVersion = string.Join("; ", this.Aero.BiosVersions);
+					this.PowerLineStatus = this.Aero.Battery.PowerLineStatus;
 
 					if (this.Aero.Keyboard.Rgb != null)
 						this.KeyboardFWVersion = await this.Aero.Keyboard.Rgb.GetFirmwareVersionAsync();
 				}
 
-				if (this.FanProfileInvalid)
+				if (mode >= UpdateMode.Normal)
 				{
-					this.FanProfileInvalid = false;
-					await this.applyFanProfileAsync();
-				}
+					if (this.FanProfileInvalid)
+					{
+						this.FanProfileInvalid = false;
+						await this.applyFanProfileAsync();
+					}
 
-				lock (this.hwMonitor)
-				{
-					this.hwMonitor.Update();
-					this.CpuTemperature = this.hwMonitor.CpuTemperature;
-					this.GpuTemperature = this.hwMonitor.GpuTemperature;
-				}
+					lock (this.hwMonitor)
+					{
+						this.hwMonitor.Update();
+						this.CpuTemperature = this.hwMonitor.CpuTemperature;
+						this.GpuTemperature = this.hwMonitor.GpuTemperature;
+					}
 
-				if (this.Aero.Gpu is P75GpuController newGpu)
-				{
-					this.GpuConfigAvailable = true;
-					this.GpuBoost = await newGpu.GetBoostEnabledAsync();
-					this.GpuPowerConfig = await newGpu.GetPowerConfigAsync();
-					this.GpuThermalTarget = await newGpu.GetThermalTargetEnabledAsync();
-				}
+					if (this.Aero.Gpu is P75GpuController newGpu)
+					{
+						this.GpuConfigAvailable = true;
+						this.GpuBoost = await newGpu.GetBoostEnabledAsync();
+						this.GpuPowerConfig = await newGpu.GetPowerConfigAsync();
+						this.GpuThermalTarget = await newGpu.GetThermalTargetEnabledAsync();
+					}
 
-				(this.FanRpm1, this.FanRpm2) = await this.Aero.Fans.GetRpmAsync();
-				this.FanPwm = await this.Aero.Fans.GetPwmAsync() * 100;
-				this.DisplayBrightness = this.Aero.Display.Brightness;
+					(this.FanRpm1, this.FanRpm2) = await this.Aero.Fans.GetRpmAsync();
+					this.FanPwm = await this.Aero.Fans.GetPwmAsync() * 100;
+					this.DisplayBrightness = this.Aero.Display.Brightness;
+					this.DisplayFrequencies = this.Aero.Display.GetIntegratedDisplayFrequencies().ToImmutableArray();
 
-				this.SmartCharge = await this.Aero.Battery.GetSmartChargeAsync();
-				this.ChargeStopEnabled = await this.Aero.Battery.GetChargePolicyAsync() == ChargePolicy.CustomStop;
-				this.ChargeStop = await this.Aero.Battery.GetChargeStopAsync();
-				this.BatteryCycles = await this.Aero.Battery.GetCyclesAsync();
-				this.BatteryHealth = await this.Aero.Battery.GetHealthAsync();
-				this.BatteryCharge = await this.Aero.Battery.GetRemainingChargeAsync();
+					this.SmartCharge = await this.Aero.Battery.GetSmartChargeAsync();
+					this.ChargeStopEnabled = await this.Aero.Battery.GetChargePolicyAsync() == ChargePolicy.CustomStop;
+					this.ChargeStop = await this.Aero.Battery.GetChargeStopAsync();
+					this.BatteryCycles = await this.Aero.Battery.GetCyclesAsync();
+					this.BatteryHealth = await this.Aero.Battery.GetHealthAsync();
+					this.BatteryCharge = await this.Aero.Battery.GetRemainingChargeAsync();
 				
-				this.WifiEnabled = await this.Aero.GetWifiEnabledAsync();
-				this.BluetoothEnabled = await this.Aero.Bluetooth.GetEnabledAsync();
-				this.CameraEnabled = await this.Aero.GetCameraEnabledAsync();
+					this.WifiEnabled = await this.Aero.GetWifiEnabledAsync();
+					this.BluetoothEnabled = await this.Aero.Bluetooth.GetEnabledAsync();
+					this.CameraEnabled = await this.Aero.GetCameraEnabledAsync();
+				}
+
+				PowerLineStatus prevPowerStatus = this.PowerLineStatus;
+				this.PowerLineStatus = this.Aero.Battery.PowerLineStatus;
+
+				if (this.PowerLineStatus != prevPowerStatus)
+				{
+					if (this.PowerLineStatus == PowerLineStatus.Online && this.DisplayFrequencyAc > 0)
+					{
+						Debug.WriteLine($"Changing display frequency to {this.DisplayFrequencyAc}");
+						this.Aero.Display.SetIntegratedDisplayFrequency(this.DisplayFrequencyAc);
+					}
+
+					if (this.PowerLineStatus == PowerLineStatus.Offline && this.DisplayFrequencyDc > 0)
+					{
+						Debug.WriteLine($"Changing display frequency to {this.DisplayFrequencyDc}");
+						this.Aero.Display.SetIntegratedDisplayFrequency(this.DisplayFrequencyDc);
+					}
+				}
 			}
 			finally
 			{
