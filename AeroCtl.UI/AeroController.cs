@@ -805,7 +805,7 @@ namespace AeroCtl.UI
 					(this.FanRpm1, this.FanRpm2) = await this.Aero.Fans.GetRpmAsync();
 					this.FanPwm = await this.Aero.Fans.GetPwmAsync() * 100;
 					this.DisplayBrightness = this.Aero.Display.Brightness;
-					this.DisplayFrequencies = this.Aero.Display.GetIntegratedDisplayFrequencies().ToImmutableArray();
+					this.DisplayFrequencies = this.Aero.Display.GetIntegratedDisplayFrequencies().OrderBy(hz => hz).ToImmutableArray();
 
 					this.SmartCharge = await this.Aero.Battery.GetSmartChargeAsync();
 					this.ChargeStopEnabled = await this.Aero.Battery.GetChargePolicyAsync() == ChargePolicy.CustomStop;

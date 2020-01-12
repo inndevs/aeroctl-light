@@ -2,6 +2,7 @@
 using System;
 using System.Collections;
 using System.Collections.Generic;
+using System.Linq;
 using System.Management;
 using System.Net;
 using System.Runtime.InteropServices;
@@ -75,11 +76,7 @@ namespace AeroCtl
 			return LidStatus.Open;
 		}
 
-		/// <summary>
-		/// Returns the name of the integrated display, if it is connected.
-		/// </summary>
-		/// <returns>The device name of the integrated display, or null if not connected.</returns>
-		public string GetIntegratedDisplayName()
+		private static IEnumerable<DISPLAY_DEVICE> enumDisplayDevices()
 		{
 			for (uint i = 0;; ++i)
 			{
@@ -89,19 +86,21 @@ namespace AeroCtl
 				if (!User32.EnumDisplayDevices(null, i, ref dev, 0))
 					break;
 
-				if ((dev.StateFlags & DisplayDeviceStateFlags.AttachedToDesktop) == 0)
-					continue;
-
-				if ((dev.StateFlags & DisplayDeviceStateFlags.Remote) != 0)
-					continue;
-
-				if ((dev.StateFlags & DisplayDeviceStateFlags.PrimaryDevice) == 0)
-					continue;
-
-				return dev.DeviceName;
+				yield return dev;
 			}
+		}
 
-			return null;
+		/// <summary>
+		/// Returns the name of the integrated display, if it is connected.
+		/// </summary>
+		/// <returns>The device name of the integrated display, or null if not connected.</returns>
+		public string GetIntegratedDisplayName()
+		{
+			return enumDisplayDevices()
+				.Where(d => (d.StateFlags & DisplayDeviceStateFlags.Remote) == 0)
+				.Where(d => d.DeviceID.Contains("VEN_8086"))
+				.OrderBy(d => d.DeviceName)
+				.FirstOrDefault().DeviceName;
 		}
 
 		public IEnumerable<uint> GetIntegratedDisplayFrequencies()
