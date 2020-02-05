@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Diagnostics;
+using System.Drawing;
 using System.IO;
 using System.Reflection;
 using System.Threading;
@@ -47,11 +48,18 @@ namespace AeroCtl.UI
 
 			// Create background update task.
 			this.updateTask = this.Dispatcher.InvokeAsync(() => this.updateLoop(this.cancellationTokenSource.Token), DispatcherPriority.Background).Task;
-			
+
+			// Get app icon.
+			Icon ico;
+			using (Stream stream = typeof(App).Assembly.GetManifestResourceStream("AeroCtl.UI.Main.ico"))
+			{
+				ico = new Icon(stream);
+			}
+
 			// Create tray icon.
 			this.trayIcon = new NotifyIcon
 			{
-				Icon = UI.Properties.Resources.Main,
+				Icon = ico,
 				Text = this.title,
 				Visible = true,
 			};
