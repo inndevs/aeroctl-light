@@ -1,6 +1,9 @@
 stages:
  - build
 
+variables:
+  GIT_SUBMODULE_STRATEGY: recursive
+
 before_script:
  - 'choco install -y netfx-4.8-devpack'
  - 'nuget restore AeroCtl.sln'
