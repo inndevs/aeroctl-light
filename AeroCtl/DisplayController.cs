@@ -103,6 +103,10 @@ namespace AeroCtl
 				.FirstOrDefault().DeviceName;
 		}
 
+		/// <summary>
+		/// Enumerates the supported display frequencies of the built-in display.
+		/// </summary>
+		/// <returns></returns>
 		public IEnumerable<uint> GetIntegratedDisplayFrequencies()
 		{
 			string devName = this.GetIntegratedDisplayName();
@@ -131,6 +135,11 @@ namespace AeroCtl
 			}
 		}
 
+		/// <summary>
+		/// Changes the display frequency of the built-in display.
+		/// </summary>
+		/// <param name="newFreq"></param>
+		/// <returns></returns>
 		public bool SetIntegratedDisplayFrequency(uint newFreq)
 		{
 			string devName = this.GetIntegratedDisplayName();

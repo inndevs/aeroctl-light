@@ -1,0 +1,20 @@
+stages:
+ - build
+
+before_script:
+ - 'choco install -y netfx-4.8-devpack'
+ - 'nuget restore AeroCtl.sln'
+
+build:
+  tags:
+   - shared-windows
+   - windows
+   - windows-1809
+  stage: build
+  script:
+   - '& "C:\Program Files (x86)\Microsoft Visual Studio\2019\BuildTools\MSBuild\Current\bin\MSBuild.exe" AeroCtl.sln /t:ReBuild /p:Configuration=Release'
+   - '7z a AeroCtl.7z .\AeroCtl.UI\bin\Release\*'
+  artifacts:
+    paths:
+     - AeroCtl.7z
+    expire_in: 30 days
