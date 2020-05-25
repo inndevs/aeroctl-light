@@ -121,8 +121,10 @@ namespace AeroCtl.Rgb.LockKeys
 
 	internal static class Effect
 	{
-		private static readonly Color baseColor = Color.FromArgb(0, 100, 40);
-		private static readonly Color highlightColor = Color.FromArgb(0, 255, 30);
+		//private static readonly Color baseColor = Color.FromArgb(0, 100, 40);
+		//private static readonly Color highlightColor = Color.FromArgb(0, 255, 30);
+		private static readonly Color baseColor = Color.FromArgb(60, 255, 90);
+		private static readonly Color highlightColor = Color.FromArgb(0, 200, 255);
 
 		private const int capsLockKey = 8;
 		private const int numLockKey = 100;

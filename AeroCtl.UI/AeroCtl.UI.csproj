@@ -137,16 +137,16 @@
   </ItemGroup>
   <ItemGroup>
     <PackageReference Include="System.Collections.Immutable">
-      <Version>1.6.0</Version>
+      <Version>1.7.1</Version>
     </PackageReference>
     <PackageReference Include="System.Json">
-      <Version>4.6.0</Version>
+      <Version>4.7.1</Version>
     </PackageReference>
     <PackageReference Include="System.Memory">
-      <Version>4.5.3</Version>
+      <Version>4.5.4</Version>
     </PackageReference>
     <PackageReference Include="System.Threading.Tasks.Extensions">
-      <Version>4.5.3</Version>
+      <Version>4.5.4</Version>
     </PackageReference>
   </ItemGroup>
   <ItemGroup>
