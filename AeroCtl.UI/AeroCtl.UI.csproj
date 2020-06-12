@@ -66,6 +66,7 @@
       <Generator>MSBuild:Compile</Generator>
       <SubType>Designer</SubType>
     </ApplicationDefinition>
+    <Compile Include="BooleanVisibilityConverter.cs" />
     <Compile Include="DisplayFrequencyConverter.cs" />
     <Compile Include="EnumerationExtension.cs" />
     <Compile Include="PowerLineStatusConverter.cs" />

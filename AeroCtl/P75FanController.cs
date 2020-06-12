@@ -12,6 +12,7 @@ namespace AeroCtl
 		#region Fields
 
 		private readonly AeroWmi wmi;
+		private bool gpuFan;
 
 		private const int minFanSpeed = 0;
 		private const int maxFanSpeed = 229;
@@ -24,6 +25,7 @@ namespace AeroCtl
 		public P75FanController(AeroWmi wmi)
 		{
 			this.wmi = wmi;
+			this.gpuFan = true;
 		}
 
 		#endregion
@@ -108,6 +110,7 @@ namespace AeroCtl
 			//await this.wmi.InvokeSetAsync<byte>("SetNvThermalTarget", 0);
 			await this.wmi.InvokeSetAsync<byte>("SetFixedFanStatus", 1);
 			await this.wmi.InvokeSetAsync<byte>("SetFixedFanSpeed", (byte)relToAbs(fanSpeed));
+			await this.wmi.InvokeSetAsync<byte>("SetGPUFanDuty", (byte)relToAbs(fanSpeed)); // Only available on some models (?)
 		}
 
 		public void SetFixed(double fanSpeed = 0.25)
@@ -116,6 +119,7 @@ namespace AeroCtl
 			this.wmi.InvokeSet<byte>("SetStepFanStatus", 1);
 			this.wmi.InvokeSet<byte>("SetFixedFanStatus", 1);
 			this.wmi.InvokeSet<byte>("SetFixedFanSpeed", (byte)relToAbs(fanSpeed));
+			this.wmi.InvokeSet<byte>("SetGPUFanDuty", (byte)relToAbs(fanSpeed)); // Only available on some models (?)
 		}
 
 		public async ValueTask SetCustomAsync()

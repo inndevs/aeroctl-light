@@ -736,6 +736,22 @@ namespace AeroCtl.UI
 
 		#endregion
 
+		#region DisplayFrequency
+
+		private uint? displayFrequency;
+
+		public uint? DisplayFrequency
+		{
+			get => this.displayFrequency;
+			private set
+			{
+				this.displayFrequency = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
 		#region DisplayFrequencies
 
 		private IReadOnlyList<uint> displayFrequencies;
@@ -948,7 +964,8 @@ namespace AeroCtl.UI
 					(this.FanRpm1, this.FanRpm2) = await this.Aero.Fans.GetRpmAsync();
 					this.FanPwm = await this.Aero.Fans.GetPwmAsync() * 100;
 					this.DisplayBrightness = this.Aero.Display.Brightness;
-					this.DisplayAvailable = this.Aero.Display.GetIntegratedDisplayName() != null;
+					this.DisplayFrequency = this.Aero.Display.GetIntegratedDisplayFrequency();
+					this.DisplayAvailable = this.DisplayFrequency != null;
 					this.DisplayFrequencies = this.Aero.Display.GetIntegratedDisplayFrequencies().OrderBy(hz => hz).ToImmutableArray();
 
 					this.SmartCharge = await this.Aero.Battery.GetSmartChargeAsync();

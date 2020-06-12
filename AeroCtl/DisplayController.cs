@@ -104,6 +104,24 @@ namespace AeroCtl
 		}
 
 		/// <summary>
+		/// Returns the current frequency of the integrated display.
+		/// </summary>
+		/// <returns></returns>
+		public uint? GetIntegratedDisplayFrequency()
+		{
+			string devName = this.GetIntegratedDisplayName();
+			if (devName == null)
+				return null;
+
+			DEVMODE current = default;
+			current.dmSize = (ushort)Marshal.SizeOf<DEVMODE>();
+			if (!User32.EnumDisplaySettings(devName, User32.ENUM_CURRENT_SETTINGS, ref current))
+				return null;
+
+			return current.dmDisplayFrequency;
+		}
+
+		/// <summary>
 		/// Enumerates the supported display frequencies of the built-in display.
 		/// </summary>
 		/// <returns></returns>

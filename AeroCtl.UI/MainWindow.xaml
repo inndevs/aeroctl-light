@@ -9,6 +9,7 @@
 		Title="AERO Controls" MinWidth="450" Width="400" SizeToContent="Height">
 	<Window.Resources>
 		<local:EnumBooleanConverter x:Key="EnumConv" />
+        <local:BooleanVisibilityConverter x:Key="BoolVisConv" />
 		<local:DisplayFrequencyConverter x:Key="DispFreqConv" />
 		<local:PowerLineStatusConverter x:Key="PowerLineConv" />
 		<Style TargetType="{x:Type CheckBox}">
@@ -115,11 +116,22 @@
 			<GroupBox Header="Display">
 				<StackPanel>
 					<Label Target="{Binding ElementName=screenBrightness}">
-						<StackPanel Orientation="Horizontal">
-							<TextBlock Margin="0 0 5 0">Screen brightness:</TextBlock>
-							<TextBlock Text="{Binding Path=Controller.DisplayBrightness, Mode=OneWay}" />
-							<TextBlock Margin="2 0 0 0">%</TextBlock>
-						</StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="145" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                <TextBlock Margin="0 0 5 0">Screen brightness:</TextBlock>
+                                <TextBlock Text="{Binding Path=Controller.DisplayBrightness, Mode=OneWay}" />
+                                <TextBlock Margin="2 0 0 0">%</TextBlock>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Grid.Column="1" Visibility="{Binding Path=Controller.DisplayAvailable, Mode=OneWay, Converter={StaticResource BoolVisConv}}">
+                                <TextBlock Margin="0 0 5 0">Display frequency:</TextBlock>
+                                <TextBlock Text="{Binding Path=Controller.DisplayFrequency, Mode=OneWay}" />
+                                <TextBlock Margin="2 0 0 0">Hz </TextBlock>
+                            </StackPanel>
+                        </Grid>
 					</Label>
 					<Slider Name="screenBrightness" Minimum="0" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding Path=Controller.DisplayBrightness}" />
 					<Grid>
