@@ -53,6 +53,7 @@
   <ItemGroup>
     <Compile Include="Aero.cs" />
     <Compile Include="Aero15Xv8FanController.cs" />
+    <Compile Include="BatteryStatus.cs" />
     <Compile Include="HidDevice.cs" />
     <Compile Include="Native\DEVMODE.cs" />
     <Compile Include="Native\DisplayDeviceStateFlags.cs" />

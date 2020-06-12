@@ -80,17 +80,8 @@ namespace AeroCtl
 			this.getClass = new ManagementClass(scope, new ManagementPath("GB_WMIACPI_Get"), null);
 			this.setClass = new ManagementClass(scope, new ManagementPath("GB_WMIACPI_Set"), null);
 
-			foreach (ManagementObject obj in this.getClass.GetInstances().OfType<ManagementObject>())
-			{
-				this.get = obj;
-				break;
-			}
-
-			foreach (ManagementObject obj in this.setClass.GetInstances().OfType<ManagementObject>())
-			{
-				this.set = obj;
-				break;
-			}
+			this.get = this.getClass.GetInstances().OfType<ManagementObject>().FirstOrDefault();
+			this.set = this.setClass.GetInstances().OfType<ManagementObject>().FirstOrDefault();
 
 			if (this.get == null)
 				throw new InvalidOperationException("Failed to find instance for GB_WMIACPI_Get. Your device is probably not supported.");

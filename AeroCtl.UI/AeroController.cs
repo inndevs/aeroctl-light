@@ -5,17 +5,20 @@ using System.Collections.Immutable;
 using System.Collections.Specialized;
 using System.ComponentModel;
 using System.Diagnostics;
+using System.Globalization;
 using System.Json;
 using System.Linq;
 using System.Runtime.CompilerServices;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows.Controls;
 using System.Windows.Documents;
-using AeroCtl.Native;
+using System.Windows.Forms;
 using AeroCtl.UI.Properties;
 using AeroCtl.UI.SoftwareFan;
 using LibreHardwareMonitor.Hardware;
+using PowerLineStatus = AeroCtl.Native.PowerLineStatus;
 
 namespace AeroCtl.UI
 {
@@ -299,6 +302,49 @@ namespace AeroCtl.UI
 
 		#endregion
 
+		#region BatteryString
+
+		public string BatteryString
+		{
+			get
+			{
+				StringBuilder str = new StringBuilder();
+
+				str.Append("Charge: ");
+				str.Append(this.BatteryChargePercent);
+				str.Append(" % (");
+				str.Append(this.BatteryCharge.ToString("F1", CultureInfo.InvariantCulture));
+				str.Append(" Wh");
+
+				if (Math.Abs(this.BatteryChargeRate) > 0.0)
+				{
+					str.Append(" +");
+					str.Append(this.batteryChargeRate.ToString("F1", CultureInfo.InvariantCulture));
+					str.Append(" W");
+				}
+
+				if (Math.Abs(this.BatteryDischargeRate) > 0.0)
+				{
+					str.Append(" -");
+					str.Append(this.BatteryDischargeRate.ToString("F1", CultureInfo.InvariantCulture));
+					str.Append(" W");
+				}
+
+				if (Math.Abs(this.BatteryVoltage) > 0.0)
+				{
+					str.Append(" @ ");
+					str.Append(this.BatteryVoltage.ToString("F2", CultureInfo.InvariantCulture));
+					str.Append(" V");
+				}
+
+				str.Append(")");
+
+				return str.ToString();
+			}
+		}
+
+		#endregion
+
 		#region BatteryCycles
 
 		private int batteryCycles;
@@ -309,6 +355,23 @@ namespace AeroCtl.UI
 			{
 				this.batteryCycles = value;
 				this.OnPropertyChanged();
+				this.OnPropertyChanged(nameof(this.BatteryString));
+			}
+		}
+
+		#endregion
+
+		#region BatteryChargePercent
+
+		private int batteryChargePercent;
+		public int BatteryChargePercent
+		{
+			get => this.batteryChargePercent;
+			private set
+			{
+				this.batteryChargePercent = value;
+				this.OnPropertyChanged();
+				this.OnPropertyChanged(nameof(this.BatteryString));
 			}
 		}
 
@@ -316,14 +379,63 @@ namespace AeroCtl.UI
 
 		#region BatteryCharge
 
-		private int batteryCharge;
-		public int BatteryCharge
+		private double batteryCharge;
+		public double BatteryCharge
 		{
 			get => this.batteryCharge;
 			private set
 			{
 				this.batteryCharge = value;
 				this.OnPropertyChanged();
+				this.OnPropertyChanged(nameof(this.BatteryString));
+			}
+		}
+
+		#endregion
+
+		#region BatteryChargeRate
+
+		private double batteryChargeRate;
+		public double BatteryChargeRate
+		{
+			get => this.batteryChargeRate;
+			private set
+			{
+				this.batteryChargeRate = value;
+				this.OnPropertyChanged();
+				this.OnPropertyChanged(nameof(this.BatteryString));
+			}
+		}
+
+		#endregion
+
+		#region BatteryDischargeRate
+
+		private double batteryDischargeRate;
+		public double BatteryDischargeRate
+		{
+			get => this.batteryDischargeRate;
+			private set
+			{
+				this.batteryDischargeRate = value;
+				this.OnPropertyChanged();
+				this.OnPropertyChanged(nameof(this.BatteryString));
+			}
+		}
+
+		#endregion
+
+		#region BatteryVoltage
+
+		private double batteryVoltage;
+		public double BatteryVoltage
+		{
+			get => this.batteryVoltage;
+			private set
+			{
+				this.batteryVoltage = value;
+				this.OnPropertyChanged();
+				this.OnPropertyChanged(nameof(this.BatteryString));
 			}
 		}
 
@@ -343,6 +455,7 @@ namespace AeroCtl.UI
 		}
 
 		#endregion
+
 
 		#region SmartCharge
 
@@ -375,6 +488,12 @@ namespace AeroCtl.UI
 
 				if (!this.updating.Value)
 					this.updates.Enqueue(() => this.Aero.Battery.SetChargePolicyAsync(value ? ChargePolicy.CustomStop : ChargePolicy.Full));
+				
+				if (!this.loading && !this.updating.Value)
+				{
+					Settings.Default.ChargeStop = this.ChargeStopEnabled ? this.ChargeStop : -1;
+					Settings.Default.Save();
+				}
 			}
 		}
 
@@ -393,6 +512,12 @@ namespace AeroCtl.UI
 
 				if (!this.updating.Value)
 					this.updates.Enqueue(() => this.Aero.Battery.SetChargeStopAsync(value));
+
+				if (!this.loading && !this.updating.Value)
+				{
+					Settings.Default.ChargeStop = this.ChargeStopEnabled ? this.ChargeStop : -1;
+					Settings.Default.Save();
+				}
 			}
 		}
 
@@ -595,6 +720,22 @@ namespace AeroCtl.UI
 
 		#endregion
 
+		#region DisplayAvailable
+
+		private bool displayAvailable;
+
+		public bool DisplayAvailable
+		{
+			get => this.displayAvailable;
+			private set
+			{
+				this.displayAvailable = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
 		#region DisplayFrequencies
 
 		private IReadOnlyList<uint> displayFrequencies;
@@ -703,6 +844,8 @@ namespace AeroCtl.UI
 				this.AutoFanAdjust = s.AutoFanAdjust;
 				this.DisplayFrequencyAc = s.DisplayFrequencyAc;
 				this.DisplayFrequencyDc = s.DisplayFrequencyDc;
+				this.ChargeStopEnabled = s.ChargeStop >= 0;
+				this.ChargeStop = s.ChargeStop >= 0 ? s.ChargeStop : 97;
 
 				this.SoftwareFanConfig = new FanConfig();
 				if (s.SoftwareFanConfig != null && s.SoftwareFanConfig.Count > 0)
@@ -740,10 +883,10 @@ namespace AeroCtl.UI
 					await this.Aero.Fans.SetGamingAsync();
 					break;
 				case FanProfile.Fixed:
-					await this.Aero.Fans.SetFixedAsync(this.fixedFanSpeed);
+					await this.Aero.Fans.SetFixedAsync(this.FixedFanSpeed);
 					break;
 				case FanProfile.Auto:
-					await this.Aero.Fans.SetAutoAsync(this.autoFanAdjust);
+					await this.Aero.Fans.SetAutoAsync(this.AutoFanAdjust);
 					break;
 				case FanProfile.Custom:
 					await this.Aero.Fans.SetCustomAsync();
@@ -805,6 +948,7 @@ namespace AeroCtl.UI
 					(this.FanRpm1, this.FanRpm2) = await this.Aero.Fans.GetRpmAsync();
 					this.FanPwm = await this.Aero.Fans.GetPwmAsync() * 100;
 					this.DisplayBrightness = this.Aero.Display.Brightness;
+					this.DisplayAvailable = this.Aero.Display.GetIntegratedDisplayName() != null;
 					this.DisplayFrequencies = this.Aero.Display.GetIntegratedDisplayFrequencies().OrderBy(hz => hz).ToImmutableArray();
 
 					this.SmartCharge = await this.Aero.Battery.GetSmartChargeAsync();
@@ -812,7 +956,13 @@ namespace AeroCtl.UI
 					this.ChargeStop = await this.Aero.Battery.GetChargeStopAsync();
 					this.BatteryCycles = await this.Aero.Battery.GetCyclesAsync();
 					this.BatteryHealth = await this.Aero.Battery.GetHealthAsync();
-					this.BatteryCharge = await this.Aero.Battery.GetRemainingChargeAsync();
+
+					BatteryStatus status = await this.Aero.Battery.GetStatusAsync();
+					this.BatteryCharge = status.Charge;
+					this.BatteryChargePercent = status.ChargePercent;
+					this.BatteryChargeRate = status.ChargeRate;
+					this.BatteryDischargeRate = status.DischargeRate;
+					this.BatteryVoltage = status.Voltage;
 				
 					this.WifiEnabled = await this.Aero.GetWifiEnabledAsync();
 					this.BluetoothEnabled = await this.Aero.Bluetooth.GetEnabledAsync();

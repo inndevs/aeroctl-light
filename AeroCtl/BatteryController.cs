@@ -7,11 +7,14 @@ using AeroCtl.Native;
 
 namespace AeroCtl
 {
+	/// <summary>
+	/// Laptop battery controller
+	/// </summary>
 	public class BatteryController
 	{
 		private readonly AeroWmi wmi;
 		private bool healthSupported = true;
-
+		
 		public PowerLineStatus PowerLineStatus
 		{
 			get
@@ -24,6 +27,47 @@ namespace AeroCtl
 		public BatteryController(AeroWmi wmi)
 		{
 			this.wmi = wmi;
+		}
+
+		/// <summary>
+		/// Returns the current battery status.
+		/// </summary>
+		/// <returns></returns>
+		public async Task<BatteryStatus> GetStatusAsync()
+		{
+			return await Task.Run(() =>
+			{
+				ManagementObject batt = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Battery")
+					.Get()
+					.OfType<ManagementObject>()
+					.FirstOrDefault();
+
+				ManagementObject status = new ManagementObjectSearcher("root\\WMI", "SELECT * FROM BatteryStatus")
+					.Get()
+					.OfType<ManagementObject>()
+					.FirstOrDefault();
+
+				int percent = 0;
+				double charge = 0;
+				double chargeRate = 0;
+				double dischargeRate = 0;
+				double voltage = 0;
+				
+				if (batt != null)
+				{
+					percent = (ushort)batt["EstimatedChargeRemaining"];
+				}
+
+				if (status != null)
+				{
+					charge = (uint)status.GetPropertyValue("RemainingCapacity") / 1000.0;
+					chargeRate = (int)status.GetPropertyValue("ChargeRate") / 1000.0;
+					dischargeRate = (int)status.GetPropertyValue("DischargeRate") / 1000.0;
+					voltage = (uint)status.GetPropertyValue("Voltage") / 1000.0;
+				}
+
+				return new BatteryStatus(charge, percent, chargeRate, dischargeRate, voltage);
+			});
 		}
 
 		public async Task<ChargePolicy> GetChargePolicyAsync()
@@ -57,22 +101,6 @@ namespace AeroCtl
 		public async Task SetSmargeChargeAsync(bool enabled)
 		{
 			await this.wmi.InvokeSetAsync<byte>("SetSmartCharge", enabled ? (byte)1 : (byte)0);
-		}
-
-		public async Task<int> GetRemainingChargeAsync()
-		{
-			return await Task.Run(() =>
-			{
-				ManagementObject batt = new ManagementObjectSearcher("root\\CIMV2", "SELECT * FROM Win32_Battery")
-					.Get()
-					.OfType<ManagementObject>()
-					.FirstOrDefault();
-
-				if (batt == null)
-					return 0;
-
-				return (ushort)batt["EstimatedChargeRemaining"];
-			});
 		}
 
 		public async Task<int?> GetHealthAsync()

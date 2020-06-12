@@ -76,7 +76,7 @@
 
 					<TextBlock Grid.Row="3" Grid.Column="0" Margin="2">Keyboard FW version</TextBlock>
 					<DockPanel Grid.Row="3" Grid.Column="1">
-						<Button DockPanel.Dock="Right" Click="onResetKeyboardClicked">Reset keyboard</Button>
+						<Button DockPanel.Dock="Right" Click="onResetKeyboardClicked" ToolTip="Issues a hardware reset to the keyboard controller. Sometimes the firmware seems to break, in which case this button usually fixes it.">Reset keyboard</Button>
 						<TextBox  IsReadOnly="True" Text="{Binding Path=Controller.KeyboardFWVersion, Mode=OneWay}" />
 					</DockPanel>
 
@@ -132,7 +132,7 @@
 							<RowDefinition Height="Auto"></RowDefinition>
 						</Grid.RowDefinitions>
 						<Label Grid.Row="0" Grid.Column="0" Target="{Binding ElementName=displayFreqDc}">Battery display frequency:</Label>
-						<ComboBox Grid.Row="0" Grid.Column="1" Name="displayFreqDc" ItemsSource="{Binding Path=Controller.DisplayFrequencyChoices}" SelectedItem="{Binding Path=Controller.DisplayFrequencyDc}">
+						<ComboBox Grid.Row="0" Grid.Column="1" Name="displayFreqDc" ItemsSource="{Binding Path=Controller.DisplayFrequencyChoices}" SelectedItem="{Binding Path=Controller.DisplayFrequencyDc}" IsEnabled="{Binding Path=Controller.DisplayAvailable}">
 							<ComboBox.ItemTemplate>
 								<DataTemplate>
 									<TextBlock Text="{Binding Converter={StaticResource DispFreqConv}}"/>
@@ -140,7 +140,7 @@
 							</ComboBox.ItemTemplate>
 						</ComboBox>
 						<Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=displayFreqAc}">AC display frequency:</Label>
-						<ComboBox Grid.Row="1" Grid.Column="1" Name="displayFreqAc" ItemsSource="{Binding Path=Controller.DisplayFrequencyChoices}" SelectedItem="{Binding Path=Controller.DisplayFrequencyAc}">
+						<ComboBox Grid.Row="1" Grid.Column="1" Name="displayFreqAc" ItemsSource="{Binding Path=Controller.DisplayFrequencyChoices}" SelectedItem="{Binding Path=Controller.DisplayFrequencyAc}" IsEnabled="{Binding Path=Controller.DisplayAvailable}">
 							<ComboBox.ItemTemplate>
 								<DataTemplate>
 									<TextBlock Text="{Binding Converter={StaticResource DispFreqConv}}"/>
@@ -155,31 +155,31 @@
 				<StackPanel>
 					<Grid>
 						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="90" />
-							<ColumnDefinition Width="90" />
-							<ColumnDefinition Width="90" />
+							<ColumnDefinition Width="100" />
 							<ColumnDefinition Width="Auto" />
 						</Grid.ColumnDefinitions>
+						<Grid.RowDefinitions>
+							<RowDefinition />
+							<RowDefinition />
+						</Grid.RowDefinitions>
 						
-						<StackPanel Orientation="Horizontal" Grid.Column="0">
-							<TextBlock Margin="0 0 5 0">Charge:</TextBlock>
-							<TextBlock Text="{Binding Path=Controller.BatteryCharge, Mode=OneWay}" />
-							<TextBlock Margin="2 0 0 0">%</TextBlock>
+						<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
+							<TextBlock Margin="0 0 5 0">Status:</TextBlock>
+							<TextBlock Text="{Binding Path=Controller.PowerLineStatus, Mode=OneWay, Converter={StaticResource PowerLineConv}}" />
 						</StackPanel>
 
-						<StackPanel Orientation="Horizontal" Grid.Column="1">
+						<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
+							<TextBlock Text="{Binding Path=Controller.BatteryString, Mode=OneWay}" />
+						</StackPanel>
+
+						<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0">
 							<TextBlock Margin="0 0 5 0">Cycles:</TextBlock>
 							<TextBlock Text="{Binding Path=Controller.BatteryCycles, Mode=OneWay}" />
 						</StackPanel>
 
-						<StackPanel Orientation="Horizontal" Grid.Column="2">
+						<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
 							<TextBlock Margin="0 0 5 0">Health:</TextBlock>
 							<TextBlock Text="{Binding Path=Controller.BatteryHealth, Mode=OneWay}" />
-						</StackPanel>
-
-						<StackPanel Orientation="Horizontal" Grid.Column="3">
-							<TextBlock Margin="0 0 5 0">Status:</TextBlock>
-							<TextBlock Text="{Binding Path=Controller.PowerLineStatus, Mode=OneWay, Converter={StaticResource PowerLineConv}}" />
 						</StackPanel>
 					</Grid>
 
