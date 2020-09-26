@@ -288,14 +288,14 @@ namespace AeroCtl.UI
 
 		#region PowerLineStatus
 
-		private PowerLineStatus powerLineStatus;
+		private BatteryState batteryState;
 
-		public PowerLineStatus PowerLineStatus
+		public BatteryState BatteryState
 		{
-			get => this.powerLineStatus;
+			get => this.batteryState;
 			private set
 			{
-				this.powerLineStatus = value;
+				this.batteryState = value;
 				this.OnPropertyChanged();
 			}
 		}
@@ -932,7 +932,7 @@ namespace AeroCtl.UI
 					this.Sku = this.Aero.Sku;
 					this.SerialNumber = this.Aero.SerialNumber;
 					this.BiosVersion = string.Join("; ", this.Aero.BiosVersions);
-					this.PowerLineStatus = this.Aero.Battery.PowerLineStatus;
+					this.BatteryState = this.Aero.Battery.State;
 
 					if (this.Aero.Keyboard.Rgb != null)
 						this.KeyboardFWVersion = await this.Aero.Keyboard.Rgb.GetFirmwareVersionAsync();
@@ -986,21 +986,21 @@ namespace AeroCtl.UI
 					this.CameraEnabled = await this.Aero.GetCameraEnabledAsync();
 				}
 
-				PowerLineStatus prevPowerStatus = this.PowerLineStatus;
-				this.PowerLineStatus = this.Aero.Battery.PowerLineStatus;
+				BatteryState prevBatteryState = this.BatteryState;
+				this.BatteryState = this.Aero.Battery.State;
 
-				if (this.PowerLineStatus != prevPowerStatus)
+				if (this.BatteryState != prevBatteryState)
 				{
-					if (this.PowerLineStatus == PowerLineStatus.Online && this.DisplayFrequencyAc > 0)
-					{
-						Debug.WriteLine($"Changing display frequency to {this.DisplayFrequencyAc}");
-						this.Aero.Display.SetIntegratedDisplayFrequency(this.DisplayFrequencyAc);
-					}
-
-					if (this.PowerLineStatus == PowerLineStatus.Offline && this.DisplayFrequencyDc > 0)
+					if (this.BatteryState == BatteryState.DC && this.DisplayFrequencyDc > 0)
 					{
 						Debug.WriteLine($"Changing display frequency to {this.DisplayFrequencyDc}");
 						this.Aero.Display.SetIntegratedDisplayFrequency(this.DisplayFrequencyDc);
+					}
+					
+					if (this.BatteryState != BatteryState.DC && this.DisplayFrequencyAc > 0)
+					{
+						Debug.WriteLine($"Changing display frequency to {this.DisplayFrequencyAc}");
+						this.Aero.Display.SetIntegratedDisplayFrequency(this.DisplayFrequencyAc);
 					}
 				}
 			}

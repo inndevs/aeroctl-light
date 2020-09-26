@@ -69,7 +69,7 @@
     <Compile Include="BooleanVisibilityConverter.cs" />
     <Compile Include="DisplayFrequencyConverter.cs" />
     <Compile Include="EnumerationExtension.cs" />
-    <Compile Include="PowerLineStatusConverter.cs" />
+    <Compile Include="BatteryStateConverter.cs" />
     <Compile Include="SoftwareFan\FanConfig.cs" />
     <Compile Include="FanConfigEditor.xaml.cs">
       <DependentUpon>FanConfigEditor.xaml</DependentUpon>

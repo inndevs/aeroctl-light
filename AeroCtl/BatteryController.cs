@@ -7,6 +7,13 @@ using AeroCtl.Native;
 
 namespace AeroCtl
 {
+	public enum BatteryState
+	{
+		NoBattery,
+		AC,
+		DC,
+	}
+
 	/// <summary>
 	/// Laptop battery controller
 	/// </summary>
@@ -15,12 +22,24 @@ namespace AeroCtl
 		private readonly AeroWmi wmi;
 		private bool healthSupported = true;
 		
-		public PowerLineStatus PowerLineStatus
+		public BatteryState State
 		{
 			get
 			{
 				Kernel32.GetSystemPowerStatus(out SYSTEM_POWER_STATUS status);
-				return status.ACLineStatus;
+				if (status.BatteryLifePercent == 255)
+					return BatteryState.NoBattery;
+
+				switch (status.ACLineStatus)
+				{
+					case PowerLineStatus.Online:
+						return BatteryState.AC;
+
+					case PowerLineStatus.Offline:
+						return BatteryState.DC;
+				}
+
+				return BatteryState.NoBattery;
 			}
 		}
 
@@ -52,18 +71,26 @@ namespace AeroCtl
 				double chargeRate = 0;
 				double dischargeRate = 0;
 				double voltage = 0;
-				
+
 				if (batt != null)
 				{
-					percent = (ushort)batt["EstimatedChargeRemaining"];
+					if (batt["EstimatedChargeRemaining"] is ushort v)
+						percent = v;
 				}
 
 				if (status != null)
 				{
-					charge = (uint)status.GetPropertyValue("RemainingCapacity") / 1000.0;
-					chargeRate = (int)status.GetPropertyValue("ChargeRate") / 1000.0;
-					dischargeRate = (int)status.GetPropertyValue("DischargeRate") / 1000.0;
-					voltage = (uint)status.GetPropertyValue("Voltage") / 1000.0;
+					if (status.GetPropertyValue("RemainingCapacity") is uint v1 && v1 != uint.MaxValue)
+						charge = v1 / 1000.0;
+					
+					if (status.GetPropertyValue("ChargeRate") is int v2)
+						chargeRate = v2 / 1000.0;
+
+					if (status.GetPropertyValue("DischargeRate") is int v3 && v3 != int.MinValue)
+						dischargeRate = v3 / 1000.0;
+
+					if (status.GetPropertyValue("Voltage") is uint v4 && v4 != uint.MaxValue)
+						voltage = v4 / 1000.0;
 				}
 
 				return new BatteryStatus(charge, percent, chargeRate, dischargeRate, voltage);

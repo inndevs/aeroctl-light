@@ -32,16 +32,16 @@ namespace AeroCtl
 				0x1044,
 				new ushort[]
 				{
-					0x7A38,
+					0x7A38, // Japan variant (?)
 					0x7A39,
 					0x7A3A,
-					0x7A3B,
+					0x7A3B, // UK/EU variant (?)
 					0x7A3C,
 					0x7A3D,
 					0x7A3C,
 					0x7A3D,
 					0x7A3E,
-					0x7A3F
+					0x7A3F // US variant (?)
 				}
 			}
 		};

@@ -5,20 +5,22 @@ using AeroCtl.Native;
 
 namespace AeroCtl.UI
 {
-	public class PowerLineStatusConverter : IValueConverter
+	public class BatteryStateConverter : IValueConverter
 	{
 		public object Convert(object value, Type targetType, object parameter, CultureInfo culture)
 		{
-			if (value is PowerLineStatus status)
+			if (value is BatteryState state)
 			{
-				switch (status)
+				switch (state)
 				{
-					case PowerLineStatus.Offline:
-						return "Battery";
-					case PowerLineStatus.Online:
+					case BatteryState.NoBattery:
+						return "No battery";
+					case BatteryState.AC:
 						return "AC";
+					case BatteryState.DC:
+						return "Battery";
 					default:
-						return "?";
+						throw new ArgumentOutOfRangeException();
 				}
 			}
 

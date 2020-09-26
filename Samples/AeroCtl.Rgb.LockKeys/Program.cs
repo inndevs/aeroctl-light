@@ -248,10 +248,10 @@ namespace AeroCtl.Rgb.LockKeys
 				int brightness = (await rgb.GetEffectAsync()).Brightness;
 
 				// Set new image.
-				await rgb.SetImageAsync(0, image);
+				await rgb.SetImageAsync(1, image);
 				await rgb.SetEffectAsync(new RgbEffect
 				{
-					Type = RgbEffectType.Custom0,
+					Type = RgbEffectType.Custom1,
 					Brightness = brightness,
 				});
 

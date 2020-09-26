@@ -56,6 +56,8 @@ namespace AeroCtl.Rgb.Rainbow
 				Ite829XRgbController rgb = (Ite829XRgbController)aero.Keyboard.Rgb;
 				byte[] image = new byte[512];
 
+				await rgb.SetEffectAsync(new RgbEffect {Type = RgbEffectType.Custom0, Brightness=255});
+				
 				double hStart = 0.0;
 				for (;;)
 				{

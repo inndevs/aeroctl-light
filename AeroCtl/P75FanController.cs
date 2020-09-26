@@ -12,7 +12,6 @@ namespace AeroCtl
 		#region Fields
 
 		private readonly AeroWmi wmi;
-		private bool gpuFan;
 
 		private const int minFanSpeed = 0;
 		private const int maxFanSpeed = 229;
@@ -25,7 +24,6 @@ namespace AeroCtl
 		public P75FanController(AeroWmi wmi)
 		{
 			this.wmi = wmi;
-			this.gpuFan = true;
 		}
 
 		#endregion
