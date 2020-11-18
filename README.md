@@ -1,5 +1,4 @@
-AeroCtl
-=======
+# AeroCtl
 
 This is a replacement for the Gigabyte "SmartManager" and/or "ControlCenter" found on the Gigabyte AERO series of notebooks. These apps can not simply be uninstalled without losing some functionality, such as Fn key support (Wifi toggle, display brightness, ...). Since these programs contain a lot of bloat and even require Intel XTU to be running at all times, and are generally pretty bad (how did they even pass QA with typos all over the place?), there was a need to replace them with something minimalist that covers everything not already covered by either standard Windows settings or dedicated tools like ThrottleStop, HWiNFO, etc. It currently implements:
 
@@ -23,7 +22,30 @@ Beware, this tool talks to various APIs, most of them proprietary and undocument
 
 This program likely will not run on a clean Windows installation as it depends on the Gigabyte ACPI WMI driver. I believe the only thing you need is `C:\Windows\SysWOW64\acpimof.dll` and its respective registry entry (see the "Installation" part [here](https://github.com/microsoft/Windows-driver-samples/tree/master/wmi/wmiacpi#installation)), but I have not tested this. The easiest way is to just install the Gigabyte app and disable all its autostarts and services.
 
-License
--------
+## Supported devices
+
+### Fully tested
+
+These laptops have been fully tested by the development team.
+
+* Aero 15-SA
+* Aero 15Xv8
+
+### Positive feedback
+
+Reports by users having a good experience.
+
+* Aero 15-YA
+* Aero 15-YB
+* Aero 15-KB
+
+### Negative feedback
+
+Laptops with open issues or other reports of limited functionality.
+
+* Aorus 15G-YB
+* Aorus 15G-KB
+
+## License
 
 GPLv3
