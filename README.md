@@ -22,6 +22,16 @@ Beware, this tool talks to various APIs, most of them proprietary and undocument
 
 This program likely will not run on a clean Windows installation as it depends on the Gigabyte ACPI WMI driver. I believe the only thing you need is `C:\Windows\SysWOW64\acpimof.dll` and its respective registry entry (see the "Installation" part [here](https://github.com/microsoft/Windows-driver-samples/tree/master/wmi/wmiacpi#installation)), but I have not tested this. The easiest way is to just install the Gigabyte app and disable all its autostarts and services.
 
+## Installation
+
+1. Install Gigabyte ControlCenter or SmartManager if it isn't already.
+    * Install .NET Framework 4.8 if it isn't already. It's included with Windows 10 1903 and up.
+2. Quit CC/SM and disable its autostart (e.g. via Task Manager's Autostart tab)
+3. Download the latest binary release package (https://gitlab.com/wtwrp/aeroctl/-/releases)
+4. Unpack the archive to your preferred directory.
+5. Run `AeroCtl.UI.exe` as administrator from the unpacked directory.
+6. (Optional) Use Windows' task scheduler to add a task to autostart aeroctl as administrator on logon.
+
 ## Supported devices
 
 ### Fully tested
