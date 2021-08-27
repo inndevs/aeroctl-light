@@ -1,6 +1,3 @@
-[submodule "ThirdParty/ManagedNativeWifi"]
-	path = ThirdParty/ManagedNativeWifi
-	url = https://gitlab.com/wtwrp/managednativewifi
 [submodule "ThirdParty/LibreHardwareMonitor"]
 	path = ThirdParty/LibreHardwareMonitor
 	url = https://gitlab.com/wtwrp/librehardwaremonitor
