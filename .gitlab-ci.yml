@@ -6,7 +6,6 @@ variables:
 
 before_script:
  - 'choco install -y dotnet-5.0-sdk'
- - 'dotnet restore .\AeroCtl.UI\'
 
 build:
   tags:
@@ -15,9 +14,8 @@ build:
    - windows-1809
   stage: build
   script:
-   - 'dotnet build .\AeroCtl.UI\ --no-incremental'
-   - 'dotnet publish .\AeroCtl.UI\ --configuration Release'
-   - '7z a AeroCtl.7z .\AeroCtl.UI\bin\Release\net48\publish\*'
+   - 'dotnet publish .\AeroCtl.UI\ --configuration Release --runtime win-x64 --no-self-contained'
+   - '7z a AeroCtl.7z .\AeroCtl.UI\bin\Release\net5.0-windows\win-x64\publish\*'
   artifacts:
     paths:
      - AeroCtl.7z
