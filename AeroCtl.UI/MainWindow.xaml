@@ -103,8 +103,9 @@
 							<StackPanel Margin="0 0 16 0" IsEnabled="{Binding Controller.GpuConfigAvailable}">
 								<CheckBox IsChecked="{Binding Controller.GpuBoost}" ToolTip="Seems to overclock the GPU a little.">GPU boost / OC</CheckBox>
 								<CheckBox IsChecked="{Binding Controller.GpuThermalTarget}" ToolTip="No idea what exactly this does. Turns the fans off for a second.">GPU thermal target</CheckBox>
-								<CheckBox IsChecked="{Binding Controller.GpuPowerConfig}" ToolTip="No idea what this does.">GPU power config</CheckBox>
-							</StackPanel>
+								<CheckBox IsChecked="{Binding Controller.GpuPowerConfig}" ToolTip="+10W TDP.">GPU power config</CheckBox>
+                                <CheckBox IsChecked="{Binding Controller.GpuDynamicBoost}" ToolTip="GPU dynamic TDP depends on CPU TDP.">GPU dynamic boost</CheckBox>
+                            </StackPanel>
 							<StackPanel Margin="0 0 16 0">
 								<CheckBox IsChecked="{Binding Controller.StartMinimized}" ToolTip="Whether the app will start minimized to tray.">Start minimized</CheckBox>
 							</StackPanel>
