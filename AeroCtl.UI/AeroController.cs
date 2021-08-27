@@ -63,7 +63,7 @@ namespace AeroCtl.UI
 		}
 
 		#endregion
-		
+
 		#region BaseBoard
 
 		private string baseBoard;
@@ -456,7 +456,6 @@ namespace AeroCtl.UI
 
 		#endregion
 
-
 		#region SmartCharge
 
 		private bool smartCharge;
@@ -488,7 +487,7 @@ namespace AeroCtl.UI
 
 				if (!this.updating.Value)
 					this.updates.Enqueue(() => this.Aero.Battery.SetChargePolicyAsync(value ? ChargePolicy.CustomStop : ChargePolicy.Full));
-				
+
 				if (!this.loading && !this.updating.Value)
 				{
 					Settings.Default.ChargeStop = this.ChargeStopEnabled ? this.ChargeStop : -1;
@@ -643,7 +642,7 @@ namespace AeroCtl.UI
 
 				if (!this.loading)
 				{
-					Settings.Default.SoftwareFanConfig = new StringCollection() {value.ToJson().ToString()};
+					Settings.Default.SoftwareFanConfig = new StringCollection() { value.ToJson().ToString() };
 					Settings.Default.Save();
 				}
 			}
@@ -669,6 +668,7 @@ namespace AeroCtl.UI
 		#region GpuAiBoost
 
 		private bool gpuAiBoost;
+		private bool gpuAiBoostSupported;
 		public bool GpuAiBoost
 		{
 			get => this.gpuAiBoost;
@@ -678,7 +678,17 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => ((P75GpuController)this.Aero.Gpu).SetAiBoostEnabledAsync(value));
+					this.updates.Enqueue(() => ((P7GpuController)this.Aero.Gpu).SetAiBoostEnabledAsync(value));
+			}
+		}
+
+		public bool GpuAiBoostSupported
+		{
+			get => this.gpuAiBoostSupported;
+			private set
+			{
+				this.gpuAiBoostSupported = value;
+				this.OnPropertyChanged();
 			}
 		}
 
@@ -687,6 +697,7 @@ namespace AeroCtl.UI
 		#region GpuAiBoost
 
 		private bool gpuDynamicBoost;
+		private bool gpuDynamicBoostSupported;
 		public bool GpuDynamicBoost
 		{
 			get => this.gpuDynamicBoost;
@@ -696,7 +707,17 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => ((P75GpuController)this.Aero.Gpu).SetDynamicBoostAsync(value));
+					this.updates.Enqueue(() => ((P7GpuController)this.Aero.Gpu).SetDynamicBoostAsync(value));
+			}
+		}
+
+		public bool GpuDynamicBoostSupported
+		{
+			get => this.gpuDynamicBoostSupported;
+			private set
+			{
+				this.gpuDynamicBoostSupported = value;
+				this.OnPropertyChanged();
 			}
 		}
 
@@ -705,6 +726,7 @@ namespace AeroCtl.UI
 		#region GpuPowerConfig
 
 		private bool gpuPowerConfig;
+		private bool gpuPowerConfigSupported;
 		public bool GpuPowerConfig
 		{
 			get => this.gpuPowerConfig;
@@ -714,7 +736,17 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => ((P75GpuController)this.Aero.Gpu).SetPowerConfigAsync(value));
+					this.updates.Enqueue(() => ((P7GpuController)this.Aero.Gpu).SetPowerConfigAsync(value));
+			}
+		}
+
+		public bool GpuPowerConfigSupported
+		{
+			get => this.gpuPowerConfigSupported;
+			private set
+			{
+				this.gpuPowerConfigSupported = value;
+				this.OnPropertyChanged();
 			}
 		}
 
@@ -723,6 +755,7 @@ namespace AeroCtl.UI
 		#region GpuThermalTarget
 
 		private bool gpuThermalTarget;
+		private bool gpuThermalTargetSupported;
 		public bool GpuThermalTarget
 		{
 			get => this.gpuThermalTarget;
@@ -732,7 +765,17 @@ namespace AeroCtl.UI
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => ((P75GpuController)this.Aero.Gpu).SetThermalTargetEnabledAsync(value));
+					this.updates.Enqueue(() => ((P7GpuController)this.Aero.Gpu).SetThermalTargetEnabledAsync(value));
+			}
+		}
+
+		public bool GpuThermalTargetSupported
+		{
+			get => this.gpuThermalTargetSupported;
+			private set
+			{
+				this.gpuThermalTargetSupported = value;
+				this.OnPropertyChanged();
 			}
 		}
 
@@ -896,7 +939,7 @@ namespace AeroCtl.UI
 		{
 			FanProfile newProfile = this.FanProfile;
 			Debug.WriteLine($"Applying fan profile {newProfile}");
-			
+
 			if (this.swFanController != null)
 			{
 				SoftwareFanController swCtl = this.swFanController;
@@ -971,13 +1014,19 @@ namespace AeroCtl.UI
 						this.GpuTemperature = this.hwMonitor.GpuTemperature;
 					}
 
-					if (this.Aero.Gpu is P75GpuController newGpu)
+					if (this.Aero.Gpu is P7GpuController newGpu)
 					{
 						this.GpuConfigAvailable = true;
-						this.GpuAiBoost = await newGpu.GetAiBoostEnabledAsync();
-						this.GpuPowerConfig = await newGpu.GetPowerConfigAsync();
-						this.GpuDynamicBoost = await newGpu.GetDynamicBoostAsync();
-						this.GpuThermalTarget = await newGpu.GetThermalTargetEnabledAsync();
+
+						this.GpuAiBoostSupported = newGpu.AiBoostSupported;
+						this.GpuPowerConfigSupported = newGpu.PowerConfigSupported;
+						this.GpuDynamicBoostSupported = newGpu.DynamicBoostSupported;
+						this.GpuThermalTargetSupported = newGpu.ThermalTargetSupported;
+
+						this.GpuAiBoost = this.GpuAiBoostSupported ? await newGpu.GetAiBoostEnabledAsync() : false;
+						this.GpuPowerConfig = this.GpuPowerConfigSupported ? await newGpu.GetPowerConfigAsync() : false;
+						this.GpuDynamicBoost = this.GpuDynamicBoostSupported ? await newGpu.GetDynamicBoostAsync() : false;
+						this.GpuThermalTarget = this.GpuThermalTargetSupported ? await newGpu.GetThermalTargetEnabledAsync() : false;
 					}
 
 					(this.FanRpm1, this.FanRpm2) = await this.Aero.Fans.GetRpmAsync();
@@ -999,7 +1048,7 @@ namespace AeroCtl.UI
 					this.BatteryChargeRate = status.ChargeRate;
 					this.BatteryDischargeRate = status.DischargeRate;
 					this.BatteryVoltage = status.Voltage;
-				
+
 					this.WifiEnabled = await this.Aero.GetWifiEnabledAsync();
 					this.BluetoothEnabled = await this.Aero.Bluetooth.GetEnabledAsync();
 					this.CameraEnabled = await this.Aero.GetCameraEnabledAsync();
@@ -1015,7 +1064,7 @@ namespace AeroCtl.UI
 						Debug.WriteLine($"Changing display frequency to {this.DisplayFrequencyDc}");
 						this.Aero.Display.SetIntegratedDisplayFrequency(this.DisplayFrequencyDc);
 					}
-					
+
 					if (this.BatteryState != BatteryState.DC && this.DisplayFrequencyAc > 0)
 					{
 						Debug.WriteLine($"Changing display frequency to {this.DisplayFrequencyAc}");

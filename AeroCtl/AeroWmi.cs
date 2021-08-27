@@ -216,6 +216,7 @@ namespace AeroCtl
 			ManagementBaseObject inParams = this.getClass.GetMethodParameters(methodName);
 			if (methodName == "GetNvPowerConfig")
             {
+				// Quirk
 				if (inParams != null)
                 {
 					inParams["Index"] = null;
@@ -237,6 +238,17 @@ namespace AeroCtl
 				Debug.WriteLine($"failed call {methodName} with params ({inParams}) = {e.Message}");
 			}
 			return default(T);
+		}
+
+		public bool HasMethod(string methodName)
+		{
+			foreach (var method in this.getClass.Methods)
+			{
+				if (method.Name == methodName)
+					return true;
+			}
+
+			return false;
 		}
 
 		public Task<T> InvokeGetAsync<T>(string methodName)

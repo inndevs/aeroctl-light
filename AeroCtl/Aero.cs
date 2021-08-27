@@ -69,7 +69,7 @@ namespace AeroCtl
 				{
 					if (this.Sku.StartsWith("P7"))
 					{
-						this.gpu = new P75GpuController(this.Wmi);
+						this.gpu = new P7GpuController(this.Wmi);
 					}
 					else
 					{
@@ -97,7 +97,7 @@ namespace AeroCtl
 				{
 					if (this.Sku.StartsWith("P7"))
 					{
-						this.fans = new P75FanController(this.Wmi);
+						this.fans = new P7FanController(this.Wmi);
 					}
 					else
 					{
