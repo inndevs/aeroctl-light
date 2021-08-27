@@ -24,12 +24,22 @@ namespace AeroCtl
 			await this.wmi.InvokeSetAsync<byte>("SetNvPowerConfig", value ? (byte)1 : (byte)0);
 		}
 
-		public async Task<bool> GetBoostEnabledAsync()
+		public async Task<bool> GetDynamicBoostAsync()
+		{
+			return await this.wmi.InvokeGetAsync<byte>("GetDynamicBoostStatus") != 0;
+		}
+
+		public async Task SetDynamicBoostAsync(bool value)
+		{
+			await this.wmi.InvokeSetAsync<byte>("SetDynamicBoostStatus", value ? (byte)1 : (byte)0);
+		}
+
+		public async Task<bool> GetAiBoostEnabledAsync()
 		{
 			return await this.wmi.InvokeGetAsync<byte>("GetAIBoostStatus") != 0;
 		}
 
-		public async Task SetBoostEnabledAsync(bool value)
+		public async Task SetAiBoostEnabledAsync(bool value)
 		{
 			await this.wmi.InvokeSetAsync<byte>("SetAIBoostStatus", value ? (byte)1 : (byte)0);
 		}

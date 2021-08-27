@@ -666,19 +666,37 @@ namespace AeroCtl.UI
 
 		#endregion
 
-		#region GpuBoost
+		#region GpuAiBoost
 
-		private bool gpuBoost;
-		public bool GpuBoost
+		private bool gpuAiBoost;
+		public bool GpuAiBoost
 		{
-			get => this.gpuBoost;
+			get => this.gpuAiBoost;
 			set
 			{
-				this.gpuBoost = value;
+				this.gpuAiBoost = value;
 				this.OnPropertyChanged();
 
 				if (!this.updating.Value)
-					this.updates.Enqueue(() => ((P75GpuController)this.Aero.Gpu).SetBoostEnabledAsync(value));
+					this.updates.Enqueue(() => ((P75GpuController)this.Aero.Gpu).SetAiBoostEnabledAsync(value));
+			}
+		}
+
+		#endregion
+
+		#region GpuAiBoost
+
+		private bool gpuDynamicBoost;
+		public bool GpuDynamicBoost
+		{
+			get => this.gpuDynamicBoost;
+			set
+			{
+				this.gpuDynamicBoost = value;
+				this.OnPropertyChanged();
+
+				if (!this.updating.Value)
+					this.updates.Enqueue(() => ((P75GpuController)this.Aero.Gpu).SetDynamicBoostAsync(value));
 			}
 		}
 
@@ -956,8 +974,9 @@ namespace AeroCtl.UI
 					if (this.Aero.Gpu is P75GpuController newGpu)
 					{
 						this.GpuConfigAvailable = true;
-						this.GpuBoost = await newGpu.GetBoostEnabledAsync();
+						this.GpuAiBoost = await newGpu.GetAiBoostEnabledAsync();
 						this.GpuPowerConfig = await newGpu.GetPowerConfigAsync();
+						this.GpuDynamicBoost = await newGpu.GetDynamicBoostAsync();
 						this.GpuThermalTarget = await newGpu.GetThermalTargetEnabledAsync();
 					}
 

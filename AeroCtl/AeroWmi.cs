@@ -213,8 +213,30 @@ namespace AeroCtl
 
 		public T InvokeGet<T>(string methodName)
 		{
-			ManagementBaseObject outParams = this.get.InvokeMethod(methodName, null, null);
-			return (T)outParams["Data"];
+			ManagementBaseObject inParams = this.getClass.GetMethodParameters(methodName);
+			if (methodName == "GetNvPowerConfig")
+            {
+				if (inParams != null)
+                {
+					inParams["Index"] = null;
+				}
+			}
+			try
+            {
+				ManagementBaseObject outParams = this.get.InvokeMethod(methodName, inParams, null);
+				if (outParams == null)
+				{
+					return default(T);
+				}
+				else
+				{
+					return (T)outParams["Data"];
+				}
+			} catch (Exception e)
+            {
+				Debug.WriteLine($"failed call {methodName} with params ({inParams}) = {e.Message}");
+			}
+			return default(T);
 		}
 
 		public Task<T> InvokeGetAsync<T>(string methodName)
