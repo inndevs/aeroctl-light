@@ -5,7 +5,10 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 before_script:
+ - 'choco install -y nuget.commandline'
+ - 'choco install -y visualstudio2019buildtools'
  - 'choco install -y dotnet-5.0-sdk'
+ - 'dotnet nuget add source --name nuget.org https://api.nuget.org/v3/index.json'
 
 build:
   tags:
