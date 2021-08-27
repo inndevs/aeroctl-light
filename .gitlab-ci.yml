@@ -5,7 +5,7 @@ variables:
   GIT_SUBMODULE_STRATEGY: recursive
 
 before_script:
- - 'choco install -y netfx-4.8-devpack'
+ - 'choco install -y dotnet-5.0-sdk'
  - 'dotnet restore .\AeroCtl.UI\'
 
 build:

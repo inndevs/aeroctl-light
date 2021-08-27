@@ -1,38 +1,28 @@
-﻿<Project Sdk="Microsoft.NET.Sdk.WindowsDesktop">
+﻿<Project Sdk="Microsoft.NET.Sdk">
   <PropertyGroup>
-    <TargetFramework>net48</TargetFramework>
+    <TargetFramework>net5.0-windows</TargetFramework>
     <OutputType>WinExe</OutputType>
-
-    <ProjectGuid>{057BA2B1-1DEF-4088-B8E7-39B01F7DBE69}</ProjectGuid>
-
     <Description>Open-source AERO control panel</Description>
     <AssemblyTitle>AeroCtl</AssemblyTitle>
-    
     <Product>AeroCtl</Product>
-    <Copyright>Copyright © WTWRP 2019</Copyright>
+    <Copyright>Copyright © WTWRP 2021</Copyright>
     <Version>1.0.0.0</Version>
-
     <UseWpf>true</UseWpf>
     <UseWindowsForms>true</UseWindowsForms>
-    
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Main.ico</ApplicationIcon>
   </PropertyGroup>
-  
-  <ItemGroup>
-    <Reference Include="System.Data.DataSetExtensions" />
-    <Reference Include="System.Net.Http" />
-  </ItemGroup>
-  
+
   <ItemGroup>
     <ProjectReference Include="..\AeroCtl\AeroCtl.csproj" />
     <ProjectReference Include="..\ThirdParty\LibreHardwareMonitor\LibreHardwareMonitorLib\LibreHardwareMonitorLib.csproj" />
   </ItemGroup>
-  
+
   <ItemGroup>
     <None Remove="Main.ico" />
     <EmbeddedResource Include="Main.ico" />
-    
+    <PackageReference Include="System.Json" Version="4.7.1" />
+
     <Compile Update="Properties\Settings.Designer.cs">
       <DesignTimeSharedInput>True</DesignTimeSharedInput>
       <AutoGen>True</AutoGen>
