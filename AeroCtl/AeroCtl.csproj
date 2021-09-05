@@ -6,7 +6,6 @@
 
   <ItemGroup>
     <PackageReference Include="ManagedNativeWifi" Version="2.1.0" />
-    <PackageReference Include="Nito.AsyncEx" Version="5.1.0" />
     <PackageReference Include="NvAPIWrapper.Net" Version="0.8.1.101" />
     <PackageReference Include="System.Collections.Immutable" Version="5.0.0" />
     <PackageReference Include="System.Json" Version="4.7.1" />

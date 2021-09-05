@@ -1113,9 +1113,9 @@ namespace AeroCtl.UI
 
 			public async ValueTask SetSpeedAsync(double speed, CancellationToken cancellationToken)
 			{
-				if (this.controller.Aero.Fans is IFanControllerSync direct)
+				if (this.controller.Aero.Fans is IFanControllerSync syncController)
 				{
-					direct.SetFixed(speed);
+					syncController.SetFixed(speed);
 				}
 				else
 				{
