@@ -1042,24 +1042,32 @@ namespace AeroCtl.UI
 					this.CameraEnabled = await this.Aero.GetCameraEnabledAsync();
 				}
 
-				this.CpuTemperature = await this.Aero.Cpu.GetTemperatureAsync();
-				this.GpuTemperature = await this.Aero.Gpu.GetTemperatureAsync() ?? 0.0;
-
-				BatteryState prevBatteryState = this.BatteryState;
-				this.BatteryState = this.Aero.Battery.State;
-
-				if (this.BatteryState != prevBatteryState)
+				if (mode >= UpdateMode.Normal || this.fanProfile == FanProfile.Software)
 				{
-					if (this.BatteryState == BatteryState.DC && this.DisplayFrequencyDc > 0)
-					{
-						Debug.WriteLine($"Changing display frequency to {this.DisplayFrequencyDc}");
-						this.Aero.Display.SetIntegratedDisplayFrequency(this.DisplayFrequencyDc);
-					}
+					// Only update if UI is visible or software fan is on.
+					this.CpuTemperature = await this.Aero.Cpu.GetTemperatureAsync();
+					this.GpuTemperature = await this.Aero.Gpu.GetTemperatureAsync() ?? 0.0;
+				}
 
-					if (this.BatteryState != BatteryState.DC && this.DisplayFrequencyAc > 0)
+				if (mode >= UpdateMode.Normal || this.DisplayFrequencyDc > 0 || this.DisplayFrequencyAc > 0)
+				{
+					// Only update if UI is visible or display Hz per battery mode is set.
+					BatteryState prevBatteryState = this.BatteryState;
+					this.BatteryState = this.Aero.Battery.State;
+
+					if (this.BatteryState != prevBatteryState)
 					{
-						Debug.WriteLine($"Changing display frequency to {this.DisplayFrequencyAc}");
-						this.Aero.Display.SetIntegratedDisplayFrequency(this.DisplayFrequencyAc);
+						if (this.BatteryState == BatteryState.DC && this.DisplayFrequencyDc > 0)
+						{
+							Debug.WriteLine($"Changing display frequency to {this.DisplayFrequencyDc}");
+							this.Aero.Display.SetIntegratedDisplayFrequency(this.DisplayFrequencyDc);
+						}
+
+						if (this.BatteryState != BatteryState.DC && this.DisplayFrequencyAc > 0)
+						{
+							Debug.WriteLine($"Changing display frequency to {this.DisplayFrequencyAc}");
+							this.Aero.Display.SetIntegratedDisplayFrequency(this.DisplayFrequencyAc);
+						}
 					}
 				}
 			}

@@ -222,23 +222,20 @@ namespace AeroCtl
 					inParams["Index"] = null;
 				}
 			}
-			try
+
+			ManagementBaseObject outParams = this.get.InvokeMethod(methodName, inParams, null);
+			T res;
+			if (outParams == null)
 			{
-				ManagementBaseObject outParams = this.get.InvokeMethod(methodName, inParams, null);
-				if (outParams == null)
-				{
-					return default(T);
-				}
-				else
-				{
-					return (T)outParams["Data"];
-				}
+				res = default(T);
 			}
-			catch (Exception e)
+			else
 			{
-				Debug.WriteLine($"failed call {methodName} with params ({inParams}) = {e.Message}");
+				res = (T)outParams["Data"];
 			}
-			return default(T);
+
+			Debug.WriteLine($"{methodName}() = {res}");
+			return res;
 		}
 
 		public bool HasMethod(string methodName)
