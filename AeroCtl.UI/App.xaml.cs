@@ -3,6 +3,7 @@ using System.Diagnostics;
 using System.Drawing;
 using System.IO;
 using System.Reflection;
+using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -65,7 +66,7 @@ namespace AeroCtl.UI
 			};
 
 			this.trayIcon.DoubleClick += (s, e2) => { this.showWindow(); };
-			
+
 			// Handle Fn key events.
 			this.aero.Keyboard.FnKeyPressed += (s, e2) => { this.Dispatcher.InvokeAsync(() => this.handleFnKey(e2)); };
 			this.aero.Touchpad.EnabledChanged += (s, e2) => { this.Dispatcher.InvokeAsync(() => this.onTouchpadEnabledChanged().AsTask()); };
@@ -73,7 +74,7 @@ namespace AeroCtl.UI
 			// To re-apply fan profile after wake up:
 			SystemEvents.SessionSwitch += this.onSessionSwitch;
 			SystemEvents.PowerModeChanged += this.onPowerModeChanged;
-			
+
 			if (!this.controller.StartMinimized || Debugger.IsAttached)
 			{
 				// Show window if 'start minimized' isn't active.
@@ -83,7 +84,7 @@ namespace AeroCtl.UI
 
 		private async Task handleFnKey(FnKeyEventArgs e)
 		{
-			switch(e.Key)
+			switch (e.Key)
 			{
 				case FnKey.IncreaseBrightness:
 					this.aero.Display.Brightness = Math.Min(100, this.aero.Display.Brightness + 10);
@@ -99,7 +100,7 @@ namespace AeroCtl.UI
 					FanProfile fanProfile = this.controller.FanProfileAlt;
 					this.controller.FanProfileAlt = this.controller.FanProfile;
 					this.controller.FanProfile = fanProfile;
-				
+
 					this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Fan profile switched to \"{fanProfile}\".", ToolTipIcon.Info);
 					break;
 
@@ -122,16 +123,16 @@ namespace AeroCtl.UI
 					await this.aero.Display.ToggleScreenAsync();
 					break;
 
-				//case FnKey.ToggleTouchpad:
-				//	bool touchPad = !await this.aero.Touchpad.GetEnabledAsync();
-				//	await this.aero.Touchpad.SetEnabledAsync(touchPad);
-				//	this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Touchpad {(touchPad ? "enabled" : "disabled")}.", ToolTipIcon.Info);
-				//	break;
+					//case FnKey.ToggleTouchpad:
+					//	bool touchPad = !await this.aero.Touchpad.GetEnabledAsync();
+					//	await this.aero.Touchpad.SetEnabledAsync(touchPad);
+					//	this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Touchpad {(touchPad ? "enabled" : "disabled")}.", ToolTipIcon.Info);
+					//	break;
 			}
 		}
 
 		private async ValueTask onTouchpadEnabledChanged()
-		{ 
+		{
 			bool touchPad = await this.aero.Touchpad.GetEnabledAsync();
 			this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Touchpad {(touchPad ? "enabled" : "disabled")}.", ToolTipIcon.Info);
 		}
@@ -215,7 +216,7 @@ namespace AeroCtl.UI
 			await Task.Yield();
 			try
 			{
-				for (;;)
+				for (; ; )
 				{
 					UpdateMode mode = UpdateMode.Light;
 
@@ -233,6 +234,27 @@ namespace AeroCtl.UI
 					await Task.Delay(750, token);
 				}
 			}
+			catch (OperationCanceledException)
+			{
+				return;
+			}
+			catch (Exception ex)
+			{
+				StringBuilder str = new();
+				str.AppendLine($"An error occurred while trying to update AERO information. Your model might not be supported (yet). Would you like to open the project's issue page?");
+				str.AppendLine();
+				str.AppendLine("Exception details:");
+				str.Append(ex.ToString());
+				if (System.Windows.MessageBox.Show(str.ToString(), "Error", MessageBoxButton.YesNo, MessageBoxImage.Error) == MessageBoxResult.Yes)
+				{
+					Process.Start(new ProcessStartInfo("https://gitlab.com/wtwrp/aeroctl/issues")
+					{
+						UseShellExecute = true
+					});
+				}
+
+				throw;
+			}
 			finally
 			{
 				this.Shutdown();
@@ -243,8 +265,8 @@ namespace AeroCtl.UI
 		{
 			// Re-apply fan profile after someone logs in or out (when the laptop comes 
 			// back from sleep) because it will default to 'Normal' otherwise.
-			if (e.Reason == SessionSwitchReason.SessionUnlock || 
-			    e.Reason == SessionSwitchReason.SessionLock)
+			if (e.Reason == SessionSwitchReason.SessionUnlock ||
+				e.Reason == SessionSwitchReason.SessionLock)
 				this.controller.FanProfileInvalid = true;
 		}
 

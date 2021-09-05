@@ -94,5 +94,13 @@ namespace AeroCtl.UI
 			if (messageBoxResult == MessageBoxResult.Yes)
 				await this.Controller.ResetKeyboard();
 		}
+
+		private void onGitLabLinkClicked(object sender, System.Windows.Navigation.RequestNavigateEventArgs e)
+		{
+			Process.Start(new ProcessStartInfo(e.Uri.ToString())
+			{
+				UseShellExecute = true
+			});
+		}
 	}
 }

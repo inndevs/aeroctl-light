@@ -135,7 +135,7 @@ namespace AeroCtl
 
 		public Aero()
 		{
-			
+
 		}
 
 		#endregion

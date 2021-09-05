@@ -19,6 +19,10 @@
     <DockPanel>
         <StatusBar DockPanel.Dock="Bottom">
             <StatusBarItem Content="{Binding Path=GitInfo, Mode=OneWay}" ></StatusBarItem>
+            <Separator />
+            <StatusBarItem>
+                <Hyperlink NavigateUri="https://gitlab.com/wtwrp/aeroctl" RequestNavigate="onGitLabLinkClicked">GitLab</Hyperlink>
+            </StatusBarItem>
         </StatusBar>
         <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
             <StackPanel>
