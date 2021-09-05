@@ -22,11 +22,11 @@ namespace AeroCtl
 		private readonly ManagementObject set;
 
 		private bool initialized;
-		
+
 		#endregion
 
 		#region Properties
-		
+
 		private string baseBoard;
 		public string BaseBoard
 		{
@@ -46,7 +46,7 @@ namespace AeroCtl
 				return this.serialNumber;
 			}
 		}
-	
+
 		private string sku;
 		public string Sku
 		{
@@ -215,15 +215,15 @@ namespace AeroCtl
 		{
 			ManagementBaseObject inParams = this.getClass.GetMethodParameters(methodName);
 			if (methodName == "GetNvPowerConfig")
-            {
+			{
 				// Quirk
 				if (inParams != null)
-                {
+				{
 					inParams["Index"] = null;
 				}
 			}
 			try
-            {
+			{
 				ManagementBaseObject outParams = this.get.InvokeMethod(methodName, inParams, null);
 				if (outParams == null)
 				{
@@ -233,8 +233,9 @@ namespace AeroCtl
 				{
 					return (T)outParams["Data"];
 				}
-			} catch (Exception e)
-            {
+			}
+			catch (Exception e)
+			{
 				Debug.WriteLine($"failed call {methodName} with params ({inParams}) = {e.Message}");
 			}
 			return default(T);

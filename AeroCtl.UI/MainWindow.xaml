@@ -6,299 +6,304 @@
 		xmlns:local="clr-namespace:AeroCtl.UI"
 		mc:Ignorable="d"
 		DataContext="{Binding RelativeSource={RelativeSource Self}}"
-		Title="AERO Controls" MinWidth="450" Width="400" SizeToContent="Height">
-	<Window.Resources>
-		<local:EnumBooleanConverter x:Key="EnumConv" />
-		<local:BooleanVisibilityConverter x:Key="BoolVisConv" />
-		<local:DisplayFrequencyConverter x:Key="DispFreqConv" />
-		<local:BatteryStateConverter x:Key="BattConv" />
-		<Style TargetType="{x:Type CheckBox}">
-			<Setter Property="ToolTipService.ShowOnDisabled" Value="true"/>
-		</Style>
-	</Window.Resources>
-	<ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
-		<StackPanel>
-			<StackPanel.Resources >
-				<Style TargetType="GroupBox" >
-					<Setter Property="Margin" Value="5,5,5,0" />
-				</Style>
-				<Style TargetType="Separator">
-					<Setter Property="Background" Value="#D5DFE5" />
-				</Style>
-				<Style TargetType="TextBox">
-					<Setter Property="Margin" Value="1" />
-				</Style>
-			</StackPanel.Resources>
-		
-			<GroupBox Header="Info">
-				<Grid>
-					<Grid.RowDefinitions>
-						<RowDefinition />
-						<RowDefinition />
-						<RowDefinition />
-						<RowDefinition />
-						<RowDefinition />
-						<RowDefinition />
-					</Grid.RowDefinitions>
-					<Grid.ColumnDefinitions>
-						<ColumnDefinition Width="Auto" />
-						<ColumnDefinition Width="*" />
-					</Grid.ColumnDefinitions>
+		Title="AERO Controls" MinWidth="450" Width="400" SizeToContent="Height" ResizeMode="CanResizeWithGrip">
+    <Window.Resources>
+        <local:EnumBooleanConverter x:Key="EnumConv" />
+        <local:BooleanVisibilityConverter x:Key="BoolVisConv" />
+        <local:DisplayFrequencyConverter x:Key="DispFreqConv" />
+        <local:BatteryStateConverter x:Key="BattConv" />
+        <Style TargetType="{x:Type CheckBox}">
+            <Setter Property="ToolTipService.ShowOnDisabled" Value="true"/>
+        </Style>
+    </Window.Resources>
+    <DockPanel>
+        <StatusBar DockPanel.Dock="Bottom">
+            <StatusBarItem Content="{Binding Path=GitInfo, Mode=OneWay}" ></StatusBarItem>
+        </StatusBar>
+        <ScrollViewer VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Disabled">
+            <StackPanel>
+                <StackPanel.Resources >
+                    <Style TargetType="GroupBox" >
+                        <Setter Property="Margin" Value="5,5,5,0" />
+                    </Style>
+                    <Style TargetType="Separator">
+                        <Setter Property="Background" Value="#D5DFE5" />
+                    </Style>
+                    <Style TargetType="TextBox">
+                        <Setter Property="Margin" Value="1" />
+                    </Style>
+                </StackPanel.Resources>
 
-					<TextBlock Grid.Row="0" Grid.Column="0" Margin="2">Model / SKU</TextBlock>
-					<Grid Grid.Row="0" Grid.Column="1">
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="*" />
-							<ColumnDefinition Width="*" />
-						</Grid.ColumnDefinitions>
-						<TextBox Grid.Row="0" Grid.Column="0" IsReadOnly="True" Text="{Binding Path=Controller.BaseBoard, Mode=OneWay}" />
-						<TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Text="{Binding Path=Controller.Sku, Mode=OneWay}" />
-					</Grid>
+                <GroupBox Header="Info">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                            <RowDefinition />
+                        </Grid.RowDefinitions>
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="Auto" />
+                            <ColumnDefinition Width="*" />
+                        </Grid.ColumnDefinitions>
 
-					<TextBlock Grid.Row="1" Grid.Column="0" Margin="2">Serial number</TextBlock>
-					<TextBox Grid.Row="1" Grid.Column="1" x:Name="snTextBox" IsReadOnly="True" Text="{Binding Path=Controller.SerialNumber, Mode=OneWay}">
-						<TextBox.Resources>
-							<Style TargetType="{x:Type ScrollViewer}">
-								<Style.Triggers>
-									<DataTrigger Binding="{Binding ElementName=snTextBox, Path=IsFocused}" Value="False">
-										<Setter Property="Effect">
-											<Setter.Value>
-												<BlurEffect Radius="10"></BlurEffect>
-											</Setter.Value>
-										</Setter>
-									</DataTrigger>
-								</Style.Triggers>
-							</Style>
-						</TextBox.Resources>
-					</TextBox>
+                        <TextBlock Grid.Row="0" Grid.Column="0" Margin="2">Model / SKU</TextBlock>
+                        <Grid Grid.Row="0" Grid.Column="1">
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="*" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
+                            <TextBox Grid.Row="0" Grid.Column="0" IsReadOnly="True" Text="{Binding Path=Controller.BaseBoard, Mode=OneWay}" />
+                            <TextBox Grid.Row="0" Grid.Column="1" IsReadOnly="True" Text="{Binding Path=Controller.Sku, Mode=OneWay}" />
+                        </Grid>
 
-					<TextBlock Grid.Row="2" Grid.Column="0" Margin="2">BIOS version(s)</TextBlock>
-					<TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" Text="{Binding Path=Controller.BiosVersion, Mode=OneWay}" />
+                        <TextBlock Grid.Row="1" Grid.Column="0" Margin="2">Serial number</TextBlock>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="snTextBox" IsReadOnly="True" Text="{Binding Path=Controller.SerialNumber, Mode=OneWay}">
+                            <TextBox.Resources>
+                                <Style TargetType="{x:Type ScrollViewer}">
+                                    <Style.Triggers>
+                                        <DataTrigger Binding="{Binding ElementName=snTextBox, Path=IsFocused}" Value="False">
+                                            <Setter Property="Effect">
+                                                <Setter.Value>
+                                                    <BlurEffect Radius="10"></BlurEffect>
+                                                </Setter.Value>
+                                            </Setter>
+                                        </DataTrigger>
+                                    </Style.Triggers>
+                                </Style>
+                            </TextBox.Resources>
+                        </TextBox>
 
-					<TextBlock Grid.Row="3" Grid.Column="0" Margin="2">Keyboard FW version</TextBlock>
-					<DockPanel Grid.Row="3" Grid.Column="1">
-						<Button DockPanel.Dock="Right" Click="onResetKeyboardClicked" ToolTip="Issues a hardware reset to the keyboard controller. Sometimes the firmware seems to break, in which case this button usually fixes it.">Reset keyboard</Button>
-						<TextBox  IsReadOnly="True" Text="{Binding Path=Controller.KeyboardFWVersion, Mode=OneWay}" />
-					</DockPanel>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Margin="2">BIOS version(s)</TextBlock>
+                        <TextBox Grid.Row="2" Grid.Column="1" IsReadOnly="True" Text="{Binding Path=Controller.BiosVersion, Mode=OneWay}" />
 
-					<TextBlock Grid.Row="4" Grid.Column="0" Margin="2">Temperature</TextBlock>
-					<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
-						<TextBlock Margin="0 0 5 0">CPU</TextBlock>
-						<TextBlock Text="{Binding Path=Controller.CpuTemperature, Mode=OneWay}" />
-						<TextBlock Margin="2 0 0 0">°C</TextBlock>
-						<TextBlock Margin="5 0 5 0">/</TextBlock>
-						<TextBlock Margin="0 0 5 0">GPU</TextBlock>
-						<TextBlock Text="{Binding Path=Controller.GpuTemperature, Mode=OneWay}" />
-						<TextBlock Margin="2 0 0 0">°C</TextBlock>
-					</StackPanel>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Margin="2">Keyboard FW version</TextBlock>
+                        <DockPanel Grid.Row="3" Grid.Column="1">
+                            <Button DockPanel.Dock="Right" Click="onResetKeyboardClicked" ToolTip="Issues a hardware reset to the keyboard controller. Sometimes the firmware seems to break, in which case this button usually fixes it.">Reset keyboard</Button>
+                            <TextBox  IsReadOnly="True" Text="{Binding Path=Controller.KeyboardFWVersion, Mode=OneWay}" />
+                        </DockPanel>
 
-					<StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
-						<Separator />
-						<StackPanel Orientation="Horizontal">
-							<StackPanel Margin="0 0 16 0">
-								<CheckBox IsChecked="{Binding Controller.WifiEnabled}" ToolTip="Hardware rfkill.">Wifi enabled</CheckBox>
-								<CheckBox IsChecked="{Binding Controller.BluetoothEnabled}" ToolTip="Hardware rfkill.">Bluetooth enabled</CheckBox>
-								<CheckBox IsChecked="{Binding Controller.CameraEnabled}" ToolTip="Built-in webcam toggle.">Camera enabled</CheckBox>
-							</StackPanel>
-							<StackPanel Margin="0 0 16 0" IsEnabled="{Binding Controller.GpuConfigAvailable}">
-								<CheckBox IsChecked="{Binding Controller.GpuAiBoost}" IsEnabled="{Binding Controller.GpuAiBoostSupported}" ToolTip="Seems to overclock the GPU a little.">GPU boost / OC</CheckBox>
-								<CheckBox IsChecked="{Binding Controller.GpuThermalTarget}" IsEnabled="{Binding Controller.GpuThermalTargetSupported}" ToolTip="No idea what exactly this does. Turns the fans off for a second.">GPU thermal target</CheckBox>
-								<CheckBox IsChecked="{Binding Controller.GpuPowerConfig}" IsEnabled="{Binding Controller.GpuPowerConfigSupported}" ToolTip="+10W TDP.">GPU power config</CheckBox>
-                                <CheckBox IsChecked="{Binding Controller.GpuDynamicBoost}" IsEnabled="{Binding Controller.GpuDynamicBoostSupported}" ToolTip="GPU dynamic TDP depends on CPU TDP.">GPU dynamic boost</CheckBox>
+                        <TextBlock Grid.Row="4" Grid.Column="0" Margin="2">Temperature</TextBlock>
+                        <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal">
+                            <TextBlock Margin="0 0 5 0">CPU</TextBlock>
+                            <TextBlock Text="{Binding Path=Controller.CpuTemperature, Mode=OneWay}" />
+                            <TextBlock Margin="2 0 0 0">°C</TextBlock>
+                            <TextBlock Margin="5 0 5 0">/</TextBlock>
+                            <TextBlock Margin="0 0 5 0">GPU</TextBlock>
+                            <TextBlock Text="{Binding Path=Controller.GpuTemperature, Mode=OneWay}" />
+                            <TextBlock Margin="2 0 0 0">°C</TextBlock>
+                        </StackPanel>
+
+                        <StackPanel Grid.Row="5" Grid.Column="0" Grid.ColumnSpan="2">
+                            <Separator />
+                            <StackPanel Orientation="Horizontal">
+                                <StackPanel Margin="0 0 16 0">
+                                    <CheckBox IsChecked="{Binding Controller.WifiEnabled}" ToolTip="Hardware rfkill.">Wifi enabled</CheckBox>
+                                    <CheckBox IsChecked="{Binding Controller.BluetoothEnabled}" ToolTip="Hardware rfkill.">Bluetooth enabled</CheckBox>
+                                    <CheckBox IsChecked="{Binding Controller.CameraEnabled}" ToolTip="Built-in webcam toggle.">Camera enabled</CheckBox>
+                                </StackPanel>
+                                <StackPanel Margin="0 0 16 0" IsEnabled="{Binding Controller.GpuConfigAvailable}">
+                                    <CheckBox IsChecked="{Binding Controller.GpuAiBoost}" IsEnabled="{Binding Controller.GpuAiBoostSupported}" ToolTip="Seems to overclock the GPU a little.">GPU boost / OC</CheckBox>
+                                    <CheckBox IsChecked="{Binding Controller.GpuThermalTarget}" IsEnabled="{Binding Controller.GpuThermalTargetSupported}" ToolTip="No idea what exactly this does. Turns the fans off for a second.">GPU thermal target</CheckBox>
+                                    <CheckBox IsChecked="{Binding Controller.GpuPowerConfig}" IsEnabled="{Binding Controller.GpuPowerConfigSupported}" ToolTip="+10W TDP.">GPU power config</CheckBox>
+                                    <CheckBox IsChecked="{Binding Controller.GpuDynamicBoost}" IsEnabled="{Binding Controller.GpuDynamicBoostSupported}" ToolTip="GPU dynamic TDP depends on CPU TDP.">GPU dynamic boost</CheckBox>
+                                </StackPanel>
+                                <StackPanel Margin="0 0 16 0">
+                                    <CheckBox IsChecked="{Binding Controller.StartMinimized}" ToolTip="Whether the app will start minimized to tray.">Start minimized</CheckBox>
+                                </StackPanel>
                             </StackPanel>
-							<StackPanel Margin="0 0 16 0">
-								<CheckBox IsChecked="{Binding Controller.StartMinimized}" ToolTip="Whether the app will start minimized to tray.">Start minimized</CheckBox>
-							</StackPanel>
-						</StackPanel>
-					</StackPanel>
-				</Grid>
-			</GroupBox>
+                        </StackPanel>
+                    </Grid>
+                </GroupBox>
 
-			<GroupBox Header="Display">
-				<StackPanel>
-					<Label Target="{Binding ElementName=screenBrightness}">
-						<Grid>
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="145" />
-								<ColumnDefinition Width="Auto" />
-							</Grid.ColumnDefinitions>
-							<StackPanel Orientation="Horizontal" Grid.Column="0">
-								<TextBlock Margin="0 0 5 0">Screen brightness:</TextBlock>
-								<TextBlock Text="{Binding Path=Controller.DisplayBrightness, Mode=OneWay}" />
-								<TextBlock Margin="2 0 0 0">%</TextBlock>
-							</StackPanel>
-							<StackPanel Orientation="Horizontal" Grid.Column="1" Visibility="{Binding Path=Controller.DisplayAvailable, Mode=OneWay, Converter={StaticResource BoolVisConv}}">
-								<TextBlock Margin="0 0 5 0">Display frequency:</TextBlock>
-								<TextBlock Text="{Binding Path=Controller.DisplayFrequency, Mode=OneWay}" />
-								<TextBlock Margin="2 0 0 0">Hz </TextBlock>
-							</StackPanel>
-						</Grid>
-					</Label>
-					<Slider Name="screenBrightness" Minimum="0" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding Path=Controller.DisplayBrightness}" />
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="Auto" />
-							<ColumnDefinition Width="100" />
-						</Grid.ColumnDefinitions>
-						<Grid.RowDefinitions>
-							<RowDefinition Height="Auto"></RowDefinition>
-							<RowDefinition Height="Auto"></RowDefinition>
-						</Grid.RowDefinitions>
-						<Label Grid.Row="0" Grid.Column="0" Target="{Binding ElementName=displayFreqDc}">Battery display frequency:</Label>
-						<ComboBox Grid.Row="0" Grid.Column="1" Name="displayFreqDc" ItemsSource="{Binding Path=Controller.DisplayFrequencyChoices}" SelectedItem="{Binding Path=Controller.DisplayFrequencyDc}" IsEnabled="{Binding Path=Controller.DisplayAvailable}">
-							<ComboBox.ItemTemplate>
-								<DataTemplate>
-									<TextBlock Text="{Binding Converter={StaticResource DispFreqConv}}"/>
-								</DataTemplate>
-							</ComboBox.ItemTemplate>
-						</ComboBox>
-						<Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=displayFreqAc}">AC display frequency:</Label>
-						<ComboBox Grid.Row="1" Grid.Column="1" Name="displayFreqAc" ItemsSource="{Binding Path=Controller.DisplayFrequencyChoices}" SelectedItem="{Binding Path=Controller.DisplayFrequencyAc}" IsEnabled="{Binding Path=Controller.DisplayAvailable}">
-							<ComboBox.ItemTemplate>
-								<DataTemplate>
-									<TextBlock Text="{Binding Converter={StaticResource DispFreqConv}}"/>
-								</DataTemplate>
-							</ComboBox.ItemTemplate>
-						</ComboBox>
-					</Grid>
-				</StackPanel>
-			</GroupBox>
+                <GroupBox Header="Display">
+                    <StackPanel>
+                        <Label Target="{Binding ElementName=screenBrightness}">
+                            <Grid>
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="145" />
+                                    <ColumnDefinition Width="Auto" />
+                                </Grid.ColumnDefinitions>
+                                <StackPanel Orientation="Horizontal" Grid.Column="0">
+                                    <TextBlock Margin="0 0 5 0">Screen brightness:</TextBlock>
+                                    <TextBlock Text="{Binding Path=Controller.DisplayBrightness, Mode=OneWay}" />
+                                    <TextBlock Margin="2 0 0 0">%</TextBlock>
+                                </StackPanel>
+                                <StackPanel Orientation="Horizontal" Grid.Column="1" Visibility="{Binding Path=Controller.DisplayAvailable, Mode=OneWay, Converter={StaticResource BoolVisConv}}">
+                                    <TextBlock Margin="0 0 5 0">Display frequency:</TextBlock>
+                                    <TextBlock Text="{Binding Path=Controller.DisplayFrequency, Mode=OneWay}" />
+                                    <TextBlock Margin="2 0 0 0">Hz</TextBlock>
+                                </StackPanel>
+                            </Grid>
+                        </Label>
+                        <Slider Name="screenBrightness" Minimum="0" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding Path=Controller.DisplayBrightness}" />
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="100" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                                <RowDefinition Height="Auto"></RowDefinition>
+                            </Grid.RowDefinitions>
+                            <Label Grid.Row="0" Grid.Column="0" Target="{Binding ElementName=displayFreqDc}">Battery display frequency:</Label>
+                            <ComboBox Grid.Row="0" Grid.Column="1" Name="displayFreqDc" ItemsSource="{Binding Path=Controller.DisplayFrequencyChoices}" SelectedItem="{Binding Path=Controller.DisplayFrequencyDc}" IsEnabled="{Binding Path=Controller.DisplayAvailable}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Converter={StaticResource DispFreqConv}}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                            <Label Grid.Row="1" Grid.Column="0" Target="{Binding ElementName=displayFreqAc}">AC display frequency:</Label>
+                            <ComboBox Grid.Row="1" Grid.Column="1" Name="displayFreqAc" ItemsSource="{Binding Path=Controller.DisplayFrequencyChoices}" SelectedItem="{Binding Path=Controller.DisplayFrequencyAc}" IsEnabled="{Binding Path=Controller.DisplayAvailable}">
+                                <ComboBox.ItemTemplate>
+                                    <DataTemplate>
+                                        <TextBlock Text="{Binding Converter={StaticResource DispFreqConv}}"/>
+                                    </DataTemplate>
+                                </ComboBox.ItemTemplate>
+                            </ComboBox>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
 
-			<GroupBox Header="Battery">
-				<StackPanel>
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="120" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-						<Grid.RowDefinitions>
-							<RowDefinition />
-							<RowDefinition />
-						</Grid.RowDefinitions>
-						
-						<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
-							<TextBlock Margin="0 0 5 0">Status:</TextBlock>
-							<TextBlock Text="{Binding Path=Controller.BatteryState, Mode=OneWay, Converter={StaticResource BattConv}}" />
-						</StackPanel>
+                <GroupBox Header="Battery">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
 
-						<StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
-							<TextBlock Text="{Binding Path=Controller.BatteryString, Mode=OneWay}" />
-						</StackPanel>
+                            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="0">
+                                <TextBlock Margin="0 0 5 0">Status:</TextBlock>
+                                <TextBlock Text="{Binding Path=Controller.BatteryState, Mode=OneWay, Converter={StaticResource BattConv}}" />
+                            </StackPanel>
 
-						<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0">
-							<TextBlock Margin="0 0 5 0">Cycles:</TextBlock>
-							<TextBlock Text="{Binding Path=Controller.BatteryCycles, Mode=OneWay}" />
-						</StackPanel>
+                            <StackPanel Orientation="Horizontal" Grid.Row="0" Grid.Column="1">
+                                <TextBlock Text="{Binding Path=Controller.BatteryString, Mode=OneWay}" />
+                            </StackPanel>
 
-						<StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
-							<TextBlock Margin="0 0 5 0">Health:</TextBlock>
-							<TextBlock Text="{Binding Path=Controller.BatteryHealth, Mode=OneWay}" />
-						</StackPanel>
-					</Grid>
+                            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="0">
+                                <TextBlock Margin="0 0 5 0">Cycles:</TextBlock>
+                                <TextBlock Text="{Binding Path=Controller.BatteryCycles, Mode=OneWay}" />
+                            </StackPanel>
 
-					<Separator />
+                            <StackPanel Orientation="Horizontal" Grid.Row="1" Grid.Column="1">
+                                <TextBlock Margin="0 0 5 0">Health:</TextBlock>
+                                <TextBlock Text="{Binding Path=Controller.BatteryHealth, Mode=OneWay}" />
+                            </StackPanel>
+                        </Grid>
 
-					<StackPanel Orientation="Horizontal">
-						<CheckBox IsChecked="{Binding Path=Controller.SmartCharge}" ToolTip="No idea what 'smart' means in this context or what difference this makes." Margin="0 0 16 0">"Smart Charge" enabled</CheckBox>
-						<CheckBox IsChecked="{Binding Path=Controller.ChargeStopEnabled}" ToolTip="Tells to battery controller to stop charging at a specific percentage.">Charge stop enabled</CheckBox>
-					</StackPanel>
+                        <Separator />
 
-					<Label Target="{Binding ElementName=chargeStop}">
-						<StackPanel Orientation="Horizontal">
-							<TextBlock Margin="0 0 5 0">Charge stop:</TextBlock>
-							<TextBlock Text="{Binding Path=Controller.ChargeStop, Mode=OneWay}" />
-							<TextBlock Margin="2 0 0 0">%</TextBlock>
-						</StackPanel>
-					</Label>
-					<Slider Name="chargeStop" Minimum="1" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding Path=Controller.ChargeStop}" />
-				</StackPanel>
-			</GroupBox>
-			
-			<GroupBox Header="Fans">
-				<StackPanel>
-					<Grid>
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="100" />
-							<ColumnDefinition Width="120" />
-							<ColumnDefinition Width="Auto" />
-						</Grid.ColumnDefinitions>
-						
-						<StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" ToolTip="PWM percentage as reported by the hardware.">
-							<TextBlock Margin="0 0 5 0">PWM:</TextBlock>
-							<TextBlock Text="{Binding Path=Controller.FanPwm, Mode=OneWay, StringFormat=F1}" />
-							<TextBlock Margin="2 0 0 0">%</TextBlock>
-						</StackPanel>
+                        <StackPanel Orientation="Horizontal">
+                            <CheckBox IsChecked="{Binding Path=Controller.SmartCharge}" ToolTip="No idea what 'smart' means in this context or what difference this makes." Margin="0 0 16 0">"Smart Charge" enabled</CheckBox>
+                            <CheckBox IsChecked="{Binding Path=Controller.ChargeStopEnabled}" ToolTip="Tells to battery controller to stop charging at a specific percentage.">Charge stop enabled</CheckBox>
+                        </StackPanel>
 
-						<StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center" ToolTip="RPM as reported by the hardware.">
-							<TextBlock Margin="0 0 5 0">RPM:</TextBlock>
-							<TextBlock Text="{Binding Path=Controller.FanRpm1, Mode=OneWay}" />
-							<TextBlock Margin="5 0 5 0">/</TextBlock>
-							<TextBlock Text="{Binding Path=Controller.FanRpm2, Mode=OneWay}" />
-						</StackPanel>
+                        <Label Target="{Binding ElementName=chargeStop}">
+                            <StackPanel Orientation="Horizontal">
+                                <TextBlock Margin="0 0 5 0">Charge stop:</TextBlock>
+                                <TextBlock Text="{Binding Path=Controller.ChargeStop, Mode=OneWay}" />
+                                <TextBlock Margin="2 0 0 0">%</TextBlock>
+                            </StackPanel>
+                        </Label>
+                        <Slider Name="chargeStop" Minimum="1" Maximum="100" IsSnapToTickEnabled="True" Value="{Binding Path=Controller.ChargeStop}" />
+                    </StackPanel>
+                </GroupBox>
 
-						<StackPanel Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Center" ToolTip="Alternate profile that is activated when you press the fan Fn key.">
-							<TextBlock Margin="0 0 5 0" VerticalAlignment="Center">Alt. profile</TextBlock>
-							<ComboBox ItemsSource="{Binding Source={local:Enumeration {x:Type local:FanProfile}}}" DisplayMemberPath="Description" SelectedValue="{Binding Controller.FanProfileAlt}" SelectedValuePath="Value" />
-						</StackPanel>
-					</Grid>
+                <GroupBox Header="Fans">
+                    <StackPanel>
+                        <Grid>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="100" />
+                                <ColumnDefinition Width="120" />
+                                <ColumnDefinition Width="Auto" />
+                            </Grid.ColumnDefinitions>
 
-					<Separator />
+                            <StackPanel Orientation="Horizontal" Grid.Column="0" VerticalAlignment="Center" ToolTip="PWM percentage as reported by the hardware.">
+                                <TextBlock Margin="0 0 5 0">PWM:</TextBlock>
+                                <TextBlock Text="{Binding Path=Controller.FanPwm, Mode=OneWay, StringFormat=F1}" />
+                                <TextBlock Margin="2 0 0 0">%</TextBlock>
+                            </StackPanel>
 
-					<Grid>
-						<Grid.Resources>
-							<Style TargetType="RadioButton">
-								<Setter Property="VerticalAlignment" Value="Center" />
-								<Setter Property="Margin" Value="5" />
-							</Style>
-						</Grid.Resources>
+                            <StackPanel Orientation="Horizontal" Grid.Column="1" VerticalAlignment="Center" ToolTip="RPM as reported by the hardware.">
+                                <TextBlock Margin="0 0 5 0">RPM:</TextBlock>
+                                <TextBlock Text="{Binding Path=Controller.FanRpm1, Mode=OneWay}" />
+                                <TextBlock Margin="5 0 5 0">/</TextBlock>
+                                <TextBlock Text="{Binding Path=Controller.FanRpm2, Mode=OneWay}" />
+                            </StackPanel>
 
-						<Grid.RowDefinitions>
-							<RowDefinition />
-							<RowDefinition />
-							<RowDefinition />
-							<RowDefinition />
-							<RowDefinition />
-							<RowDefinition />
-							<RowDefinition />
-							<RowDefinition />
-						</Grid.RowDefinitions>
+                            <StackPanel Orientation="Horizontal" Grid.Column="2" VerticalAlignment="Center" ToolTip="Alternate profile that is activated when you press the fan Fn key.">
+                                <TextBlock Margin="0 0 5 0" VerticalAlignment="Center">Alt. profile</TextBlock>
+                                <ComboBox ItemsSource="{Binding Source={local:Enumeration {x:Type local:FanProfile}}}" DisplayMemberPath="Description" SelectedValue="{Binding Controller.FanProfileAlt}" SelectedValuePath="Value" />
+                            </StackPanel>
+                        </Grid>
 
-						<Grid.ColumnDefinitions>
-							<ColumnDefinition Width="Auto" />
-							<ColumnDefinition Width="*" />
-						</Grid.ColumnDefinitions>
+                        <Separator />
 
-						<Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
-							<Grid.ColumnDefinitions>
-								<ColumnDefinition Width="*" />
-								<ColumnDefinition Width="*" />
-								<ColumnDefinition Width="*" />
-							</Grid.ColumnDefinitions>
+                        <Grid>
+                            <Grid.Resources>
+                                <Style TargetType="RadioButton">
+                                    <Setter Property="VerticalAlignment" Value="Center" />
+                                    <Setter Property="Margin" Value="5" />
+                                </Style>
+                            </Grid.Resources>
 
-							<RadioButton Grid.Row="0" Grid.Column="0" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Quiet}}">Quiet</RadioButton>
-						
-							<RadioButton Grid.Row="0" Grid.Column="1" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Normal}}">Normal</RadioButton>
-						
-							<RadioButton Grid.Row="0" Grid.Column="2" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Gaming}}">Gaming</RadioButton>
-						</Grid>
-						
-						<RadioButton Grid.Row="1" Grid.Column="0" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Fixed}}" DockPanel.Dock="Left" Name="fanProfileFixed">Fixed</RadioButton>
-						<Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="False" Value="{Binding Path=Controller.FixedFanSpeed}" IsEnabled="{Binding ElementName=fanProfileFixed, Path=IsChecked}" />
-				   
-						<RadioButton Grid.Row="2" Grid.Column="0" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Auto}}" DockPanel.Dock="Left" Name="fanProfileAuto">Auto</RadioButton>
-						<Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="False" Value="{Binding Path=Controller.AutoFanAdjust}" IsEnabled="{Binding ElementName=fanProfileAuto, Path=IsChecked}" />
+                            <Grid.RowDefinitions>
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                                <RowDefinition />
+                            </Grid.RowDefinitions>
 
-						<RadioButton Grid.Row="3" Grid.Column="0" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Custom}}" DockPanel.Dock="Left" Name="fanProfileCustom">Custom</RadioButton>
-						<Button Grid.Row="3" Grid.Column="1" Width="90" Height="23" HorizontalAlignment="Left" IsEnabled="{Binding ElementName=fanProfileCustom, Path=IsChecked}" Click="onEditHwCurveClicked">Edit Curve</Button>
+                            <Grid.ColumnDefinitions>
+                                <ColumnDefinition Width="Auto" />
+                                <ColumnDefinition Width="*" />
+                            </Grid.ColumnDefinitions>
 
-						<RadioButton Grid.Row="4" Grid.Column="0" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Software}}" DockPanel.Dock="Left" Name="fanProfileSoftware">Software</RadioButton>
-						<StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" IsEnabled="{Binding ElementName=fanProfileSoftware, Path=IsChecked}">
-							<Button Width="90" Height="23" HorizontalAlignment="Left" Click="onEditSwCurveClicked" Margin="0 0 2 0">Edit Curve</Button>
-							<Button Width="90" Height="23" Click="onEditSwConfigClicked">Config</Button>
-						</StackPanel>
-					</Grid>
-				</StackPanel>
-			</GroupBox>
-		</StackPanel>
-	</ScrollViewer>
+                            <Grid Grid.Row="0" Grid.Column="0" Grid.ColumnSpan="2">
+                                <Grid.ColumnDefinitions>
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                    <ColumnDefinition Width="*" />
+                                </Grid.ColumnDefinitions>
+
+                                <RadioButton Grid.Row="0" Grid.Column="0" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Quiet}}">Quiet</RadioButton>
+
+                                <RadioButton Grid.Row="0" Grid.Column="1" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Normal}}">Normal</RadioButton>
+
+                                <RadioButton Grid.Row="0" Grid.Column="2" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Gaming}}">Gaming</RadioButton>
+                            </Grid>
+
+                            <RadioButton Grid.Row="1" Grid.Column="0" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Fixed}}" DockPanel.Dock="Left" Name="fanProfileFixed">Fixed</RadioButton>
+                            <Slider Grid.Row="1" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="False" Value="{Binding Path=Controller.FixedFanSpeed}" IsEnabled="{Binding ElementName=fanProfileFixed, Path=IsChecked}" />
+
+                            <RadioButton Grid.Row="2" Grid.Column="0" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Auto}}" DockPanel.Dock="Left" Name="fanProfileAuto">Auto</RadioButton>
+                            <Slider Grid.Row="2" Grid.Column="1" Minimum="0" Maximum="1" SmallChange="0.05" LargeChange="0.25" TickPlacement="BottomRight" TickFrequency="0.25" IsSnapToTickEnabled="False" Value="{Binding Path=Controller.AutoFanAdjust}" IsEnabled="{Binding ElementName=fanProfileAuto, Path=IsChecked}" />
+
+                            <RadioButton Grid.Row="3" Grid.Column="0" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Custom}}" DockPanel.Dock="Left" Name="fanProfileCustom">Custom</RadioButton>
+                            <Button Grid.Row="3" Grid.Column="1" Width="90" Height="23" HorizontalAlignment="Left" IsEnabled="{Binding ElementName=fanProfileCustom, Path=IsChecked}" Click="onEditHwCurveClicked">Edit Curve</Button>
+
+                            <RadioButton Grid.Row="4" Grid.Column="0" IsChecked="{Binding Path=Controller.FanProfile, Converter={StaticResource EnumConv}, ConverterParameter={x:Static local:FanProfile.Software}}" DockPanel.Dock="Left" Name="fanProfileSoftware">Software</RadioButton>
+                            <StackPanel Grid.Row="4" Grid.Column="1" Orientation="Horizontal" IsEnabled="{Binding ElementName=fanProfileSoftware, Path=IsChecked}">
+                                <Button Width="90" Height="23" HorizontalAlignment="Left" Click="onEditSwCurveClicked" Margin="0 0 2 0">Edit Curve</Button>
+                                <Button Width="90" Height="23" Click="onEditSwConfigClicked">Config</Button>
+                            </StackPanel>
+                        </Grid>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+    </DockPanel>
 </Window>

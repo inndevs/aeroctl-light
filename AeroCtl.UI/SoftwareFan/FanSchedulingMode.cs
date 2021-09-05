@@ -6,13 +6,13 @@ namespace AeroCtl.UI.SoftwareFan
 	{
 		[Description("Async task")]
 		AsyncTask,
-	
+
 		[Description("Thread (normal prio)")]
 		NormalThread,
 
 		[Description("Thread (above normal prio)")]
 		AboveNormalThread,
-	
+
 		[Description("Thread (highest prio)")]
 		HighestThread,
 	}

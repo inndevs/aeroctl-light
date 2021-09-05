@@ -7,7 +7,7 @@ namespace AeroCtl
 	/// <summary>
 	/// Implements the fan controller and thermal management of the notebook.
 	/// </summary>
-	public class P7FanController : IFanController, IDirectFanSpeedController
+	public class P7FanController : IFanController, IFanControllerSync
 	{
 		#region Fields
 

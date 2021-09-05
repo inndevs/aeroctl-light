@@ -42,7 +42,7 @@ namespace AeroCtl.UI.SoftwareFan
 			{
 				this.interval = value;
 				this.OnPropertyChanged();
-			} 
+			}
 		}
 
 		/// <summary>

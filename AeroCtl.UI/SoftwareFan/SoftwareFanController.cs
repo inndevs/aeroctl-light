@@ -137,7 +137,7 @@ namespace AeroCtl.UI.SoftwareFan
 
 		private async Task runAsync(CancellationToken cancellationToken)
 		{
-			for (;;)
+			for (; ; )
 			{
 				await Task.Delay(this.config.Interval, cancellationToken);
 				await this.update(cancellationToken);

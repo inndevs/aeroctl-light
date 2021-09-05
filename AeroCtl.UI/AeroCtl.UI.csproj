@@ -15,12 +15,12 @@
 
   <ItemGroup>
     <ProjectReference Include="..\AeroCtl\AeroCtl.csproj" />
-    <ProjectReference Include="..\ThirdParty\LibreHardwareMonitor\LibreHardwareMonitorLib\LibreHardwareMonitorLib.csproj" />
   </ItemGroup>
 
   <ItemGroup>
     <None Remove="Main.ico" />
     <EmbeddedResource Include="Main.ico" />
+    <PackageReference Include="GitInfo" Version="2.2.0" />
     <PackageReference Include="System.Json" Version="4.7.1" />
 
     <Compile Update="Properties\Settings.Designer.cs">

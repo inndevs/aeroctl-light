@@ -12,24 +12,18 @@ using System.Runtime.CompilerServices;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using System.Windows.Controls;
-using System.Windows.Documents;
-using System.Windows.Forms;
 using AeroCtl.UI.Properties;
 using AeroCtl.UI.SoftwareFan;
-using LibreHardwareMonitor.Hardware;
-using PowerLineStatus = AeroCtl.Native.PowerLineStatus;
 
 namespace AeroCtl.UI
 {
 	/// <summary>
-	/// Current state of the laptop for data binding.
+	/// Contain the current state of the laptop for data binding and controls its various properties.
 	/// </summary>
 	public class AeroController : INotifyPropertyChanged
 	{
 		#region Fields
 
-		private readonly HwMonitor hwMonitor;
 		private SoftwareFanController swFanController;
 		private readonly AsyncLocal<bool> updating;
 		private bool loading;
@@ -39,6 +33,9 @@ namespace AeroCtl.UI
 
 		#region Aero
 
+		/// <summary>
+		/// The wrapped <see cref="Aero"/> instance.
+		/// </summary>
 		public Aero Aero { get; }
 
 		#endregion
@@ -901,7 +898,6 @@ namespace AeroCtl.UI
 			this.Aero = aero;
 			this.updating = new AsyncLocal<bool>();
 			this.updates = new ConcurrentQueue<Func<Task>>();
-			this.hwMonitor = new HwMonitor();
 		}
 
 		#endregion
@@ -969,7 +965,7 @@ namespace AeroCtl.UI
 					await this.Aero.Fans.SetCustomAsync();
 					break;
 				case FanProfile.Software:
-					this.swFanController = new SoftwareFanController(this.SoftwareFanConfig, new AeroFanProvider(this.Aero, this.hwMonitor));
+					this.swFanController = new SoftwareFanController(this.SoftwareFanConfig, new FanProviderImpl(this));
 					break;
 				default:
 					throw new InvalidEnumArgumentException(nameof(this.FanProfile), (int)newProfile, typeof(FanProfile));
@@ -982,7 +978,6 @@ namespace AeroCtl.UI
 				await updateFunc();
 
 			Debug.Assert(!this.updating.Value);
-
 
 			this.updating.Value = true;
 			try
@@ -1005,13 +1000,6 @@ namespace AeroCtl.UI
 					{
 						this.FanProfileInvalid = false;
 						await this.applyFanProfileAsync();
-					}
-
-					lock (this.hwMonitor)
-					{
-						this.hwMonitor.Update();
-						this.CpuTemperature = this.hwMonitor.CpuTemperature;
-						this.GpuTemperature = this.hwMonitor.GpuTemperature;
 					}
 
 					if (this.Aero.Gpu is P7GpuController newGpu)
@@ -1054,6 +1042,9 @@ namespace AeroCtl.UI
 					this.CameraEnabled = await this.Aero.GetCameraEnabledAsync();
 				}
 
+				this.CpuTemperature = await this.Aero.Cpu.GetTemperatureAsync();
+				this.GpuTemperature = await this.Aero.Gpu.GetTemperatureAsync() ?? 0.0;
+
 				BatteryState prevBatteryState = this.BatteryState;
 				this.BatteryState = this.Aero.Battery.State;
 
@@ -1091,8 +1082,6 @@ namespace AeroCtl.UI
 				await this.swFanController.StopAsync();
 				this.swFanController = null;
 			}
-
-			this.hwMonitor?.Dispose();
 		}
 
 		public async ValueTask<bool> ResetKeyboard()
@@ -1106,39 +1095,31 @@ namespace AeroCtl.UI
 		#region Nested Types
 
 		/// <summary>
-		/// Provider implementation for the software fan.
+		/// <see cref="ISoftwareFanProvider"/> implementation for the software fan.
 		/// </summary>
-		private sealed class AeroFanProvider : ISoftwareFanProvider
+		private sealed class FanProviderImpl : ISoftwareFanProvider
 		{
-			private readonly Aero aero;
-			private readonly HwMonitor hwmon;
+			private readonly AeroController controller;
 
-			public AeroFanProvider(Aero aero, HwMonitor hwmon)
+			public FanProviderImpl(AeroController controller)
 			{
-				this.aero = aero;
-				this.hwmon = hwmon;
+				this.controller = controller;
 			}
 
 			public ValueTask<double> GetTemperatureAsync(CancellationToken cancellationToken)
 			{
-				lock (this.hwmon)
-				{
-					this.hwmon.Update();
-					double cpu = this.hwmon.CpuTemperature;
-					double gpu = this.hwmon.GpuTemperature;
-					return new ValueTask<double>(Math.Max(cpu, gpu));
-				}
+				return new(Math.Max(this.controller.CpuTemperature, this.controller.GpuTemperature));
 			}
 
 			public async ValueTask SetSpeedAsync(double speed, CancellationToken cancellationToken)
 			{
-				if (this.aero.Fans is IDirectFanSpeedController direct)
+				if (this.controller.Aero.Fans is IFanControllerSync direct)
 				{
 					direct.SetFixed(speed);
 				}
 				else
 				{
-					await this.aero.Fans.SetFixedAsync(speed);
+					await this.controller.Aero.Fans.SetFixedAsync(speed);
 				}
 			}
 		}

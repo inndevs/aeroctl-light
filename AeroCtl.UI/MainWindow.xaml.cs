@@ -19,6 +19,8 @@ namespace AeroCtl.UI
 
 		public AeroController Controller { get; }
 
+		public string GitInfo => $"AeroCtl v{ThisAssembly.Git.BaseTag}";
+
 		public MainWindow(AeroController controller)
 		{
 			this.Controller = controller;

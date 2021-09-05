@@ -19,6 +19,26 @@ namespace AeroCtl
 			this.ThermalTargetSupported = this.wmi.HasMethod("GetNvThermalTarget");
 		}
 
+		public override async ValueTask<double?> GetTemperatureAsync()
+		{
+			// Not sure what the difference between these two is. Query both, just in case.
+			try
+			{
+				return await this.wmi.InvokeGetAsync<ushort>("getGpuTemp1");
+			}
+			catch (ManagementException)
+			{
+				try
+				{
+					return await this.wmi.InvokeGetAsync<ushort>("getGpuTemp2");
+				}
+				catch (ManagementException)
+				{
+					return null;
+				}
+			}
+		}
+
 		public bool PowerConfigSupported { get; set; }
 
 		public async Task<bool> GetPowerConfigAsync()

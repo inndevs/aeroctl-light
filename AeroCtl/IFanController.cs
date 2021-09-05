@@ -16,7 +16,7 @@ namespace AeroCtl
 		ValueTask SetCustomAsync();
 	}
 
-	public interface IDirectFanSpeedController
+	public interface IFanControllerSync
 	{
 		void SetFixed(double fanSpeed = 0.25);
 	}
