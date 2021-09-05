@@ -25,7 +25,7 @@ This program likely will not run on a clean Windows installation as it depends o
 ## Installation
 
 1. Install Gigabyte ControlCenter or SmartManager if it isn't already.
-    * Install .NET Framework 4.8 if it isn't already. It's included with Windows 10 1903 and up.
+    * Install [.NET 5.0 Runtime](https://dotnet.microsoft.com/download/dotnet/5.0/runtime) if it isn't already.
 2. Quit CC/SM and disable its autostart (e.g. via Task Manager's Autostart tab)
 3. Download the latest binary release package (https://gitlab.com/wtwrp/aeroctl/-/releases)
 4. Unpack the archive to your preferred directory.
