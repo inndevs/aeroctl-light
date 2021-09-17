@@ -946,8 +946,6 @@ namespace AeroCtl.UI
 			}
 		}
 
-		static Random rng = new Random();
-
 		private async Task applyFanProfileAsync()
 		{
 			FanProfile newProfile = this.FanProfile;
