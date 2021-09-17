@@ -48,7 +48,7 @@ namespace AeroCtl
 		{
 			try
 			{
-				await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", value ? (byte) 1 : (byte) 0);
+				await this.wmi.InvokeSetAsync<byte>("SetFanSpeed", value ? (byte)1 : (byte)0);
 			}
 			catch (ManagementException) // Always thrown by design.
 			{ }
@@ -78,7 +78,7 @@ namespace AeroCtl
 		{
 			try
 			{
-				await this.wmi.InvokeSetAsync<byte>("SetSmartCool", value ? (byte) 1 : (byte) 0);
+				await this.wmi.InvokeSetAsync<byte>("SetSmartCool", value ? (byte)1 : (byte)0);
 			}
 			catch (ManagementException) // Always thrown by design.
 			{ }
@@ -158,6 +158,7 @@ namespace AeroCtl
 		}
 
 		#endregion
+
 		private static ushort reverse(ushort val)
 		{
 			return (ushort)((val << 8) | (val >> 8));

@@ -557,6 +557,21 @@ namespace AeroCtl.UI
 
 		#endregion
 
+		#region FanException
+
+		private Exception fanException;
+		public Exception FanException
+		{
+			get => this.fanException;
+			set
+			{
+				this.fanException = value;
+				this.OnPropertyChanged();
+			}
+		}
+
+		#endregion
+
 		#region FanProfileAlt
 
 		private FanProfile fanProfileAlt;
@@ -931,6 +946,8 @@ namespace AeroCtl.UI
 			}
 		}
 
+		static Random rng = new Random();
+
 		private async Task applyFanProfileAsync()
 		{
 			FanProfile newProfile = this.FanProfile;
@@ -999,7 +1016,15 @@ namespace AeroCtl.UI
 					if (this.FanProfileInvalid)
 					{
 						this.FanProfileInvalid = false;
-						await this.applyFanProfileAsync();
+						try
+						{
+							await this.applyFanProfileAsync();
+							this.FanException = null;
+						}
+						catch (Exception ex)
+						{
+							this.FanException = ex;
+						}
 					}
 
 					if (this.Aero.Gpu is P7GpuController newGpu)

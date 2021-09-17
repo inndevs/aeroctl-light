@@ -77,14 +77,28 @@ namespace AeroCtl
 				Impersonation = ImpersonationLevel.Impersonate
 			});
 
-			this.getClass = new ManagementClass(scope, new ManagementPath("GB_WMIACPI_Get"), null);
-			this.setClass = new ManagementClass(scope, new ManagementPath("GB_WMIACPI_Set"), null);
-
-			this.get = this.getClass.GetInstances().OfType<ManagementObject>().FirstOrDefault();
-			this.set = this.setClass.GetInstances().OfType<ManagementObject>().FirstOrDefault();
+			try
+			{
+				this.getClass = new ManagementClass(scope, new ManagementPath("GB_WMIACPI_Get"), null);
+				this.get = this.getClass.GetInstances().OfType<ManagementObject>().FirstOrDefault();
+			}
+			catch (ManagementException ex)
+			{
+				throw new InvalidOperationException("Failed to query GB_WMIACPI_Get. Your device is probably not supported.", ex);
+			}
 
 			if (this.get == null)
 				throw new InvalidOperationException("Failed to find instance for GB_WMIACPI_Get. Your device is probably not supported.");
+
+			try
+			{
+				this.setClass = new ManagementClass(scope, new ManagementPath("GB_WMIACPI_Set"), null);
+				this.set = this.setClass.GetInstances().OfType<ManagementObject>().FirstOrDefault();
+			}
+			catch (ManagementException ex)
+			{
+				throw new InvalidOperationException("Failed to query GB_WMIACPI_Set. Your device is probably not supported.", ex);
+			}
 
 			if (this.set == null)
 				throw new InvalidOperationException("Failed to find instance for GB_WMIACPI_Set. Your device is probably not supported.");
@@ -137,48 +151,55 @@ namespace AeroCtl
 		/// <returns></returns>
 		public ImmutableDictionary<string, object> Invoke(string methodName, params (string, object)[] parameters)
 		{
-			ManagementObject target = this.get;
-			MethodData m;
-
 			try
 			{
-				m = this.getClass.Methods[methodName];
-			}
-			catch (ManagementException ex) when (ex.ErrorCode == ManagementStatus.NotFound)
-			{
-				target = this.set;
-				m = this.setClass.Methods[methodName];
-			}
+				ManagementObject target = this.get;
+				MethodData m;
 
-			ManagementBaseObject inParams = m.InParameters;
-
-			if (inParams != null)
-			{
-				foreach ((string name, object value) in parameters)
+				try
 				{
-					inParams[name] = value;
+					m = this.getClass.Methods[methodName];
 				}
-			}
-			else
-			{
-				if (parameters.Length != 0)
-					throw new TargetParameterCountException($"Method does not take any parameters, but {parameters.Length} were supplied.");
-			}
-
-			ManagementBaseObject outParams = target.InvokeMethod(methodName, inParams, null);
-			ImmutableDictionary<string, object> result = ImmutableDictionary<string, object>.Empty;
-
-			if (outParams != null)
-			{
-				foreach (var res in outParams.Properties)
+				catch (ManagementException ex) when (ex.ErrorCode == ManagementStatus.NotFound)
 				{
-					result = result.Add(res.Name, res.Value);
+					target = this.set;
+					m = this.setClass.Methods[methodName];
 				}
+
+				ManagementBaseObject inParams = m.InParameters;
+
+				if (inParams != null)
+				{
+					foreach ((string name, object value) in parameters)
+					{
+						inParams[name] = value;
+					}
+				}
+				else
+				{
+					if (parameters.Length != 0)
+						throw new TargetParameterCountException($"Method does not take any parameters, but {parameters.Length} were supplied.");
+				}
+
+				ManagementBaseObject outParams = target.InvokeMethod(methodName, inParams, null);
+				ImmutableDictionary<string, object> result = ImmutableDictionary<string, object>.Empty;
+
+				if (outParams != null)
+				{
+					foreach (var res in outParams.Properties)
+					{
+						result = result.Add(res.Name, res.Value);
+					}
+				}
+
+				Debug.WriteLine($"{methodName}({string.Join(", ", parameters.Select(p => $"{p.Item1} = {p.Item2}"))}) = {string.Join(", ", result.Select(p => $"{p.Key} = {p.Value}"))}");
+
+				return result;
 			}
-
-			Debug.WriteLine($"{methodName}({string.Join(", ", parameters.Select(p => $"{p.Item1} = {p.Item2}"))}) = {string.Join(", ", result.Select(p => $"{p.Key} = {p.Value}"))}");
-
-			return result;
+			catch (ManagementException ex)
+			{
+				throw new InvalidOperationException($"Failed to execute method '{methodName}': {ex.Message}", ex);
+			}
 		}
 
 		/// <summary>
@@ -194,16 +215,23 @@ namespace AeroCtl
 
 		public T InvokeSet<T>(string methodName, T value)
 		{
-			ManagementBaseObject inParams = this.set.GetMethodParameters(methodName);
-			inParams["Data"] = value;
-			ManagementBaseObject outParams = this.set.InvokeMethod(methodName, inParams, null);
+			try
+			{
+				ManagementBaseObject inParams = this.set.GetMethodParameters(methodName);
+				inParams["Data"] = value;
+				ManagementBaseObject outParams = this.set.InvokeMethod(methodName, inParams, null);
 
-			T res = default;
-			if (outParams != null)
-				res = (T)outParams["DataOut"];
+				T res = default;
+				if (outParams != null)
+					res = (T)outParams["DataOut"];
 
-			Debug.WriteLine($"{methodName}({value}) = {res}");
-			return res;
+				Debug.WriteLine($"{methodName}({value}) = {res}");
+				return res;
+			}
+			catch (ManagementException ex)
+			{
+				throw new InvalidOperationException($"Failed to execute setter method '{methodName}': {ex.Message}", ex);
+			}
 		}
 
 		public Task<T> InvokeSetAsync<T>(string methodName, T value)
@@ -213,29 +241,37 @@ namespace AeroCtl
 
 		public T InvokeGet<T>(string methodName)
 		{
-			ManagementBaseObject inParams = this.getClass.GetMethodParameters(methodName);
-			if (methodName == "GetNvPowerConfig")
+			try
 			{
-				// Quirk
-				if (inParams != null)
+				ManagementBaseObject inParams = this.getClass.GetMethodParameters(methodName);
+				if (methodName == "GetNvPowerConfig")
 				{
-					inParams["Index"] = null;
+					// Quirk
+					if (inParams != null)
+					{
+						inParams["Index"] = null;
+					}
 				}
+
+				ManagementBaseObject outParams = this.get.InvokeMethod(methodName, inParams, null);
+				T res;
+				if (outParams == null)
+				{
+					res = default(T);
+				}
+				else
+				{
+					res = (T)outParams["Data"];
+				}
+
+				Debug.WriteLine($"{methodName}() = {res}");
+				return res;
+			}
+			catch (ManagementException ex)
+			{
+				throw new InvalidOperationException($"Failed to execute getter method '{methodName}': {ex.Message}", ex);
 			}
 
-			ManagementBaseObject outParams = this.get.InvokeMethod(methodName, inParams, null);
-			T res;
-			if (outParams == null)
-			{
-				res = default(T);
-			}
-			else
-			{
-				res = (T)outParams["Data"];
-			}
-
-			Debug.WriteLine($"{methodName}() = {res}");
-			return res;
 		}
 
 		public bool HasMethod(string methodName)

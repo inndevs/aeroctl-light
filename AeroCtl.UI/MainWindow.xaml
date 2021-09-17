@@ -10,6 +10,7 @@
     <Window.Resources>
         <local:EnumBooleanConverter x:Key="EnumConv" />
         <local:BooleanVisibilityConverter x:Key="BoolVisConv" />
+        <local:NotNullVisibilityConverter x:Key="NotNullVisConv" />
         <local:DisplayFrequencyConverter x:Key="DispFreqConv" />
         <local:BatteryStateConverter x:Key="BattConv" />
         <Style TargetType="{x:Type CheckBox}">
@@ -251,6 +252,12 @@
                         </Grid>
 
                         <Separator />
+
+                        <StackPanel Orientation="Horizontal" MouseUp="onFanExceptionInfoClicked"
+                                    Visibility="{Binding Path=Controller.FanException, Mode=OneWay, Converter={StaticResource NotNullVisConv}}">
+                            <TextBlock FontWeight="Bold" Foreground="DarkRed">⚠ Error applying fan profile</TextBlock>
+                            <TextBlock Cursor="Hand" Foreground="Blue" Margin="5 0 0 0" TextDecorations="Underline">Show details</TextBlock>
+                        </StackPanel>
 
                         <Grid>
                             <Grid.Resources>

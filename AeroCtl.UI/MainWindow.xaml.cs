@@ -102,5 +102,14 @@ namespace AeroCtl.UI
 				UseShellExecute = true
 			});
 		}
+
+		private void onFanExceptionInfoClicked(object sender, System.Windows.Input.MouseButtonEventArgs e)
+		{
+			Exception ex = this.Controller.FanException;
+			if (ex == null)
+				return;
+
+			MessageBox.Show(ex.ToString(), "Fan exception");
+		}
 	}
 }
