@@ -192,7 +192,5 @@ namespace AeroCtl
 		}
 
 		#endregion
-
-
 	}
 }

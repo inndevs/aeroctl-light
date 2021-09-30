@@ -198,7 +198,7 @@ namespace AeroCtl
 			}
 			catch (ManagementException ex)
 			{
-				throw new InvalidOperationException($"Failed to execute method '{methodName}': {ex.Message}", ex);
+				throw new ManagementException($"Failed to execute method '{methodName}': {ex.Message}", ex);
 			}
 		}
 
@@ -230,7 +230,7 @@ namespace AeroCtl
 			}
 			catch (ManagementException ex)
 			{
-				throw new InvalidOperationException($"Failed to execute setter method '{methodName}': {ex.Message}", ex);
+				throw new ManagementException($"Failed to execute setter method '{methodName}': {ex.Message}", ex);
 			}
 		}
 
@@ -269,9 +269,8 @@ namespace AeroCtl
 			}
 			catch (ManagementException ex)
 			{
-				throw new InvalidOperationException($"Failed to execute getter method '{methodName}': {ex.Message}", ex);
+				throw new ManagementException($"Failed to execute getter method '{methodName}': {ex.Message}", ex);
 			}
-
 		}
 
 		public bool HasMethod(string methodName)
