@@ -3,23 +3,31 @@ stages:
 
 variables:
   GIT_SUBMODULE_STRATEGY: recursive
-
-before_script:
- - 'choco install -y nuget.commandline'
- - 'choco install -y visualstudio2019buildtools'
- - 'choco install -y dotnet-5.0-sdk'
- - 'dotnet nuget add source --name nuget.org https://api.nuget.org/v3/index.json'
+  S3CFG: $S3CFG
 
 build:
   tags:
-   - shared-windows
-   - windows
-   - windows-1809
+    - shared-windows
+    - windows
+    - windows-1809
   stage: build
+  before_script:
+    - 'choco install -y nuget.commandline'
+    - 'choco install -y visualstudio2019buildtools'
+    - 'choco install -y dotnet-5.0-sdk'
+    - 'dotnet nuget add source --name nuget.org https://api.nuget.org/v3/index.json'
   script:
-   - 'dotnet publish .\AeroCtl.UI\ --configuration Release --runtime win-x64 --no-self-contained'
-   - '7z a AeroCtl.7z .\AeroCtl.UI\bin\Release\net5.0-windows\win-x64\publish\*'
+    - 'dotnet publish .\AeroCtl.UI\ --configuration Release --runtime win-x64 --no-self-contained -o publish'
   artifacts:
     paths:
-     - AeroCtl.7z
+     - .\publish
     expire_in: 30 days
+
+upload_s3:
+  image: d3fk/s3cmd
+  stage: deploy
+  dependencies:
+    - build
+  script:
+    - 'echo $S3CFG | base64 -d > $HOME/.s3cfg'
+    - 's3cmd put publish/AeroCtl.UI.exe s3://aeroctl/$CI_COMMIT_REF_NAME/AeroCtl.UI.exe'
