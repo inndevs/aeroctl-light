@@ -21,7 +21,7 @@ namespace AeroCtl
 	{
 		private readonly AeroWmi wmi;
 		private bool healthSupported = true;
-		
+
 		public BatteryState State
 		{
 			get
@@ -82,7 +82,7 @@ namespace AeroCtl
 				{
 					if (status.GetPropertyValue("RemainingCapacity") is uint v1 && v1 != uint.MaxValue)
 						charge = v1 / 1000.0;
-					
+
 					if (status.GetPropertyValue("ChargeRate") is int v2)
 						chargeRate = v2 / 1000.0;
 
@@ -139,7 +139,7 @@ namespace AeroCtl
 			{
 				return await this.wmi.InvokeGetAsync<byte>("GetBatteryHealth");
 			}
-			catch (ManagementException ex) when (ex.ErrorCode == ManagementStatus.InvalidMethod)
+			catch (ManagementException)
 			{
 				this.healthSupported = false;
 				return null;
