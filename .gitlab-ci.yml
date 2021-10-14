@@ -25,10 +25,12 @@ build:
     expire_in: 30 days
 
 upload_s3:
-  image: d3fk/s3cmd
+  image: ubuntu
   stage: deploy
   dependencies:
     - build
+  before_script:
+    - 'apt-get update && apt-get install -y s3cmd'
   script:
     - 'echo $S3CFG | base64 -d > $HOME/.s3cfg'
     - 's3cmd put publish/AeroCtl.UI.exe s3://aeroctl/$CI_COMMIT_REF_NAME/AeroCtl.UI.exe'
