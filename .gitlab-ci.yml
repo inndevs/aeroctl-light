@@ -30,7 +30,7 @@ upload_s3:
   dependencies:
     - build
   before_script:
-    - 'apt-get update && apt-get install -y s3cmd'
+    - 'apt-get update && apt-get install -y s3cmd ca-certificates'
   script:
     - 'echo $S3CFG | base64 -d > $HOME/.s3cfg'
     - 's3cmd put publish/AeroCtl.UI.exe s3://aeroctl/$CI_COMMIT_REF_NAME/AeroCtl.UI.exe'
