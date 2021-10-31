@@ -65,7 +65,7 @@ namespace AeroCtl
 		{
 			try
 			{
-				return await this.wmi.InvokeGetAsync<byte>("GetDynamicBoostStatus") != 0;
+				return await this.wmi.InvokeGetAsync<byte>("GetDynamicBoostStatus") != 1;
 			}
 			catch (ManagementException)
 			{
