@@ -67,11 +67,7 @@ namespace AeroCtl.UI
 
 			this.trayIcon.DoubleClick += (s, e2) => { this.showWindow(); };
 
-			// Handle Fn key events.
-			this.aero.Keyboard.FnKeyPressed += (s, e2) => { this.Dispatcher.InvokeAsync(() => this.handleFnKey(e2)); };
-			this.aero.Touchpad.EnabledChanged += (s, e2) => { this.Dispatcher.InvokeAsync(() => this.onTouchpadEnabledChanged().AsTask()); };
-
-			// To re-apply fan profile after wake up:
+			// bind events to reinit settings after hibernate etc.
 			SystemEvents.SessionSwitch += this.onSessionSwitch;
 			SystemEvents.PowerModeChanged += this.onPowerModeChanged;
 
@@ -82,60 +78,7 @@ namespace AeroCtl.UI
 			}
 		}
 
-		private async Task handleFnKey(FnKeyEventArgs e)
-		{
-			switch (e.Key)
-			{
-				case FnKey.IncreaseBrightness:
-					this.aero.Display.Brightness = Math.Min(100, this.aero.Display.Brightness + 10);
-					await WindowsOsd.ShowBrightnessAsync();
-					break;
 
-				case FnKey.DecreaseBrightness:
-					this.aero.Display.Brightness = Math.Max(0, this.aero.Display.Brightness - 10);
-					await WindowsOsd.ShowBrightnessAsync();
-					break;
-
-				case FnKey.ToggleFan:
-					FanProfile fanProfile = this.controller.FanProfileAlt;
-					this.controller.FanProfileAlt = this.controller.FanProfile;
-					this.controller.FanProfile = fanProfile;
-
-					this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Fan profile switched to \"{fanProfile}\".", ToolTipIcon.Info);
-					break;
-
-				case FnKey.ToggleWifi:
-					bool? currentState = await this.aero.GetWifiEnabledAsync();
-					if (currentState == null)
-					{
-						this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, "Could not determine Wi-Fi state.", ToolTipIcon.Warning);
-					}
-					else
-					{
-						bool newState = !currentState.Value;
-						await this.aero.SetWifiEnabledAsync(newState);
-						this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Wi-Fi {(newState ? "enabled" : "disabled")}.", ToolTipIcon.Info);
-					}
-
-					break;
-
-				case FnKey.ToggleScreen:
-					await this.aero.Display.ToggleScreenAsync();
-					break;
-
-					//case FnKey.ToggleTouchpad:
-					//	bool touchPad = !await this.aero.Touchpad.GetEnabledAsync();
-					//	await this.aero.Touchpad.SetEnabledAsync(touchPad);
-					//	this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Touchpad {(touchPad ? "enabled" : "disabled")}.", ToolTipIcon.Info);
-					//	break;
-			}
-		}
-
-		private async ValueTask onTouchpadEnabledChanged()
-		{
-			bool touchPad = await this.aero.Touchpad.GetEnabledAsync();
-			this.trayIcon.ShowBalloonTip(notificationTimeout, this.title, $"Touchpad {(touchPad ? "enabled" : "disabled")}.", ToolTipIcon.Info);
-		}
 
 		private void showWindow()
 		{
@@ -183,22 +126,12 @@ namespace AeroCtl.UI
 				// Remove tray icon.
 				this.trayIcon.Dispose();
 
-				bool resetFans = this.controller.FanProfile == FanProfile.Software;
-
 				// Unregister events (probably not necessary but whatever).
 				SystemEvents.SessionSwitch -= this.onSessionSwitch;
 				SystemEvents.PowerModeChanged -= this.onPowerModeChanged;
 
-				// Close controller.
-				await this.controller.DisposeAsync();
-
-				// Reset fan profile to normal so the laptop doesn't melt.
-				if (resetFans)
-					await this.aero.Fans.SetNormalAsync();
-
 				// Close aero.
 				this.aero.Dispose();
-
 			}
 		}
 
@@ -225,7 +158,7 @@ namespace AeroCtl.UI
 						mode = UpdateMode.Full;
 						first = false;
 					}
-					else if (this.controller.FanProfileInvalid || (this.window != null && this.window.WindowState != WindowState.Minimized))
+					else if (this.window != null && this.window.WindowState != WindowState.Minimized)
 					{
 						mode = UpdateMode.Normal;
 					}
@@ -241,7 +174,7 @@ namespace AeroCtl.UI
 			catch (Exception ex)
 			{
 				StringBuilder str = new();
-				str.AppendLine($"An error occurred while trying to update AERO information. Your model might not be supported (yet). Would you like to open the project's issue page?");
+				str.AppendLine($"Voll aggressiver Fehler.");
 				str.AppendLine();
 				str.AppendLine("Exception details:");
 				str.Append(ex.ToString());
@@ -263,18 +196,13 @@ namespace AeroCtl.UI
 
 		private void onSessionSwitch(object sender, SessionSwitchEventArgs e)
 		{
-			// Re-apply fan profile after someone logs in or out (when the laptop comes 
-			// back from sleep) because it will default to 'Normal' otherwise.
-			if (e.Reason == SessionSwitchReason.SessionUnlock ||
-				e.Reason == SessionSwitchReason.SessionLock)
-				this.controller.FanProfileInvalid = true;
+			// do stuff after someone logs in or out (or when the laptop comes back from sleep)
 		}
 
 		private void onPowerModeChanged(object sender, PowerModeChangedEventArgs e)
 		{
-			// Re-apply fan-profile after hibernation resume.
-			if (e.Mode == PowerModes.Resume)
-				this.controller.FanProfileInvalid = true;
+			// do stuff after hibernation resume.
 		}
+		
 	}
 }
