@@ -13,8 +13,14 @@ HAVE FUN!!
 3. Go to folder `supply/` and run the .bat as admin - this placed the .dll that control center would also use to communicate with WMI (= Gigabyte Hardware API)
 4. Install Gigabyte ControlCenter or SmartManager if it isn't already.
     * Install [.NET 5.0 Runtime](https://dotnet.microsoft.com/download/dotnet/5.0/runtime) if it isn't already.
-8. Run `AeroCtl.UI.exe` as administrator from the unpacked directory.
-9. (Optional) Use Windows' task scheduler to add a task to autostart aeroctl as administrator on logon.
+5. Run `AeroCtl.UI.exe` as administrator from the unpacked directory.
+6. (Optional) Use Windows' task scheduler to add a task to autostart aeroctl as administrator on logon.
+
+# Build
+1. Build in IDE
+2. Go to AeroCtl.Ui
+3. Run  `dotnet publish -r win-x64 --self-contained false -p:PublishSingleFile=true -p:IncludeAllContentForSelfExtract=true`
+4. .exe is in `AeroCtl.Ui/bin/Debug/.../publish`
 
 ## Supported devices
 

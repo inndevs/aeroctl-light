@@ -6,12 +6,14 @@
     <Description>Open-source AERO control panel</Description>
     <AssemblyTitle>AeroCtl</AssemblyTitle>
     <Product>AeroCtl</Product>
-    <Copyright>Copyright © WTWRP 2021</Copyright>
+    <Copyright>Copyright © WTWRP 2021 forked by heNNNy</Copyright>
     <UseWpf>true</UseWpf>
     <UseWindowsForms>true</UseWindowsForms>
     <ApplicationManifest>app.manifest</ApplicationManifest>
     <ApplicationIcon>Main.ico</ApplicationIcon>
     <PublishSingleFile>true</PublishSingleFile>
+    <SelfContained>false</SelfContained>
+    <IncludeAllContentForSelfExtract>true</IncludeAllContentForSelfExtract>
     <DebugType>embedded</DebugType>
     <GenerateAssemblyVersionAttribute>false</GenerateAssemblyVersionAttribute>
     <GenerateAssemblyFileVersionAttribute>false</GenerateAssemblyFileVersionAttribute>
